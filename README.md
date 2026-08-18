@@ -85,7 +85,7 @@ Each memory has these fields:
 | `created_at` | aware ISO-8601 or `null` | Source creation/ingestion time when exposed. |
 | `updated_at` | aware ISO-8601 or `null` | Source update time when exposed. |
 | `source_refs` | list | Transcript ID plus optional turn index and character span. |
-| `provenance_status` | enum | `verified`, `known_absent`, or `unavailable`. |
+| `provenance_status` | enum | `declared`, `known_absent`, or `unavailable`. |
 | `scope` | object | Separate nullable `user_id`, `agent_id`, and `session_id`. |
 | `active` | boolean or `null` | Adapter-specific current/retrievable mapping; `null` means unknown. |
 | `supersedes` | list[string] | Explicit source-provided replacement IDs only; never inferred. |
@@ -100,20 +100,22 @@ rejected.
 
 **Missing provenance.** An empty `source_refs` does not carry enough meaning by itself:
 
-- `verified`: at least one source reference was supplied;
+- `declared`: the source, backend, or explicit adapter mapping supplied at least one reference;
 - `known_absent`: the source explicitly supplied an empty provenance collection;
 - `unavailable`: the adapter/backend did not expose transcript provenance.
 
-Graphiti episode UUIDs are retained as source transcript identifiers, but their turn and character
-offsets remain `null`. This records the real episodic link without pretending finer attribution exists.
+`declared` does not mean that MemLint checked a reference against a transcript. That verification
+belongs to a later phase. Graphiti episode IDs remain in `raw` and are not treated as transcript IDs
+unless the caller provides an explicit episode-to-transcript mapping.
 
 **Meaning of `active`.** This field is deliberately nullable and its mapping is documented per adapter
 below. It means "current/retrievable according to this source path," not a universal truth predicate.
 
 **Stable IDs.** A source ID is used unchanged. If absent, MemLint hashes canonical JSON containing the
-adapter name, exact content, creation timestamp, scope, and source references, producing
-`<adapter>:<24 hex characters>`. Identical anonymous records intentionally collide; the store rejects
-the duplicate and asks the producer to supply real identities instead of inventing unstable random IDs.
+adapter name, exact content, canonical UTC creation timestamp, scope, and canonical source-reference
+set, producing `<adapter>:<24 hex characters>`. Source-reference ordering does not change the ID.
+Identical anonymous records intentionally collide; the store rejects the duplicate and asks the
+producer to supply real identities instead of inventing unstable random IDs.
 
 **Embeddings.** Existing vectors are copied when exposed. Missing vectors stay `null`; no paid or local
 embedding service is called.
@@ -123,9 +125,9 @@ embedding service is called.
 | Backend | ID/content | Timestamps | Scope | Provenance | `active` | Backend-only data |
 |---|---|---|---|---|---|---|
 | File | `id`, `content` | Explicit fields | `scope` or top-level scope keys | Explicit `source_refs` | Explicit value, otherwise `null` | Unknown metadata and supplied `raw` |
-| Mem0 | `id`, `memory` | `created_at`, `updated_at` | `user_id`, `agent_id`, `run_id → session_id` | Current documented memory response has no first-class transcript refs, so `unavailable` | `null` unless an export explicitly contains `active` | Full response including hash/metadata |
-| Graphiti | EntityEdge `uuid`, `fact` | `created_at` is ingestion time; validity timestamps stay in `raw` | Explicit adapter scope; `group_id` is not guessed to be a user/session | `episodes` → refs with unknown turn/span | true iff exposed `invalid_at` and `expired_at` are both null; `null` when those fields are absent | Relation, nodes, group, bi-temporal fields, attributes |
-| Letta | Block `id`/`value`; Passage `id`/`text` | Passage times copied; current Block schema exposes none | Adapter agent/user context | `unavailable` unless an export explicitly supplies refs | attached core blocks are true; listed passages are true unless `is_deleted`; explicit value wins | `memory_type`, labels, archive/file metadata, mutability metadata |
+| Mem0 | `id`, `memory` | `created_at`, `updated_at` | Record `user_id`, `agent_id`, `run_id/session_id`; missing values fall back to query scope | Current documented memory response has no first-class transcript refs, so `unavailable` | `null` unless an export explicitly contains `active` | Full response including hash/metadata |
+| Graphiti | EntityEdge `uuid`, `fact` | `created_at` is ingestion time; validity timestamps stay in `raw` | Explicit adapter scope; `group_id` is not guessed to be a user/session | Episode IDs stay in `raw`; transcript refs require an explicit mapping | true iff exposed `invalid_at` and `expired_at` are both null; `null` when those fields are absent | Relation, nodes, group, episodes, bi-temporal fields, attributes |
+| Letta | Block `id`/`value`; Passage `id`/`text` | Passage times copied; current Block schema exposes none | Adapter agent/user context | `unavailable` unless an export explicitly supplies refs | attached core blocks are active; non-deleted archival passages are active; deleted passages are inactive; explicit value wins | `memory_type`, labels, archive/file metadata, mutability metadata |
 
 Mem0 transport follows the documented paginated `MemoryClient.get_all(...)` response. Graphiti reads
 `EntityEdge.get_by_group_ids(...)` through a Neo4j driver and does not instantiate its LLM ingestion
@@ -171,7 +173,7 @@ memlint dump --adapter graphiti --source tests/fixtures/graphiti.json --user-id 
 memlint dump --adapter letta --source tests/fixtures/letta.json --agent-id agent-1
 ```
 
-Verified live command shapes are:
+Documented live command shapes are:
 
 ```bash
 MEM0_API_KEY=... memlint dump --adapter mem0 --user-id user-123
@@ -201,13 +203,15 @@ No matching, entailment, inference, or source reconstruction is performed in Par
 
 ## Known limitations
 
+- Live external accounts/services were not used in the Foundation test suite.
 - Live Mem0, Graphiti, and Letta integrations require user-managed services, credentials, and optional
-  SDKs; local tests validate their documented record shapes and transport call contracts, not real
-  accounts.
+  SDKs; local tests use source-shaped fixtures and selected fake transports, not real accounts.
 - Graphiti `group_id` is kept in `raw` because its meaning is deployment-specific. Pass explicit scope
   values when known.
-- Graphiti episode IDs may identify source episodes rather than one-to-one conversational transcripts.
+- Graphiti episode IDs are source episode identifiers, not MemLint transcript IDs. Programmatic users
+  may pass `episode_transcript_map` only when they have an explicit mapping.
 - Current Letta core block responses do not expose creation/update timestamps.
+- Letta `active` describes current attachment/listing state along that adapter source path; it is not a
+  backend-independent truth state.
 - Backend metadata cannot be promoted into portable fields unless the mapping is explicit and stable.
 - Schema version `0.1` supports normalization only. It contains no findings, checker, or repair model.
-

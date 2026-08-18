@@ -2,9 +2,24 @@
 /.mypy_cache/
 /.pytest_cache/
 /.ruff_cache/
+
 /build/
 /dist/
 *.egg-info/
+
 __pycache__/
 *.py[cod]
 
+.env
+.env.*
+!.env.example
+
+.coverage
+coverage.xml
+/htmlcov/
+
+.DS_Store
+.idea/
+.vscode/
+
+normalized.json
