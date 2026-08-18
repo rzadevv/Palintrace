@@ -102,9 +102,11 @@ class Mem0Adapter(MemoryAdapter):
         if (
             isinstance(self._page_size, bool)
             or not isinstance(self._page_size, int)
-            or self._page_size <= 0
+            or not 1 <= self._page_size <= 200
         ):
-            raise AdapterDataError("Mem0 live export page_size must be a positive integer")
+            raise AdapterDataError(
+                "Mem0 live export page_size must be an integer between 1 and 200"
+            )
         if not any(
             self._filters.get(field) is not None and str(self._filters[field]).strip()
             for field in ("user_id", "agent_id", "run_id")

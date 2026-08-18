@@ -178,10 +178,11 @@ Documented live command shapes are:
 ```bash
 MEM0_API_KEY=... memlint dump --adapter mem0 --user-id user-123
 
+export NEO4J_URI=bolt://localhost:7687
+export NEO4J_USER=neo4j
+export NEO4J_PASSWORD=...
+
 memlint dump --adapter graphiti \
-  --neo4j-uri bolt://localhost:7687 \
-  --neo4j-user neo4j \
-  --neo4j-password ... \
   --group-id user-123-group
 
 LETTA_API_KEY=... memlint dump --adapter letta --agent-id agent-...

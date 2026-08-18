@@ -129,9 +129,9 @@ def test_mem0_live_export_accepts_each_entity_scope(filters: dict[str, str]) -> 
     assert len(store) == 0
 
 
-@pytest.mark.parametrize("page_size", [0, -1, True, 1.5])
+@pytest.mark.parametrize("page_size", [0, -1, 201, 1000, True, 1.5])
 def test_mem0_live_export_rejects_invalid_page_size(page_size: Any) -> None:
-    with pytest.raises(AdapterDataError, match="positive integer"):
+    with pytest.raises(AdapterDataError, match="integer between 1 and 200"):
         Mem0Adapter(
             client=object(),
             filters={"user_id": "user-123"},
