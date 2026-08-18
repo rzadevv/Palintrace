@@ -1,0 +1,16 @@
+{
+  "results": [
+    {
+      "id": "m1",
+      "memory": "User prefers Python.",
+      "user_id": "user-123",
+      "agent_id": null,
+      "run_id": null,
+      "hash": "fixture-hash",
+      "metadata": {"category": "preference"},
+      "created_at": "2026-08-10T14:20:00+02:00",
+      "updated_at": null
+    }
+  ]
+}
+

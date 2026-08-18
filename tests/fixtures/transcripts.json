@@ -1,0 +1,19 @@
+{
+  "schema_version": "0.1",
+  "transcripts": [
+    {
+      "id": "conversation-1",
+      "turns": [
+        {
+          "index": 4,
+          "role": "user",
+          "content": "User prefers Python.",
+          "timestamp": "2026-08-10T14:20:00+02:00",
+          "metadata": {"source": "fixture"}
+        }
+      ],
+      "metadata": {}
+    }
+  ]
+}
+

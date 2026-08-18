@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "memlint"
+version = "0.1.0"
+description = "System-agnostic normalization foundation for auditing agent memory"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "MemLint contributors" }]
+dependencies = [
+  "pydantic>=2.8,<3",
+  "PyYAML>=6,<7",
+]
+
+[project.optional-dependencies]
+mem0 = ["mem0ai>=2"]
+graphiti = ["graphiti-core>=0.20"]
+letta = ["letta-client>=1"]
+dev = [
+  "mypy>=1.15",
+  "pytest>=8.3",
+  "ruff>=0.9",
+  "types-PyYAML>=6.0",
+]
+
+[project.scripts]
+memlint = "memlint.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/memlint"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["memlint"]

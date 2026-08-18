@@ -1,0 +1,12 @@
+memories:
+  - id: preference-python
+    content: User prefers Python.
+    created_at: "2026-08-10T14:20:00+02:00"
+    source_refs:
+      - transcript_id: conversation-1
+        turn_idx: 0
+        span: [0, 20]
+    scope:
+      user_id: user-1
+    active: true
+

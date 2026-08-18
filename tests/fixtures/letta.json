@@ -1,0 +1,16 @@
+{
+  "blocks": [],
+  "passages": [
+    {
+      "id": "m1",
+      "text": "User prefers Python.",
+      "created_at": "2026-08-10T14:20:00+02:00",
+      "updated_at": null,
+      "is_deleted": false,
+      "archive_id": "archive-1",
+      "metadata": {"category": "preference"},
+      "embedding": [0.1, 0.2]
+    }
+  ]
+}
+

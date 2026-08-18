@@ -1,0 +1,15 @@
+{
+  "memories": [
+    {
+      "id": "m1",
+      "content": "User prefers Python.",
+      "created_at": "2026-08-10T14:20:00+02:00",
+      "source_refs": [
+        {"transcript_id": "conversation-1", "turn_idx": 4, "span": [0, 20]}
+      ],
+      "scope": {"user_id": "user-123"},
+      "active": true
+    }
+  ]
+}
+
