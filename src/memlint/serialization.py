@@ -37,4 +37,3 @@ def loads_transcripts(text: str) -> TranscriptSet:
     """Validate a transcript set from JSON text."""
 
     return TranscriptSet.model_validate_json(text)
-

@@ -45,9 +45,15 @@ class Mem0Adapter(MemoryAdapter):
 
     def dump(self) -> NormalizedStore:
         records = self._records if self._records is not None else self._fetch_records()
-        return normalize_records(self.name, records, normalize_mem0_record)
+        query_scope = _mem0_scope(self._filters)
+        return normalize_records(
+            self.name,
+            records,
+            lambda record: normalize_mem0_record(record, scope=query_scope),
+        )
 
     def _fetch_records(self) -> list[Any]:
+        self._validate_live_arguments()
         client = self._client
         if client is None:
             api_key = self._api_key or os.getenv("MEM0_API_KEY")
@@ -92,8 +98,23 @@ class Mem0Adapter(MemoryAdapter):
             raise transport_error("Mem0", error) from error
         return records
 
+    def _validate_live_arguments(self) -> None:
+        if (
+            isinstance(self._page_size, bool)
+            or not isinstance(self._page_size, int)
+            or self._page_size <= 0
+        ):
+            raise AdapterDataError("Mem0 live export page_size must be a positive integer")
+        if not any(
+            self._filters.get(field) is not None and str(self._filters[field]).strip()
+            for field in ("user_id", "agent_id", "run_id")
+        ):
+            raise AdapterDataError(
+                "Mem0 live export requires at least one entity filter: user_id, agent_id, or run_id"
+            )
 
-def normalize_mem0_record(record: Any) -> NormalizedMemory:
+
+def normalize_mem0_record(record: Any, *, scope: MemoryScope | None = None) -> NormalizedMemory:
     """Normalize one documented Mem0 memory response."""
 
     source = record_mapping(record)
@@ -101,13 +122,17 @@ def normalize_mem0_record(record: Any) -> NormalizedMemory:
     if not isinstance(content, str):
         raise AdapterDataError("Mem0 record requires string field 'memory'")
 
-    scope = merge_scope(
+    normalized_scope = merge_scope(
         MemoryScope(
             user_id=_optional_string(source.get("user_id")),
             agent_id=_optional_string(source.get("agent_id")),
-            session_id=_optional_string(source.get("run_id")),
+            session_id=_optional_string(
+                source.get("run_id")
+                if source.get("run_id") is not None
+                else source.get("session_id")
+            ),
         ),
-        None,
+        scope,
     )
     refs_supplied = "source_refs" in source
     refs_value = source.get("source_refs", [])
@@ -115,7 +140,7 @@ def normalize_mem0_record(record: Any) -> NormalizedMemory:
         raise AdapterDataError("Mem0 source_refs must be a list when explicitly supplied")
     source_refs = tuple(SourceRef.model_validate(item) for item in refs_value)
     provenance_status = (
-        ProvenanceStatus.VERIFIED
+        ProvenanceStatus.DECLARED
         if source_refs
         else ProvenanceStatus.KNOWN_ABSENT
         if refs_supplied
@@ -127,8 +152,8 @@ def normalize_mem0_record(record: Any) -> NormalizedMemory:
             "mem0",
             content=content,
             created_at=source.get("created_at"),
-            scope=scope,
-            source_refs=refs_value,
+            scope=normalized_scope,
+            source_refs=source_refs,
         )
 
     try:
@@ -139,7 +164,7 @@ def normalize_mem0_record(record: Any) -> NormalizedMemory:
             updated_at=source.get("updated_at"),
             source_refs=source_refs,
             provenance_status=provenance_status,
-            scope=scope,
+            scope=normalized_scope,
             active=source.get("active") if "active" in source else None,
             supersedes=tuple(str(item) for item in source.get("supersedes", [])),
             embedding=source.get("embedding"),
@@ -151,3 +176,20 @@ def normalize_mem0_record(record: Any) -> NormalizedMemory:
 
 def _optional_string(value: Any) -> str | None:
     return None if value is None else str(value)
+
+
+def _mem0_scope(values: Mapping[str, Any]) -> MemoryScope:
+    """Read only documented entity dimensions, never arbitrary metadata."""
+
+    try:
+        return MemoryScope(
+            user_id=_optional_string(values.get("user_id")),
+            agent_id=_optional_string(values.get("agent_id")),
+            session_id=_optional_string(
+                values.get("run_id")
+                if values.get("run_id") is not None
+                else values.get("session_id")
+            ),
+        )
+    except ValidationError as error:
+        raise AdapterDataError(f"invalid Mem0 query scope: {error}") from error

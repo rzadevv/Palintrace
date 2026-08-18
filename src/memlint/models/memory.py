@@ -20,9 +20,9 @@ from pydantic import (
 
 
 class ProvenanceStatus(StrEnum):
-    """How confidently ``source_refs`` describes the record's provenance."""
+    """What the source or adapter declares about transcript provenance."""
 
-    VERIFIED = "verified"
+    DECLARED = "declared"
     KNOWN_ABSENT = "known_absent"
     UNAVAILABLE = "unavailable"
 
@@ -45,12 +45,16 @@ class SourceRef(BaseModel):
 
     @field_validator("span")
     @classmethod
-    def span_end_must_follow_start(
-        cls, value: tuple[int, int] | None
-    ) -> tuple[int, int] | None:
-        if value is not None and value[1] < value[0]:
-            raise ValueError("span end must be greater than or equal to span start")
+    def span_end_must_follow_start(cls, value: tuple[int, int] | None) -> tuple[int, int] | None:
+        if value is not None and value[1] <= value[0]:
+            raise ValueError("span end must be greater than span start")
         return value
+
+    @model_validator(mode="after")
+    def span_requires_turn(self) -> SourceRef:
+        if self.span is not None and self.turn_idx is None:
+            raise ValueError("span requires turn_idx")
+        return self
 
 
 class MemoryScope(BaseModel):
@@ -127,10 +131,10 @@ class NormalizedMemory(BaseModel):
     def validate_cross_field_invariants(self) -> NormalizedMemory:
         if self.id in self.supersedes:
             raise ValueError("a memory cannot supersede itself")
-        if self.source_refs and self.provenance_status is not ProvenanceStatus.VERIFIED:
-            raise ValueError("source_refs require provenance_status='verified'")
-        if not self.source_refs and self.provenance_status is ProvenanceStatus.VERIFIED:
-            raise ValueError("verified provenance requires at least one source_ref")
+        if self.source_refs and self.provenance_status is not ProvenanceStatus.DECLARED:
+            raise ValueError("source_refs require provenance_status='declared'")
+        if not self.source_refs and self.provenance_status is ProvenanceStatus.DECLARED:
+            raise ValueError("declared provenance requires at least one source_ref")
         return self
 
     def semantic_dict(self) -> dict[str, JsonValue]:

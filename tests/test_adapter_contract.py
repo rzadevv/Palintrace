@@ -49,5 +49,4 @@ def test_backend_semantics_are_not_forced_into_false_equivalence() -> None:
     assert mem0.active is None
     assert graphiti.active is True
     assert mem0.source_refs == ()
-    assert graphiti.source_refs
-
+    assert graphiti.source_refs == ()

@@ -149,4 +149,3 @@ def _load_external_export(path: Path, adapter: str) -> list[dict[str, Any]]:
 
 if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(main())
-

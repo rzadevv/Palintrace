@@ -135,7 +135,7 @@ def normalize_file_record(record: Any, *, source_format: str) -> NormalizedMemor
     if explicit_status is not None:
         provenance_status = ProvenanceStatus(explicit_status)
     elif source_refs:
-        provenance_status = ProvenanceStatus.VERIFIED
+        provenance_status = ProvenanceStatus.DECLARED
     elif refs_supplied:
         provenance_status = ProvenanceStatus.KNOWN_ABSENT
     else:
@@ -149,7 +149,7 @@ def normalize_file_record(record: Any, *, source_format: str) -> NormalizedMemor
             content=content,
             created_at=created_at,
             scope=scope,
-            source_refs=refs_value,
+            source_refs=source_refs,
         )
 
     normalized_fields = {

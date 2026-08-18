@@ -10,7 +10,7 @@ def test_mem0_missing_credentials_are_actionable(monkeypatch: pytest.MonkeyPatch
     monkeypatch.delenv("MEM0_API_KEY", raising=False)
 
     with pytest.raises(AdapterAuthenticationError, match="MEM0_API_KEY"):
-        Mem0Adapter().dump()
+        Mem0Adapter(filters={"user_id": "user-1"}).dump()
 
 
 def test_graphiti_requires_explicit_group_and_connection_configuration() -> None:
@@ -29,4 +29,3 @@ def test_letta_missing_agent_or_credentials_are_actionable(
         LettaAdapter().dump()
     with pytest.raises(AdapterAuthenticationError, match="LETTA_API_KEY"):
         LettaAdapter(agent_id="agent-1").dump()
-

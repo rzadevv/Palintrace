@@ -100,9 +100,7 @@ class LettaAdapter(MemoryAdapter):
 
             after: str | None = None
             while True:
-                passages = client.agents.passages.list(
-                    self._agent_id, after=after, limit=200
-                )
+                passages = client.agents.passages.list(self._agent_id, after=after, limit=200)
                 page = page_items(passages)
                 for passage in page:
                     item = record_mapping(passage)
@@ -121,9 +119,7 @@ class LettaAdapter(MemoryAdapter):
         return records
 
 
-def normalize_letta_record(
-    record: Any, *, scope: MemoryScope | None = None
-) -> NormalizedMemory:
+def normalize_letta_record(record: Any, *, scope: MemoryScope | None = None) -> NormalizedMemory:
     """Normalize a Letta core block or archival passage."""
 
     source = record_mapping(record)
@@ -144,7 +140,7 @@ def normalize_letta_record(
         raise AdapterDataError("Letta source_refs must be a list when explicitly supplied")
     source_refs = tuple(SourceRef.model_validate(item) for item in refs_value)
     provenance_status = (
-        ProvenanceStatus.VERIFIED
+        ProvenanceStatus.DECLARED
         if source_refs
         else ProvenanceStatus.KNOWN_ABSENT
         if refs_supplied
@@ -165,7 +161,7 @@ def normalize_letta_record(
             content=content,
             created_at=source.get("created_at"),
             scope=normalized_scope,
-            source_refs=refs_value,
+            source_refs=source_refs,
         )
 
     try:

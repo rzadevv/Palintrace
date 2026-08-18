@@ -45,4 +45,3 @@ def test_transcript_serialization_round_trip() -> None:
 
     assert loads_transcripts(serialized) == transcripts
     assert isinstance(transcripts, TranscriptSet)
-

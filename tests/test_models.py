@@ -21,7 +21,7 @@ def test_valid_memory_construction() -> None:
         content="User prefers Python.",
         created_at="2026-08-10T14:20:00+02:00",
         source_refs=(SourceRef(transcript_id="conversation-1", turn_idx=4, span=(0, 20)),),
-        provenance_status=ProvenanceStatus.VERIFIED,
+        provenance_status=ProvenanceStatus.DECLARED,
         scope=MemoryScope(user_id="user-123"),
         active=True,
         embedding=(0.1, 0.2),
@@ -61,7 +61,13 @@ def test_independently_available_updated_timestamp_is_preserved() -> None:
     assert memory.updated_at == datetime.fromisoformat("2026-08-10T14:20:00+02:00")
 
 
-def test_provenance_status_distinguishes_unavailable_from_known_absent() -> None:
+def test_all_provenance_states_have_distinct_meanings() -> None:
+    declared = NormalizedMemory(
+        id="m0",
+        content="Declared memory",
+        source_refs=(SourceRef(transcript_id="t1"),),
+        provenance_status=ProvenanceStatus.DECLARED,
+    )
     unavailable = NormalizedMemory(id="m1", content="A memory")
     absent = NormalizedMemory(
         id="m2",
@@ -69,17 +75,19 @@ def test_provenance_status_distinguishes_unavailable_from_known_absent() -> None
         provenance_status=ProvenanceStatus.KNOWN_ABSENT,
     )
 
+    assert declared.source_refs == (SourceRef(transcript_id="t1"),)
+    assert declared.provenance_status is ProvenanceStatus.DECLARED
     assert unavailable.source_refs == absent.source_refs == ()
     assert unavailable.provenance_status is ProvenanceStatus.UNAVAILABLE
     assert absent.provenance_status is ProvenanceStatus.KNOWN_ABSENT
 
 
-def test_verified_provenance_requires_refs_and_refs_require_verified_status() -> None:
+def test_declared_provenance_requires_refs_and_refs_require_declared_status() -> None:
     with pytest.raises(ValidationError, match="requires at least one"):
         NormalizedMemory(
             id="m1",
             content="A memory",
-            provenance_status=ProvenanceStatus.VERIFIED,
+            provenance_status=ProvenanceStatus.DECLARED,
         )
     with pytest.raises(ValidationError, match="require provenance_status"):
         NormalizedMemory(
@@ -91,7 +99,11 @@ def test_verified_provenance_requires_refs_and_refs_require_verified_status() ->
 
 def test_malformed_span_and_scope_are_rejected() -> None:
     with pytest.raises(ValidationError, match="span end"):
-        SourceRef(transcript_id="t1", span=(10, 2))
+        SourceRef(transcript_id="t1", turn_idx=0, span=(10, 2))
+    with pytest.raises(ValidationError, match="span end"):
+        SourceRef(transcript_id="t1", turn_idx=0, span=(5, 5))
+    with pytest.raises(ValidationError, match="requires turn_idx"):
+        SourceRef(transcript_id="t1", span=(0, 5))
     with pytest.raises(ValidationError, match="must not be blank"):
         MemoryScope(user_id=" ")
 

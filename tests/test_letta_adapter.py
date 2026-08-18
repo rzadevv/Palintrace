@@ -37,6 +37,25 @@ def test_letta_core_block_has_no_fabricated_timestamp_or_embedding() -> None:
     assert memory.active is True
 
 
+def test_letta_deleted_archival_passage_is_inactive() -> None:
+    memory = normalize_letta_record(_archival_fixture() | {"is_deleted": True})
+
+    assert memory.active is False
+
+
+def test_letta_supplied_source_refs_are_declared() -> None:
+    memory = normalize_letta_record(
+        {
+            "id": "block-1",
+            "value": "User prefers Python.",
+            "memory_type": "core",
+            "source_refs": [{"transcript_id": "transcript-1"}],
+        }
+    )
+
+    assert memory.provenance_status is ProvenanceStatus.DECLARED
+
+
 def test_letta_transport_calls_documented_agent_memory_endpoints() -> None:
     class Blocks:
         def list(self, agent_id: str, **kwargs: Any) -> list[dict[str, Any]]:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from typing import Any
 
 from pydantic import ValidationError
@@ -38,6 +38,7 @@ class GraphitiAdapter(MemoryAdapter):
         password: str | None = None,
         group_ids: Iterable[str] | None = None,
         scope: MemoryScope | None = None,
+        episode_transcript_map: Mapping[str, SourceRef | Mapping[str, Any] | str] | None = None,
         include_embeddings: bool = False,
         page_size: int = 500,
     ):
@@ -48,6 +49,7 @@ class GraphitiAdapter(MemoryAdapter):
         self._password = password
         self._group_ids = tuple(group_ids or ())
         self._scope = scope
+        self._episode_transcript_map = dict(episode_transcript_map or {})
         self._include_embeddings = include_embeddings
         self._page_size = page_size
 
@@ -70,7 +72,11 @@ class GraphitiAdapter(MemoryAdapter):
         return normalize_records(
             self.name,
             records,
-            lambda record: normalize_graphiti_record(record, scope=self._scope),
+            lambda record: normalize_graphiti_record(
+                record,
+                scope=self._scope,
+                episode_transcript_map=self._episode_transcript_map,
+            ),
         )
 
     async def _fetch_records(self) -> list[Any]:
@@ -132,7 +138,10 @@ class GraphitiAdapter(MemoryAdapter):
 
 
 def normalize_graphiti_record(
-    record: Any, *, scope: MemoryScope | None = None
+    record: Any,
+    *,
+    scope: MemoryScope | None = None,
+    episode_transcript_map: Mapping[str, SourceRef | Mapping[str, Any] | str] | None = None,
 ) -> NormalizedMemory:
     """Normalize one Graphiti ``EntityEdge`` fact."""
 
@@ -142,18 +151,11 @@ def normalize_graphiti_record(
         raise AdapterDataError("Graphiti EntityEdge requires string field 'fact'")
     normalized_scope = scope or MemoryScope()
 
-    episodes_supplied = "episodes" in source
     episodes = source.get("episodes", [])
     if not isinstance(episodes, list):
         raise AdapterDataError("Graphiti episodes must be a list")
-    source_refs = tuple(SourceRef(transcript_id=str(episode)) for episode in episodes)
-    provenance_status = (
-        ProvenanceStatus.VERIFIED
-        if source_refs
-        else ProvenanceStatus.KNOWN_ABSENT
-        if episodes_supplied
-        else ProvenanceStatus.UNAVAILABLE
-    )
+    source_refs = _mapped_episode_refs(episodes, episode_transcript_map or {})
+    provenance_status = ProvenanceStatus.DECLARED if source_refs else ProvenanceStatus.UNAVAILABLE
 
     state_supplied = "invalid_at" in source or "expired_at" in source
     active = None
@@ -167,7 +169,7 @@ def normalize_graphiti_record(
             content=content,
             created_at=source.get("created_at"),
             scope=normalized_scope,
-            source_refs=episodes,
+            source_refs=source_refs,
         )
 
     try:
@@ -186,3 +188,23 @@ def normalize_graphiti_record(
         )
     except ValidationError as error:
         raise AdapterDataError(f"invalid Graphiti record: {error}") from error
+
+
+def _mapped_episode_refs(
+    episodes: list[Any],
+    episode_transcript_map: Mapping[str, SourceRef | Mapping[str, Any] | str],
+) -> tuple[SourceRef, ...]:
+    """Use only explicit episode-to-transcript mappings for normalized provenance."""
+
+    refs: list[SourceRef] = []
+    for episode in episodes:
+        mapped = episode_transcript_map.get(str(episode))
+        if mapped is None:
+            continue
+        if isinstance(mapped, SourceRef):
+            refs.append(mapped)
+        elif isinstance(mapped, str):
+            refs.append(SourceRef(transcript_id=mapped))
+        else:
+            refs.append(SourceRef.model_validate(mapped))
+    return tuple(refs)

@@ -41,4 +41,3 @@ def test_generic_code_does_not_read_raw_attributes() -> None:
 def test_part_one_does_not_contain_detector_packages() -> None:
     forbidden = {"checkers", "detectors", "repair", "mutations", "benchmarks"}
     assert not any(path.name in forbidden for path in SOURCE_ROOT.rglob("*"))
-

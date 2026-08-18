@@ -4,16 +4,19 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Iterable, Mapping, Sequence
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
-from pydantic import JsonValue, ValidationError
+from pydantic import AwareDatetime, JsonValue, TypeAdapter, ValidationError
 
-from memlint.models import MemoryScope, NormalizedMemory, NormalizedStore
+from memlint.models import MemoryScope, NormalizedMemory, NormalizedStore, SourceRef
+
+_AWARE_DATETIME = TypeAdapter(AwareDatetime)
 
 
 class AdapterError(RuntimeError):
@@ -54,7 +57,11 @@ class MemoryAdapter(ABC):
 def json_safe(value: Any) -> JsonValue:
     """Convert SDK values to lossless JSON-compatible data or fail clearly."""
 
-    if value is None or isinstance(value, (str, int, float, bool)):
+    if value is None or isinstance(value, (str, int, bool)):
+        return value
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise AdapterDataError("JSON values must not contain NaN or infinity")
         return value
     if isinstance(value, (datetime, date)):
         return value.isoformat()
@@ -101,13 +108,42 @@ def deterministic_memory_id(
     identity = {
         "adapter": adapter,
         "content": content,
-        "created_at": json_safe(created_at),
+        "created_at": _canonical_timestamp(created_at),
         "scope": scope.model_dump(mode="json"),
-        "source_refs": json_safe(source_refs),
+        "source_refs": _canonical_source_refs(source_refs),
     }
     canonical = json.dumps(identity, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:24]
     return f"{adapter}:{digest}"
+
+
+def _canonical_timestamp(value: Any) -> str | None:
+    """Represent equivalent aware timestamps identically for generated IDs."""
+
+    if value is None:
+        return None
+    try:
+        parsed = _AWARE_DATETIME.validate_python(value)
+    except ValidationError as error:
+        raise AdapterDataError(f"generated ID requires an aware created_at: {error}") from error
+    return parsed.astimezone(UTC).isoformat().replace("+00:00", "Z")
+
+
+def _canonical_source_refs(value: Any) -> list[dict[str, JsonValue]]:
+    """Canonicalize transcript references as an order-independent collection."""
+
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes, bytearray)):
+        raise AdapterDataError("generated ID source_refs must be a sequence")
+    encoded: dict[str, dict[str, JsonValue]] = {}
+    for item in value:
+        try:
+            source_ref = item if isinstance(item, SourceRef) else SourceRef.model_validate(item)
+        except ValidationError as error:
+            raise AdapterDataError(f"invalid source reference for generated ID: {error}") from error
+        data = source_ref.model_dump(mode="json")
+        key = json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        encoded[key] = data
+    return [encoded[key] for key in sorted(encoded)]
 
 
 def merge_scope(primary: MemoryScope, fallback: MemoryScope | None) -> MemoryScope:

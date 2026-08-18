@@ -78,9 +78,7 @@ class TranscriptSet(BaseModel):
 
     @field_validator("transcripts")
     @classmethod
-    def transcript_ids_must_be_unique(
-        cls, value: tuple[Transcript, ...]
-    ) -> tuple[Transcript, ...]:
+    def transcript_ids_must_be_unique(cls, value: tuple[Transcript, ...]) -> tuple[Transcript, ...]:
         ids = [transcript.id for transcript in value]
         if len(ids) != len(set(ids)):
             raise ValueError("transcript IDs must be unique")

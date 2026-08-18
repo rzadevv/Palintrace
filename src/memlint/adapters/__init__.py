@@ -26,4 +26,3 @@ __all__ = [
     "normalize_letta_record",
     "normalize_mem0_record",
 ]
-
