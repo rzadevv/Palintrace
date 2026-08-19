@@ -1,4 +1,4 @@
-"""Command-line entry points for normalized exports and controlled mutations."""
+"""Command-line entry points for normalized exports, mutations, and audits."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ from memlint.adapters import AdapterDataError, AdapterError, FileAdapter
 from memlint.adapters.graphiti import GraphitiAdapter
 from memlint.adapters.letta import LettaAdapter
 from memlint.adapters.mem0 import Mem0Adapter
+from memlint.checkers import OrphanedProvenanceChecker
 from memlint.models import MemoryScope, NormalizedStore
 from memlint.mutations import (
     BaseStoreStatus,
@@ -75,6 +76,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     mutation.add_argument("--output", type=Path, required=True, help="mutated store JSON")
     mutation.add_argument("--manifest", type=Path, required=True, help="separate gold JSON")
+
+    audit = commands.add_parser("audit", help="run one checker on normalized data")
+    audit.add_argument("--store", type=Path, required=True, help="NormalizedStore JSON")
+    audit.add_argument("--transcripts", type=Path, required=True, help="TranscriptSet JSON")
+    audit.add_argument("--checker", choices=("orphaned_provenance",), required=True)
+    audit.add_argument("--output", type=Path, help="write checker result JSON instead of stdout")
     return parser
 
 
@@ -85,6 +92,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.command == "mutate":
             _run_mutation(args)
             return 0
+        if args.command == "audit":
+            text = _run_audit(args)
+            if args.output is None:
+                sys.stdout.write(text)
+            return 0
         store = _build_store(args)
         text = store.to_json(args.output)
     except (AdapterError, OSError, ValueError) as error:
@@ -92,6 +104,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.output is None:
         sys.stdout.write(text)
     return 0
+
+
+def _run_audit(args: argparse.Namespace) -> str:
+    input_paths = {args.store.resolve(), args.transcripts.resolve()}
+    if args.output is not None and args.output.resolve() in input_paths:
+        raise ValueError("audit output must not overwrite input files")
+
+    store = load_store(args.store)
+    transcripts = load_transcripts(args.transcripts)
+    checker = OrphanedProvenanceChecker()
+    result = checker.check(store, transcripts=transcripts)
+    return result.to_json(args.output)
 
 
 def _run_mutation(args: argparse.Namespace) -> None:

@@ -1,5 +1,17 @@
 """Public, backend-independent MemLint foundation API."""
 
+from memlint.checkers import (
+    CHECKER_RESULT_SCHEMA_VERSION,
+    Checker,
+    CheckerCost,
+    CheckerError,
+    CheckerInputError,
+    CheckerResult,
+    CheckerStats,
+    EvidenceItem,
+    Finding,
+    OrphanedProvenanceChecker,
+)
 from memlint.models import (
     MemoryScope,
     NormalizedMemory,
@@ -27,6 +39,15 @@ from memlint.mutations import (
 from memlint.taxonomy import TAXONOMY_VERSION, DefectClass
 
 __all__ = [
+    "CHECKER_RESULT_SCHEMA_VERSION",
+    "Checker",
+    "CheckerCost",
+    "CheckerError",
+    "CheckerInputError",
+    "CheckerResult",
+    "CheckerStats",
+    "EvidenceItem",
+    "Finding",
     "MemoryScope",
     "BaseStoreStatus",
     "ConflictRelation",
@@ -41,6 +62,7 @@ __all__ = [
     "MutationResult",
     "NormalizedMemory",
     "NormalizedStore",
+    "OrphanedProvenanceChecker",
     "ProvenanceStatus",
     "SourceRef",
     "Transcript",
