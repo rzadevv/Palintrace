@@ -4,8 +4,8 @@ MemLint is a system-agnostic foundation for auditing agent memory. Its research 
 which memory defects can eventually be detected from an existing store and its source transcripts,
 without external annotations or hidden canonical user state.
 
-This repository currently implements the frozen Foundation and **Part 2: taxonomy and mutation
-harness**.
+This repository currently implements the frozen Foundation, the Part 2 taxonomy and mutation
+harness, and the first structural checker.
 
 Implemented:
 
@@ -16,13 +16,15 @@ Implemented:
 - `memlint dump`;
 - taxonomy version 1.0 with eight frozen defect classes;
 - deterministic controlled mutations and separate gold manifests;
-- `memlint mutate`.
+- a typed, deterministic checker result API;
+- the `orphaned_provenance` checker;
+- `memlint dump`, `memlint mutate`, and `memlint audit`.
 
 Not implemented yet:
 
-- defect checkers of any kind;
+- the other seven defect checkers, including semantic and retrieval checks;
 - HaluMem, LongMemEval, or LoCoMo evaluation;
-- LLM, NLI, retrieval, embedding-generation, repair, or privacy logic.
+- LLM, NLI, retrieval, embedding generation, automatic repair, or benchmark scoring.
 
 ## Architecture
 
@@ -40,7 +42,8 @@ NormalizedStore ─► controlled mutation ─┬─► mutated NormalizedStore
                                        └─► gold mutation manifest
 ```
 
-Future detector code may receive the mutated store but must not receive the gold manifest.
+Checker code may receive the mutated store but must not receive the gold manifest. The implemented
+checker reads only normalized store and transcript data.
 
 All future generic code receives only `NormalizedStore`. Backend SDK imports stay inside adapter
 modules. Source-native fields are retained under `raw` for reproduction, but a test rejects `.raw`
@@ -203,6 +206,19 @@ Retrieval-shadowing mutations create distractor-crowding challenges and a retrie
 See [the frozen taxonomy](docs/taxonomy.md) and [mutation harness](docs/mutations.md) for precise
 boundaries and supported subtypes.
 
+Run the structural provenance audit separately from mutation gold data:
+
+```bash
+memlint audit \
+  --store mutated.json \
+  --transcripts examples/mutation-transcripts.json \
+  --checker orphaned_provenance \
+  --output findings.json
+```
+
+The audit command has no manifest input. See [checker results](docs/checkers.md) for the result and
+evidence contracts.
+
 Committed source-shaped exports can exercise every adapter offline:
 
 ```bash
@@ -254,6 +270,6 @@ mutation harness.
 - Letta `active` describes current attachment/listing state along that adapter source path; it is not a
   backend-independent truth state.
 - Backend metadata cannot be promoted into portable fields unless the mapping is explicit and stable.
-- Normalized schema version `0.1` contains no findings, gold labels, checker, or repair model.
+- Normalized schema version `0.1` contains no findings, gold labels, checker results, or repair data.
 - Mutation challenges create controlled research inputs but do not report detector or retrieval
   performance.
