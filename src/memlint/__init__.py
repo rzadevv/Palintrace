@@ -12,6 +12,10 @@ from memlint.models import (
 )
 from memlint.mutations import (
     BaseStoreStatus,
+    ConflictRelation,
+    DistractorFamily,
+    GoldLabel,
+    GoldLabelUnit,
     MutationError,
     MutationManifest,
     MutationPreconditionError,
@@ -25,7 +29,11 @@ from memlint.taxonomy import TAXONOMY_VERSION, DefectClass
 __all__ = [
     "MemoryScope",
     "BaseStoreStatus",
+    "ConflictRelation",
     "DefectClass",
+    "DistractorFamily",
+    "GoldLabel",
+    "GoldLabelUnit",
     "MutationError",
     "MutationManifest",
     "MutationPreconditionError",

@@ -57,7 +57,6 @@ def apply(
             MutationTarget(
                 memory_id=target.id,
                 role=MutationTargetRole.PRIMARY,
-                receives_gold_label=True,
             ),
         ),
         modified_memory_ids=(target.id,),
@@ -79,9 +78,16 @@ def _mutate_ref(
     if transcript is None:
         raise MutationPreconditionError("selected source reference is not resolvable")
     if subtype == "missing_transcript":
-        missing_id = deterministic_id("missing-transcript", {"mutation_id": mutation_id})
+        collision_index = 0
+        missing_id = deterministic_id(
+            "transcript", {"mutation_id": mutation_id, "collision_index": collision_index}
+        )
         while transcripts.get(missing_id) is not None:
-            missing_id = f"{missing_id}-missing"
+            collision_index += 1
+            missing_id = deterministic_id(
+                "transcript",
+                {"mutation_id": mutation_id, "collision_index": collision_index},
+            )
         return source_ref.model_copy(update={"transcript_id": missing_id})
     if subtype == "missing_turn":
         missing_index = max((turn.index for turn in transcript.turns), default=0) + 1

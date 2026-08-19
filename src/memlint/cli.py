@@ -17,7 +17,13 @@ from memlint.adapters.graphiti import GraphitiAdapter
 from memlint.adapters.letta import LettaAdapter
 from memlint.adapters.mem0 import Mem0Adapter
 from memlint.models import MemoryScope, NormalizedStore
-from memlint.mutations import BaseStoreStatus, MutationRequest, mutate
+from memlint.mutations import (
+    BaseStoreStatus,
+    ConflictRelation,
+    DistractorFamily,
+    MutationRequest,
+    mutate,
+)
 from memlint.serialization import load_store, load_transcripts
 from memlint.taxonomy import DefectClass
 
@@ -56,9 +62,11 @@ def build_parser() -> argparse.ArgumentParser:
     mutation.add_argument("--target-id")
     mutation.add_argument("--replace-from")
     mutation.add_argument("--replace-to")
+    mutation.add_argument("--conflict-relation", choices=tuple(ConflictRelation))
     mutation.add_argument("--destination-user-id")
     mutation.add_argument("--destination-agent-id")
     mutation.add_argument("--query")
+    mutation.add_argument("--distractor-family", choices=tuple(DistractorFamily))
     mutation.add_argument("--distractor-count", type=int, default=3)
     mutation.add_argument(
         "--base-store-status",
@@ -106,9 +114,11 @@ def _run_mutation(args: argparse.Namespace) -> None:
         target_memory_id=args.target_id,
         replace_from=args.replace_from,
         replace_to=args.replace_to,
+        conflict_relation=args.conflict_relation,
         destination_user_id=args.destination_user_id,
         destination_agent_id=args.destination_agent_id,
         query=args.query,
+        distractor_family=args.distractor_family,
         distractor_count=args.distractor_count,
         base_store_status=args.base_store_status,
     )

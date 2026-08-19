@@ -42,12 +42,10 @@ def apply(
             MutationTarget(
                 memory_id=target.id,
                 role=MutationTargetRole.PRIMARY,
-                receives_gold_label=True,
             ),
             MutationTarget(
                 memory_id=duplicate_id,
                 role=MutationTargetRole.DUPLICATE,
-                receives_gold_label=True,
             ),
         ),
         created_memory_ids=(duplicate_id,),

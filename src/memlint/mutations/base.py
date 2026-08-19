@@ -86,9 +86,18 @@ def deterministic_id(namespace: str, payload: object) -> str:
 
 
 def derived_memory_id(mutation_id: str, role: str, index: int = 0) -> str:
-    """Create a stable memory ID within a deterministic mutation."""
+    """Create an opaque stable memory ID without revealing mutation semantics."""
 
-    return deterministic_id("mutated", {"mutation_id": mutation_id, "role": role, "index": index})
+    return deterministic_id("mem", {"mutation_id": mutation_id, "role": role, "index": index})
+
+
+def require_no_embedding(memory: NormalizedMemory) -> None:
+    """Reject content mutation when its stored embedding cannot be regenerated."""
+
+    if memory.embedding is not None:
+        raise MutationPreconditionError(
+            "Part 2 cannot safely mutate content without regenerating the embedding"
+        )
 
 
 def select_memory(

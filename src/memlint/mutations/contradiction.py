@@ -11,10 +11,16 @@ from memlint.mutations.base import (
     append_memories,
     derived_memory_id,
     replace_once,
+    require_no_embedding,
     select_memory,
     validated_memory_copy,
 )
-from memlint.mutations.models import MutationRequest, MutationTarget, MutationTargetRole
+from memlint.mutations.models import (
+    ConflictRelation,
+    MutationRequest,
+    MutationTarget,
+    MutationTargetRole,
+)
 
 SUBTYPE = "controlled_conflict"
 
@@ -32,6 +38,10 @@ def apply(
     subtype = request.subtype or SUBTYPE
     if subtype != SUBTYPE:
         raise MutationPreconditionError(f"unsupported contradiction subtype: {subtype}")
+    if request.conflict_relation is not ConflictRelation.EXCLUSIVE_VALUE:
+        raise MutationPreconditionError(
+            "controlled contradiction requires conflict_relation='exclusive_value'"
+        )
     target = select_memory(
         store,
         request.target_memory_id,
@@ -39,6 +49,7 @@ def apply(
         predicate=lambda memory: memory.active is True,
         requirement="an explicitly active memory",
     )
+    require_no_embedding(target)
     conflicting_content = replace_once(target.content, request.replace_from, request.replace_to)
     conflicting_id = derived_memory_id(mutation_id, "conflicting")
     conflicting = validated_memory_copy(
@@ -61,12 +72,10 @@ def apply(
             MutationTarget(
                 memory_id=target.id,
                 role=MutationTargetRole.PRIMARY,
-                receives_gold_label=True,
             ),
             MutationTarget(
                 memory_id=conflicting_id,
                 role=MutationTargetRole.CONFLICTING,
-                receives_gold_label=True,
             ),
         ),
         created_memory_ids=(conflicting_id,),
@@ -75,5 +84,6 @@ def apply(
             "conflicting_content": conflicting_content,
             "replace_from": request.replace_from,
             "replace_to": request.replace_to,
+            "semantic_relation": request.conflict_relation.value,
         },
     )

@@ -4,6 +4,10 @@ from memlint.mutations.base import MutationError, MutationPreconditionError
 from memlint.mutations.engine import mutate
 from memlint.mutations.models import (
     BaseStoreStatus,
+    ConflictRelation,
+    DistractorFamily,
+    GoldLabel,
+    GoldLabelUnit,
     MutationManifest,
     MutationRequest,
     MutationResult,
@@ -14,6 +18,10 @@ from memlint.mutations.models import (
 
 __all__ = [
     "BaseStoreStatus",
+    "ConflictRelation",
+    "DistractorFamily",
+    "GoldLabel",
+    "GoldLabelUnit",
     "MutationError",
     "MutationManifest",
     "MutationPreconditionError",

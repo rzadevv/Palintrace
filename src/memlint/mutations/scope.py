@@ -71,12 +71,10 @@ def apply(
             MutationTarget(
                 memory_id=copied_id,
                 role=MutationTargetRole.PRIMARY,
-                receives_gold_label=True,
             ),
             MutationTarget(
                 memory_id=target.id,
                 role=MutationTargetRole.SOURCE,
-                receives_gold_label=False,
             ),
         ),
         created_memory_ids=(copied_id,),

@@ -49,12 +49,10 @@ def apply(
             MutationTarget(
                 memory_id=injected_id,
                 role=MutationTargetRole.PRIMARY,
-                receives_gold_label=True,
             ),
             MutationTarget(
                 memory_id=scope_source.id,
                 role=MutationTargetRole.SOURCE,
-                receives_gold_label=False,
             ),
         ),
         created_memory_ids=(injected_id,),

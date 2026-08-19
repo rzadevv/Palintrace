@@ -22,7 +22,13 @@ from memlint.mutations.base import (
     semantic_store_digest,
     transcript_set_digest,
 )
-from memlint.mutations.models import MutationManifest, MutationRequest, MutationResult
+from memlint.mutations.models import (
+    GOLD_LABEL_UNIT_BY_DEFECT,
+    GoldLabel,
+    MutationManifest,
+    MutationRequest,
+    MutationResult,
+)
 from memlint.taxonomy import TAXONOMY_VERSION, DefectClass
 
 MutationHandler = Callable[
@@ -76,6 +82,11 @@ def mutate(
         transcript_digest=transcript_digest,
         target_memory_ids=application.target_memory_ids,
         targets=application.targets,
+        gold_label=GoldLabel(
+            unit=GOLD_LABEL_UNIT_BY_DEFECT[request.defect_class],
+            memory_ids=application.target_memory_ids,
+            observed_positive=not application.requires_runtime_validation,
+        ),
         created_memory_ids=application.created_memory_ids,
         modified_memory_ids=application.modified_memory_ids,
         removed_memory_ids=application.removed_memory_ids,

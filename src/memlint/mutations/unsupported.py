@@ -13,6 +13,7 @@ from memlint.mutations.base import (
     MutationPreconditionError,
     replace_memory,
     replace_once,
+    require_no_embedding,
     select_memory,
     validated_memory_copy,
 )
@@ -41,14 +42,20 @@ def apply(
         predicate=lambda memory: bool(memory.source_refs),
         requirement="a memory with declared provenance",
     )
+    require_no_embedding(target)
     replacement = replace_once(target.content, request.replace_from, request.replace_to)
     if transcripts is None:
         raise MutationPreconditionError("unsupported-claim mutation requires transcripts")
-    if request.replace_from is None or not _source_supports(
-        target, transcripts, request.replace_from
+    evidence = _resolved_evidence(target, transcripts)
+    if request.replace_from is None or not any(
+        request.replace_from in item for item in evidence
     ):
         raise MutationPreconditionError(
             "no resolvable declared source evidence contains replace_from"
+        )
+    if request.replace_to is not None and any(request.replace_to in item for item in evidence):
+        raise MutationPreconditionError(
+            "resolved source evidence already contains replace_to; unsupported gold is ambiguous"
         )
     mutated = validated_memory_copy(target, content=replacement)
     return MutationApplication(
@@ -59,7 +66,6 @@ def apply(
             MutationTarget(
                 memory_id=target.id,
                 role=MutationTargetRole.PRIMARY,
-                receives_gold_label=True,
             ),
         ),
         modified_memory_ids=(target.id,),
@@ -76,11 +82,11 @@ def apply(
     )
 
 
-def _source_supports(
-    memory: NormalizedMemory, transcripts: TranscriptSet, expected: str
-) -> bool:
-    return any(
-        expected in evidence
+def _resolved_evidence(
+    memory: NormalizedMemory, transcripts: TranscriptSet
+) -> tuple[str, ...]:
+    return tuple(
+        evidence
         for source_ref in memory.source_refs
         for evidence in _evidence(source_ref, transcripts)
     )

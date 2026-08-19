@@ -11,6 +11,7 @@ from memlint.mutations.base import (
     append_memories,
     derived_memory_id,
     replace_once,
+    require_no_embedding,
     select_memory,
     validated_memory_copy,
 )
@@ -39,6 +40,7 @@ def apply(
         predicate=lambda memory: memory.active is True,
         requirement="an explicitly active memory",
     )
+    require_no_embedding(target)
     replacement_content = replace_once(target.content, request.replace_from, request.replace_to)
     replacement_id = derived_memory_id(mutation_id, "superseding")
     superseding = validated_memory_copy(
@@ -61,12 +63,10 @@ def apply(
             MutationTarget(
                 memory_id=target.id,
                 role=MutationTargetRole.PRIMARY,
-                receives_gold_label=True,
             ),
             MutationTarget(
                 memory_id=replacement_id,
                 role=MutationTargetRole.SUPERSEDING,
-                receives_gold_label=False,
             ),
         ),
         created_memory_ids=(replacement_id,),

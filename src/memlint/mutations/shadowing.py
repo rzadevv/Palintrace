@@ -13,6 +13,7 @@ from memlint.mutations.base import (
     select_memory,
 )
 from memlint.mutations.models import (
+    DistractorFamily,
     MutationRequest,
     MutationTarget,
     MutationTargetRole,
@@ -44,6 +45,10 @@ def apply(
         raise MutationPreconditionError(f"unsupported retrieval-shadowing subtype: {subtype}")
     if request.query is None:
         raise MutationPreconditionError("distractor_crowding requires an explicit query")
+    if request.distractor_family is not DistractorFamily.EDITOR:
+        raise MutationPreconditionError(
+            "distractor_crowding requires distractor_family='editor'"
+        )
     target = select_memory(store, request.target_memory_id, rng)
     distractors = tuple(
         NormalizedMemory(
@@ -68,13 +73,13 @@ def apply(
             MutationTarget(
                 memory_id=target.id,
                 role=MutationTargetRole.PRIMARY,
-                receives_gold_label=False,
             ),
         ),
         created_memory_ids=distractor_ids,
         parameters={
             "challenge_type": subtype,
             "distractor_count": request.distractor_count,
+            "distractor_family": request.distractor_family.value,
         },
         requires_runtime_validation=True,
         retrieval_probe=probe,
