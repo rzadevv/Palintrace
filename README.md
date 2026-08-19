@@ -4,7 +4,8 @@ MemLint is a system-agnostic foundation for auditing agent memory. Its research 
 which memory defects can eventually be detected from an existing store and its source transcripts,
 without external annotations or hidden canonical user state.
 
-This repository currently implements **Part 1: Foundation only**.
+This repository currently implements the frozen Foundation and **Part 2: taxonomy and mutation
+harness**.
 
 Implemented:
 
@@ -12,12 +13,14 @@ Implemented:
 - Mem0, Graphiti, Letta, and explicit file adapters;
 - a minimal transcript representation;
 - deterministic JSON serialization;
-- `memlint dump`.
+- `memlint dump`;
+- taxonomy version 1.0 with eight frozen defect classes;
+- deterministic controlled mutations and separate gold manifests;
+- `memlint mutate`.
 
 Not implemented yet:
 
 - defect checkers of any kind;
-- mutation testing or benchmark experiments;
 - HaluMem, LongMemEval, or LoCoMo evaluation;
 - LLM, NLI, retrieval, embedding-generation, repair, or privacy logic.
 
@@ -29,6 +32,15 @@ Graphiti ──┤
 Letta ─────┼──► Adapter ─► NormalizedStore
 Files ─────┘
 ```
+
+Part 2 branches a clean/base normalized store into two separate artifacts:
+
+```text
+NormalizedStore ─► controlled mutation ─┬─► mutated NormalizedStore
+                                       └─► gold mutation manifest
+```
+
+Future detector code may receive the mutated store but must not receive the gold manifest.
 
 All future generic code receives only `NormalizedStore`. Backend SDK imports stay inside adapter
 modules. Source-native fields are retained under `raw` for reproduction, but a test rejects `.raw`
@@ -104,9 +116,10 @@ rejected.
 - `known_absent`: the source explicitly supplied an empty provenance collection;
 - `unavailable`: the adapter/backend did not expose transcript provenance.
 
-`declared` does not mean that MemLint checked a reference against a transcript. That verification
-belongs to a later phase. Graphiti episode IDs remain in `raw` and are not treated as transcript IDs
-unless the caller provides an explicit episode-to-transcript mapping.
+`declared` does not mean that an adapter checked a reference against a transcript. Mutation
+preconditions may resolve a reference when a controlled mutation specifically requires it. Graphiti
+episode IDs remain in `raw` and are not treated as transcript IDs unless the caller provides an
+explicit episode-to-transcript mapping.
 
 **Meaning of `active`.** This field is deliberately nullable and its mapping is documented per adapter
 below. It means "current/retrievable according to this source path," not a universal truth predicate.
@@ -165,6 +178,31 @@ memlint dump --adapter file --source examples/store.yaml
 memlint dump --adapter file --source examples/store.yaml --output normalized.json
 ```
 
+Controlled mutation example:
+
+```bash
+memlint mutate \
+  --store examples/mutation-store.json \
+  --transcripts examples/mutation-transcripts.json \
+  --defect unsupported_claim \
+  --seed 42 \
+  --target-id preference-python \
+  --replace-from Python \
+  --replace-to Rust \
+  --output mutated.json \
+  --manifest mutation.json
+```
+
+The output paths must differ. `mutated.json` contains only normalized store data; `mutation.json`
+contains the injected gold positive, deterministic IDs/digests, and reproduction parameters. A
+manifest defaults to `base_store_status: unknown`: records outside the injected positive are not
+automatically verified negatives. Use `curated_clean` only for an independently curated clean input.
+
+Retrieval-shadowing mutations create distractor-crowding challenges and a retrieval probe. They set
+`requires_runtime_validation: true`; adding distractors alone is not evidence that shadowing occurred.
+See [the frozen taxonomy](docs/taxonomy.md) and [mutation harness](docs/mutations.md) for precise
+boundaries and supported subtypes.
+
 Committed source-shaped exports can exercise every adapter offline:
 
 ```bash
@@ -200,7 +238,8 @@ uniquely indexed `TranscriptTurn` values with role, exact content, optional awar
 metadata. [examples/transcripts.json](examples/transcripts.json) demonstrates how
 `examples/store.yaml` points to turn `0` and character span `[0, 20]`.
 
-No matching, entailment, inference, or source reconstruction is performed in Part 1.
+No matching, entailment, inference, or source reconstruction is performed by the Foundation or
+mutation harness.
 
 ## Known limitations
 
@@ -215,4 +254,6 @@ No matching, entailment, inference, or source reconstruction is performed in Par
 - Letta `active` describes current attachment/listing state along that adapter source path; it is not a
   backend-independent truth state.
 - Backend metadata cannot be promoted into portable fields unless the mapping is explicit and stable.
-- Schema version `0.1` supports normalization only. It contains no findings, checker, or repair model.
+- Normalized schema version `0.1` contains no findings, gold labels, checker, or repair model.
+- Mutation challenges create controlled research inputs but do not report detector or retrieval
+  performance.
