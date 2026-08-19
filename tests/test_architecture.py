@@ -91,4 +91,5 @@ def test_part_three_has_only_implemented_checker_modules() -> None:
         "models.py",
         "orphaned_provenance.py",
         "redundancy_bloat.py",
+        "stale_active.py",
     }

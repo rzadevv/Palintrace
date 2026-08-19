@@ -16,7 +16,12 @@ from memlint.adapters import AdapterDataError, AdapterError, FileAdapter
 from memlint.adapters.graphiti import GraphitiAdapter
 from memlint.adapters.letta import LettaAdapter
 from memlint.adapters.mem0 import Mem0Adapter
-from memlint.checkers import Checker, OrphanedProvenanceChecker, RedundancyBloatChecker
+from memlint.checkers import (
+    Checker,
+    OrphanedProvenanceChecker,
+    RedundancyBloatChecker,
+    StaleActiveChecker,
+)
 from memlint.models import MemoryScope, NormalizedStore
 from memlint.mutations import (
     BaseStoreStatus,
@@ -31,6 +36,7 @@ from memlint.taxonomy import DefectClass
 CHECKER_FACTORIES: dict[str, type[Checker]] = {
     "orphaned_provenance": OrphanedProvenanceChecker,
     "redundancy_bloat": RedundancyBloatChecker,
+    "stale_active": StaleActiveChecker,
 }
 
 

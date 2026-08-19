@@ -12,6 +12,7 @@ from memlint.checkers import (
     Finding,
     OrphanedProvenanceChecker,
     RedundancyBloatChecker,
+    StaleActiveChecker,
 )
 from memlint.models import (
     MemoryScope,
@@ -65,6 +66,7 @@ __all__ = [
     "NormalizedStore",
     "OrphanedProvenanceChecker",
     "RedundancyBloatChecker",
+    "StaleActiveChecker",
     "ProvenanceStatus",
     "SourceRef",
     "Transcript",
