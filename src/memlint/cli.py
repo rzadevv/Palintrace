@@ -79,7 +79,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     audit = commands.add_parser("audit", help="run one checker on normalized data")
     audit.add_argument("--store", type=Path, required=True, help="NormalizedStore JSON")
-    audit.add_argument("--transcripts", type=Path, required=True, help="TranscriptSet JSON")
+    audit.add_argument("--transcripts", type=Path, help="TranscriptSet JSON when required")
     audit.add_argument("--checker", choices=("orphaned_provenance",), required=True)
     audit.add_argument("--output", type=Path, help="write checker result JSON instead of stdout")
     return parser
@@ -107,12 +107,14 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 def _run_audit(args: argparse.Namespace) -> str:
-    input_paths = {args.store.resolve(), args.transcripts.resolve()}
+    input_paths = {args.store.resolve()}
+    if args.transcripts is not None:
+        input_paths.add(args.transcripts.resolve())
     if args.output is not None and args.output.resolve() in input_paths:
         raise ValueError("audit output must not overwrite input files")
 
     store = load_store(args.store)
-    transcripts = load_transcripts(args.transcripts)
+    transcripts = load_transcripts(args.transcripts) if args.transcripts is not None else None
     checker = OrphanedProvenanceChecker()
     result = checker.check(store, transcripts=transcripts)
     return result.to_json(args.output)

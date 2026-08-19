@@ -115,7 +115,7 @@ class OrphanedProvenanceChecker:
             cost=CheckerCost(),
             stats=CheckerStats(
                 memories_scanned=len(store.memories),
-                source_refs_scanned=source_refs_scanned,
                 findings_emitted=len(findings),
+                details={"source_refs_scanned": source_refs_scanned},
             ),
         )

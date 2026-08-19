@@ -53,13 +53,18 @@ def test_checker_package_cannot_import_mutation_code_or_gold_models() -> None:
             if isinstance(node, ast.Import):
                 if any(alias.name.startswith("memlint.mutations") for alias in node.names):
                     violations.append(f"{path}:{node.lineno}:mutation import")
-            elif isinstance(node, ast.ImportFrom) and node.module:
-                is_absolute_mutation_import = node.module.startswith("memlint.mutations")
-                is_relative_mutation_import = node.level > 0 and node.module.startswith("mutations")
+            elif isinstance(node, ast.ImportFrom):
+                module = node.module or ""
+                is_absolute_mutation_import = module.startswith("memlint.mutations")
+                is_relative_mutation_import = node.level > 0 and module.startswith("mutations")
+                imports_mutations_symbol = any(
+                    alias.name == "mutations" for alias in node.names
+                ) and (node.level > 0 or module == "memlint")
                 imports_gold_model = any(alias.name in forbidden_names for alias in node.names)
                 if (
                     is_absolute_mutation_import
                     or is_relative_mutation_import
+                    or imports_mutations_symbol
                     or imports_gold_model
                 ):
                     violations.append(f"{path}:{node.lineno}:mutation import")

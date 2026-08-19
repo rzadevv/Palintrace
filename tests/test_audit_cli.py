@@ -69,6 +69,23 @@ def test_audit_cli_emits_clean_result_to_stdout(capsys: pytest.CaptureFixture[st
     assert checker_result.findings == ()
 
 
+def test_audit_cli_surfaces_missing_required_transcript_set(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    with pytest.raises(SystemExit, match="2"):
+        main(
+            [
+                "audit",
+                "--store",
+                "examples/mutation-store.json",
+                "--checker",
+                "orphaned_provenance",
+            ]
+        )
+
+    assert "orphaned_provenance checker requires a TranscriptSet" in capsys.readouterr().err
+
+
 @pytest.mark.parametrize("input_name", ["store", "transcripts"])
 def test_audit_cli_rejects_overwriting_inputs(input_name: str, tmp_path: Path) -> None:
     store_path = Path("examples/mutation-store.json")

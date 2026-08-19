@@ -68,7 +68,7 @@ def test_missing_transcript_emits_one_structural_finding() -> None:
     assert result.cost.input_tokens == 0
     assert result.cost.output_tokens == 0
     assert result.stats.memories_scanned == 1
-    assert result.stats.source_refs_scanned == 1
+    assert result.stats.details == {"source_refs_scanned": 1}
     assert result.stats.findings_emitted == 1
 
 
@@ -138,7 +138,7 @@ def test_unavailable_and_known_absent_provenance_emit_no_findings() -> None:
 
     assert result.findings == ()
     assert result.stats.memories_scanned == 2
-    assert result.stats.source_refs_scanned == 0
+    assert result.stats.details == {"source_refs_scanned": 0}
 
 
 def test_missing_transcript_set_raises_input_error() -> None:
@@ -165,7 +165,7 @@ def test_multiple_broken_refs_produce_one_finding_with_sorted_evidence() -> None
         "invalid_span",
     )
     assert tuple(item.data["source_ref_index"] for item in result.findings[0].evidence) == (0, 1)
-    assert result.stats.source_refs_scanned == 2
+    assert result.stats.details == {"source_refs_scanned": 2}
 
 
 def test_multiple_memories_are_sorted_and_results_are_deterministic() -> None:

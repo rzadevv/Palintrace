@@ -18,7 +18,7 @@ from pydantic import (
 
 from memlint.taxonomy import DefectClass
 
-CHECKER_RESULT_SCHEMA_VERSION = "0.1"
+CHECKER_RESULT_SCHEMA_VERSION = "0.2"
 
 
 class EvidenceItem(BaseModel):
@@ -116,8 +116,17 @@ class CheckerStats(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     memories_scanned: NonNegativeInt
-    source_refs_scanned: NonNegativeInt
     findings_emitted: NonNegativeInt
+    details: dict[str, NonNegativeInt] = Field(default_factory=dict)
+
+    @field_validator("details")
+    @classmethod
+    def detail_keys_must_not_be_blank(
+        cls, value: dict[str, NonNegativeInt]
+    ) -> dict[str, NonNegativeInt]:
+        if any(not key.strip() for key in value):
+            raise ValueError("checker stat detail keys must not be blank")
+        return value
 
 
 class CheckerResult(BaseModel):
