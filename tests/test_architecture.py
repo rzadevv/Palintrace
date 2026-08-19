@@ -83,6 +83,12 @@ def test_checker_package_does_not_read_raw_attributes() -> None:
     assert violations == []
 
 
-def test_part_three_has_only_the_orphaned_provenance_checker_module() -> None:
+def test_part_three_has_only_implemented_checker_modules() -> None:
     modules = {path.name for path in CHECKER_ROOT.glob("*.py")}
-    assert modules == {"__init__.py", "base.py", "models.py", "orphaned_provenance.py"}
+    assert modules == {
+        "__init__.py",
+        "base.py",
+        "models.py",
+        "orphaned_provenance.py",
+        "redundancy_bloat.py",
+    }

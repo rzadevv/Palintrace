@@ -15,6 +15,7 @@ from memlint.checkers.models import (
     Finding,
 )
 from memlint.checkers.orphaned_provenance import OrphanedProvenanceChecker
+from memlint.checkers.redundancy_bloat import RedundancyBloatChecker
 
 __all__ = [
     "CHECKER_RESULT_SCHEMA_VERSION",
@@ -27,5 +28,6 @@ __all__ = [
     "EvidenceItem",
     "Finding",
     "OrphanedProvenanceChecker",
+    "RedundancyBloatChecker",
     "deterministic_finding_id",
 ]

@@ -16,7 +16,7 @@ from memlint.adapters import AdapterDataError, AdapterError, FileAdapter
 from memlint.adapters.graphiti import GraphitiAdapter
 from memlint.adapters.letta import LettaAdapter
 from memlint.adapters.mem0 import Mem0Adapter
-from memlint.checkers import OrphanedProvenanceChecker
+from memlint.checkers import Checker, OrphanedProvenanceChecker, RedundancyBloatChecker
 from memlint.models import MemoryScope, NormalizedStore
 from memlint.mutations import (
     BaseStoreStatus,
@@ -27,6 +27,11 @@ from memlint.mutations import (
 )
 from memlint.serialization import load_store, load_transcripts
 from memlint.taxonomy import DefectClass
+
+CHECKER_FACTORIES: dict[str, type[Checker]] = {
+    "orphaned_provenance": OrphanedProvenanceChecker,
+    "redundancy_bloat": RedundancyBloatChecker,
+}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -80,7 +85,7 @@ def build_parser() -> argparse.ArgumentParser:
     audit = commands.add_parser("audit", help="run one checker on normalized data")
     audit.add_argument("--store", type=Path, required=True, help="NormalizedStore JSON")
     audit.add_argument("--transcripts", type=Path, help="TranscriptSet JSON when required")
-    audit.add_argument("--checker", choices=("orphaned_provenance",), required=True)
+    audit.add_argument("--checker", choices=tuple(CHECKER_FACTORIES), required=True)
     audit.add_argument("--output", type=Path, help="write checker result JSON instead of stdout")
     return parser
 
@@ -115,7 +120,7 @@ def _run_audit(args: argparse.Namespace) -> str:
 
     store = load_store(args.store)
     transcripts = load_transcripts(args.transcripts) if args.transcripts is not None else None
-    checker = OrphanedProvenanceChecker()
+    checker = CHECKER_FACTORIES[args.checker]()
     result = checker.check(store, transcripts=transcripts)
     return result.to_json(args.output)
 
