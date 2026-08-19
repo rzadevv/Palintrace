@@ -5,7 +5,7 @@ which memory defects can eventually be detected from an existing store and its s
 without external annotations or hidden canonical user state.
 
 This repository currently implements the frozen Foundation, the Part 2 taxonomy and mutation
-harness, and the first structural checker.
+harness, and two structural checkers.
 
 Implemented:
 
@@ -18,11 +18,12 @@ Implemented:
 - deterministic controlled mutations and separate gold manifests;
 - a typed, deterministic checker result API;
 - the `orphaned_provenance` checker;
+- the exact-duplicate `redundancy_bloat` checker;
 - `memlint dump`, `memlint mutate`, and `memlint audit`.
 
 Not implemented yet:
 
-- the other seven defect checkers, including semantic and retrieval checks;
+- the other six defect checkers and semantic duplicate detection;
 - HaluMem, LongMemEval, or LoCoMo evaluation;
 - LLM, NLI, retrieval, embedding generation, automatic repair, or benchmark scoring.
 
@@ -42,8 +43,8 @@ NormalizedStore ─► controlled mutation ─┬─► mutated NormalizedStore
                                        └─► gold mutation manifest
 ```
 
-Checker code may receive the mutated store but must not receive the gold manifest. The implemented
-checker reads only normalized store and transcript data.
+Checker code may receive the mutated store but must not receive the gold manifest. Implemented
+checkers read only normalized data; transcript input is checker-specific.
 
 All future generic code receives only `NormalizedStore`. Backend SDK imports stay inside adapter
 modules. Source-native fields are retained under `raw` for reproduction, but a test rejects `.raw`

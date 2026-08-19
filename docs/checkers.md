@@ -28,13 +28,13 @@ The orphaned-provenance checker reports its structural work as
 
 For a structural finding, confidence `1.0` means that the declared rule was deterministically
 satisfied. It is not a statistically calibrated probability. Cost values report calls and tokens
-used; the structural checker below reports zero for all three and makes no pricing assumptions.
+used; the structural checkers report zero for all three and make no pricing assumptions.
 
 ## Orphaned provenance
 
-`orphaned_provenance` is the only implemented checker. It requires a `TranscriptSet` and resolves
-source references only for memories whose provenance status is `declared`. It emits one Finding per
-defective memory, combining multiple broken references into separately ordered evidence items.
+`orphaned_provenance` requires a `TranscriptSet` and resolves source references only for memories
+whose provenance status is `declared`. It emits one Finding per defective memory, combining multiple
+broken references into separately ordered evidence items.
 
 The supported evidence kinds are:
 
@@ -63,3 +63,26 @@ memlint audit \
 
 Omit `--output` to write deterministic JSON to standard output. The output path must differ from both
 input paths. The audit command does not accept a mutation manifest.
+
+## Redundancy / bloat
+
+`redundancy_bloat` implements only the structural `exact_duplicate` case. Two memories form a
+duplicate pair when their stored content strings are exactly equal and their normalized scopes are
+equal with at least one known scope dimension. A pair whose user, agent, and session dimensions are
+all unknown is skipped because missing scope does not establish a shared principal.
+
+The checker does not strip whitespace, change case, normalize Unicode or punctuation, or evaluate
+semantic similarity. Similar or paraphrased claims are therefore outside this check. Timestamps,
+provenance, active state, supersession, and embeddings do not alter exact claim identity.
+
+Each duplicate memory pair receives a separate Finding with `exact_duplicate` evidence containing an
+exact-content SHA-256 digest, content length, and normalized scope. The evidence does not repeat the
+memory content. Three matching memories produce three pair findings. The checker requires no
+transcripts and uses no model calls or tokens.
+
+```bash
+memlint audit \
+  --store duplicated.json \
+  --checker redundancy_bloat \
+  --output findings.json
+```
