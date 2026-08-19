@@ -1,4 +1,4 @@
-"""Minimal ``memlint dump`` command for normalized exports."""
+"""Command-line entry points for normalized exports and controlled mutations."""
 
 from __future__ import annotations
 
@@ -17,6 +17,9 @@ from memlint.adapters.graphiti import GraphitiAdapter
 from memlint.adapters.letta import LettaAdapter
 from memlint.adapters.mem0 import Mem0Adapter
 from memlint.models import MemoryScope, NormalizedStore
+from memlint.mutations import BaseStoreStatus, MutationRequest, mutate
+from memlint.serialization import load_store, load_transcripts
+from memlint.taxonomy import DefectClass
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -43,6 +46,27 @@ def build_parser() -> argparse.ArgumentParser:
     dump.add_argument("--include-embeddings", action="store_true")
 
     dump.add_argument("--letta-base-url", default=os.getenv("LETTA_BASE_URL"))
+
+    mutation = commands.add_parser("mutate", help="inject one deterministic defect")
+    mutation.add_argument("--store", type=Path, required=True, help="base NormalizedStore JSON")
+    mutation.add_argument("--transcripts", type=Path, help="TranscriptSet JSON when required")
+    mutation.add_argument("--defect", choices=tuple(DefectClass), required=True)
+    mutation.add_argument("--subtype")
+    mutation.add_argument("--seed", type=int, default=0)
+    mutation.add_argument("--target-id")
+    mutation.add_argument("--replace-from")
+    mutation.add_argument("--replace-to")
+    mutation.add_argument("--destination-user-id")
+    mutation.add_argument("--destination-agent-id")
+    mutation.add_argument("--query")
+    mutation.add_argument("--distractor-count", type=int, default=3)
+    mutation.add_argument(
+        "--base-store-status",
+        choices=tuple(BaseStoreStatus),
+        default=BaseStoreStatus.UNKNOWN,
+    )
+    mutation.add_argument("--output", type=Path, required=True, help="mutated store JSON")
+    mutation.add_argument("--manifest", type=Path, required=True, help="separate gold JSON")
     return parser
 
 
@@ -50,6 +74,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
+        if args.command == "mutate":
+            _run_mutation(args)
+            return 0
         store = _build_store(args)
         text = store.to_json(args.output)
     except (AdapterError, OSError, ValueError) as error:
@@ -57,6 +84,37 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.output is None:
         sys.stdout.write(text)
     return 0
+
+
+def _run_mutation(args: argparse.Namespace) -> None:
+    output = args.output.resolve()
+    manifest_output = args.manifest.resolve()
+    input_paths = {args.store.resolve()}
+    if args.transcripts is not None:
+        input_paths.add(args.transcripts.resolve())
+    if output == manifest_output:
+        raise ValueError("--output and --manifest must be different paths")
+    if output in input_paths or manifest_output in input_paths:
+        raise ValueError("mutation outputs must not overwrite input files")
+
+    store = load_store(args.store)
+    transcripts = load_transcripts(args.transcripts) if args.transcripts is not None else None
+    request = MutationRequest(
+        defect_class=args.defect,
+        subtype=args.subtype,
+        seed=args.seed,
+        target_memory_id=args.target_id,
+        replace_from=args.replace_from,
+        replace_to=args.replace_to,
+        destination_user_id=args.destination_user_id,
+        destination_agent_id=args.destination_agent_id,
+        query=args.query,
+        distractor_count=args.distractor_count,
+        base_store_status=args.base_store_status,
+    )
+    result = mutate(store, request, transcripts)
+    result.mutated_store.to_json(args.output)
+    result.manifest.to_json(args.manifest)
 
 
 def _build_store(args: argparse.Namespace) -> NormalizedStore:

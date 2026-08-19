@@ -37,3 +37,9 @@ def loads_transcripts(text: str) -> TranscriptSet:
     """Validate a transcript set from JSON text."""
 
     return TranscriptSet.model_validate_json(text)
+
+
+def load_transcripts(path: str | Path) -> TranscriptSet:
+    """Validate a transcript set from a UTF-8 JSON file."""
+
+    return loads_transcripts(Path(path).read_text(encoding="utf-8"))

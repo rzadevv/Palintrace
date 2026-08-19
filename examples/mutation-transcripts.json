@@ -1,0 +1,44 @@
+{
+  "schema_version": "0.1",
+  "transcripts": [
+    {
+      "id": "preference-transcript",
+      "turns": [
+        {
+          "index": 0,
+          "role": "user",
+          "content": "I prefer Python.",
+          "timestamp": "2026-08-10T14:20:00+02:00",
+          "metadata": {}
+        }
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "employment-transcript",
+      "turns": [
+        {
+          "index": 0,
+          "role": "user",
+          "content": "I work at Aster Labs.",
+          "timestamp": "2026-08-11T09:00:00+02:00",
+          "metadata": {}
+        }
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "editor-transcript",
+      "turns": [
+        {
+          "index": 0,
+          "role": "user",
+          "content": "My favorite editor is Neovim.",
+          "timestamp": "2026-08-12T16:30:00+02:00",
+          "metadata": {}
+        }
+      ],
+      "metadata": {}
+    }
+  ]
+}

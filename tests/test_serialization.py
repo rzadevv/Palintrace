@@ -1,7 +1,13 @@
 from pathlib import Path
 
 from memlint.models import MemoryScope, NormalizedMemory, NormalizedStore, TranscriptSet
-from memlint.serialization import dumps_transcripts, load_store, loads_store, loads_transcripts
+from memlint.serialization import (
+    dumps_transcripts,
+    load_store,
+    load_transcripts,
+    loads_store,
+    loads_transcripts,
+)
 
 
 def test_store_serialization_round_trip_and_determinism(tmp_path: Path) -> None:
@@ -45,3 +51,4 @@ def test_transcript_serialization_round_trip() -> None:
 
     assert loads_transcripts(serialized) == transcripts
     assert isinstance(transcripts, TranscriptSet)
+    assert load_transcripts("tests/fixtures/transcripts.json") == transcripts

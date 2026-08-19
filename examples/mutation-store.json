@@ -1,0 +1,102 @@
+{
+  "adapter": "file",
+  "exported_at": null,
+  "memories": [
+    {
+      "active": true,
+      "content": "User prefers Python.",
+      "created_at": "2026-08-10T14:20:00+02:00",
+      "embedding": null,
+      "id": "preference-python",
+      "provenance_status": "declared",
+      "raw": {},
+      "scope": {
+        "agent_id": "agent-a",
+        "session_id": "session-shared",
+        "user_id": "user-a"
+      },
+      "source_refs": [
+        {
+          "span": [
+            0,
+            16
+          ],
+          "transcript_id": "preference-transcript",
+          "turn_idx": 0
+        }
+      ],
+      "supersedes": [],
+      "updated_at": null
+    },
+    {
+      "active": true,
+      "content": "User works at Aster Labs.",
+      "created_at": "2026-08-11T09:00:00+02:00",
+      "embedding": null,
+      "id": "employment-aster",
+      "provenance_status": "declared",
+      "raw": {},
+      "scope": {
+        "agent_id": "agent-a",
+        "session_id": "session-shared",
+        "user_id": "user-a"
+      },
+      "source_refs": [
+        {
+          "span": [
+            0,
+            21
+          ],
+          "transcript_id": "employment-transcript",
+          "turn_idx": 0
+        }
+      ],
+      "supersedes": [],
+      "updated_at": null
+    },
+    {
+      "active": true,
+      "content": "User's favorite editor is Neovim.",
+      "created_at": "2026-08-12T16:30:00+02:00",
+      "embedding": null,
+      "id": "editor-neovim",
+      "provenance_status": "declared",
+      "raw": {},
+      "scope": {
+        "agent_id": "agent-a",
+        "session_id": "session-shared",
+        "user_id": "user-a"
+      },
+      "source_refs": [
+        {
+          "span": [
+            0,
+            29
+          ],
+          "transcript_id": "editor-transcript",
+          "turn_idx": 0
+        }
+      ],
+      "supersedes": [],
+      "updated_at": null
+    },
+    {
+      "active": true,
+      "content": "Bob prefers tea.",
+      "created_at": null,
+      "embedding": null,
+      "id": "bob-tea",
+      "provenance_status": "unavailable",
+      "raw": {},
+      "scope": {
+        "agent_id": "agent-b",
+        "session_id": "session-shared",
+        "user_id": "user-b"
+      },
+      "source_refs": [],
+      "supersedes": [],
+      "updated_at": null
+    }
+  ],
+  "schema_version": "0.1"
+}

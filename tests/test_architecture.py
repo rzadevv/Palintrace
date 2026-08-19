@@ -38,6 +38,6 @@ def test_generic_code_does_not_read_raw_attributes() -> None:
     assert violations == []
 
 
-def test_part_one_does_not_contain_detector_packages() -> None:
-    forbidden = {"checkers", "detectors", "repair", "mutations", "benchmarks"}
+def test_part_two_does_not_contain_later_phase_packages() -> None:
+    forbidden = {"checkers", "detectors", "repair", "benchmarks"}
     assert not any(path.name in forbidden for path in SOURCE_ROOT.rglob("*"))
