@@ -2,6 +2,7 @@
 
 from memlint.checkers import (
     CHECKER_RESULT_SCHEMA_VERSION,
+    SCOPE_POLICY_SCHEMA_VERSION,
     Checker,
     CheckerCost,
     CheckerError,
@@ -11,8 +12,13 @@ from memlint.checkers import (
     EvidenceItem,
     Finding,
     OrphanedProvenanceChecker,
+    PrincipalBoundaryRule,
+    PrivacyScopeViolationChecker,
     RedundancyBloatChecker,
+    ScopeDimension,
+    ScopeIsolationPolicy,
     StaleActiveChecker,
+    load_scope_policy,
 )
 from memlint.models import (
     MemoryScope,
@@ -65,7 +71,12 @@ __all__ = [
     "NormalizedMemory",
     "NormalizedStore",
     "OrphanedProvenanceChecker",
+    "PrincipalBoundaryRule",
+    "PrivacyScopeViolationChecker",
     "RedundancyBloatChecker",
+    "SCOPE_POLICY_SCHEMA_VERSION",
+    "ScopeDimension",
+    "ScopeIsolationPolicy",
     "StaleActiveChecker",
     "ProvenanceStatus",
     "SourceRef",
@@ -74,6 +85,7 @@ __all__ = [
     "TranscriptTurn",
     "RetrievalProbe",
     "TAXONOMY_VERSION",
+    "load_scope_policy",
     "mutate",
 ]
 

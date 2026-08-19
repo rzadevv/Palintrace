@@ -90,6 +90,7 @@ def test_part_three_has_only_implemented_checker_modules() -> None:
         "base.py",
         "models.py",
         "orphaned_provenance.py",
+        "privacy_scope_violation.py",
         "redundancy_bloat.py",
         "stale_active.py",
     }

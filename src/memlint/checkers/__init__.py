@@ -15,6 +15,14 @@ from memlint.checkers.models import (
     Finding,
 )
 from memlint.checkers.orphaned_provenance import OrphanedProvenanceChecker
+from memlint.checkers.privacy_scope_violation import (
+    SCOPE_POLICY_SCHEMA_VERSION,
+    PrincipalBoundaryRule,
+    PrivacyScopeViolationChecker,
+    ScopeDimension,
+    ScopeIsolationPolicy,
+    load_scope_policy,
+)
 from memlint.checkers.redundancy_bloat import RedundancyBloatChecker
 from memlint.checkers.stale_active import StaleActiveChecker
 
@@ -29,7 +37,13 @@ __all__ = [
     "EvidenceItem",
     "Finding",
     "OrphanedProvenanceChecker",
+    "PrincipalBoundaryRule",
+    "PrivacyScopeViolationChecker",
     "RedundancyBloatChecker",
+    "SCOPE_POLICY_SCHEMA_VERSION",
+    "ScopeDimension",
+    "ScopeIsolationPolicy",
     "StaleActiveChecker",
     "deterministic_finding_id",
+    "load_scope_policy",
 ]

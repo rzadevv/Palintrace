@@ -19,8 +19,10 @@ from memlint.adapters.mem0 import Mem0Adapter
 from memlint.checkers import (
     Checker,
     OrphanedProvenanceChecker,
+    PrivacyScopeViolationChecker,
     RedundancyBloatChecker,
     StaleActiveChecker,
+    load_scope_policy,
 )
 from memlint.models import MemoryScope, NormalizedStore
 from memlint.mutations import (
@@ -38,6 +40,7 @@ CHECKER_FACTORIES: dict[str, type[Checker]] = {
     "redundancy_bloat": RedundancyBloatChecker,
     "stale_active": StaleActiveChecker,
 }
+CHECKER_NAMES = (*CHECKER_FACTORIES, "privacy_scope_violation")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -91,7 +94,8 @@ def build_parser() -> argparse.ArgumentParser:
     audit = commands.add_parser("audit", help="run one checker on normalized data")
     audit.add_argument("--store", type=Path, required=True, help="NormalizedStore JSON")
     audit.add_argument("--transcripts", type=Path, help="TranscriptSet JSON when required")
-    audit.add_argument("--checker", choices=tuple(CHECKER_FACTORIES), required=True)
+    audit.add_argument("--checker", choices=CHECKER_NAMES, required=True)
+    audit.add_argument("--scope-policy", type=Path, help="JSON authoritative scope policy")
     audit.add_argument("--output", type=Path, help="write checker result JSON instead of stdout")
     return parser
 
@@ -121,14 +125,26 @@ def _run_audit(args: argparse.Namespace) -> str:
     input_paths = {args.store.resolve()}
     if args.transcripts is not None:
         input_paths.add(args.transcripts.resolve())
+    if args.scope_policy is not None:
+        input_paths.add(args.scope_policy.resolve())
     if args.output is not None and args.output.resolve() in input_paths:
         raise ValueError("audit output must not overwrite input files")
 
     store = load_store(args.store)
     transcripts = load_transcripts(args.transcripts) if args.transcripts is not None else None
-    checker = CHECKER_FACTORIES[args.checker]()
+    checker = _build_checker(args)
     result = checker.check(store, transcripts=transcripts)
     return result.to_json(args.output)
+
+
+def _build_checker(args: argparse.Namespace) -> Checker:
+    if args.checker == "privacy_scope_violation":
+        if args.scope_policy is None:
+            raise ValueError("privacy_scope_violation checker requires --scope-policy")
+        return PrivacyScopeViolationChecker(load_scope_policy(args.scope_policy))
+    if args.scope_policy is not None:
+        raise ValueError("--scope-policy is only valid for privacy_scope_violation")
+    return CHECKER_FACTORIES[args.checker]()
 
 
 def _run_mutation(args: argparse.Namespace) -> None:

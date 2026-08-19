@@ -1,0 +1,12 @@
+{
+  "rules": [
+    {
+      "authoritative_source_principal": "user-a",
+      "dimension": "user_id",
+      "prohibited_destination_principals": [
+        "user-b"
+      ]
+    }
+  ],
+  "schema_version": "0.1"
+}
