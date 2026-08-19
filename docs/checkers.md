@@ -4,17 +4,23 @@ A checker receives portable `NormalizedStore` data and, when required, a `Transc
 receive mutation requests, manifests, or labels, and it does not inspect backend-native `raw` fields.
 Mutation manifests remain evaluation-only artifacts outside the checker and audit interfaces.
 
-Checker output uses schema version `0.1` and contains:
+Checker output uses schema version `0.2` and contains:
 
 - `Finding`: an immutable defect class, one or more memory IDs, confidence, and supporting evidence;
 - `EvidenceItem`: a stable machine-readable kind, concise message, and minimal JSON data;
 - `CheckerCost`: nonnegative model-call and token counters;
-- `CheckerStats`: deterministic counts of scanned memories, scanned source references, and findings;
+- `CheckerStats`: scanned-memory and finding counts plus checker-specific nonnegative details;
 - `CheckerResult`: the checker identity, defect class, sorted findings, cost, and statistics.
 
-Finding IDs are derived from canonical semantic inputs with SHA-256. Identical inputs therefore
+Finding IDs are derived from canonical semantic inputs with SHA-256. Memory IDs and evidence
+identities are sorted before hashing, and an evidence identity contains only its kind and structured
+data. Human-readable evidence wording does not affect identity. Identical semantic inputs therefore
 produce identical IDs and byte-stable sorted JSON. Results contain no execution timestamp or runtime
 duration.
+
+Generic checker statistics contain `memories_scanned`, `findings_emitted`, and a `details` object.
+The orphaned-provenance checker reports its structural work as
+`details.source_refs_scanned`.
 
 For a structural finding, confidence `1.0` means that the declared rule was deterministically
 satisfied. It is not a statistically calibrated probability. Cost values report calls and tokens
