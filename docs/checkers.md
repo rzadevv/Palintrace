@@ -28,7 +28,7 @@ The orphaned-provenance checker reports its structural work as
 
 For a structural finding, confidence `1.0` means that the declared rule was deterministically
 satisfied. It is not a statistically calibrated probability. Cost values report calls and tokens
-used; the structural checkers report zero for all three and make no pricing assumptions.
+used; the structural checkers report zero model and token use and make no pricing assumptions.
 
 ## Orphaned provenance
 
@@ -107,5 +107,40 @@ supersession links scanned, resolved links, missing targets skipped, and self-li
 memlint audit \
   --store stale.json \
   --checker stale_active \
+  --output findings.json
+```
+
+## Privacy / scope violation
+
+`privacy_scope_violation` implements policy-prohibited exact portable replicas relative to an
+explicitly declared authoritative principal. A version `0.1` `ScopeIsolationPolicy` is required and
+supports only `user_id` and `agent_id`. Each rule names an `authoritative_source_principal` and one
+or more prohibited destination principals; there is no default assumption that all principals are
+mutually isolated. Policies contain principal-boundary configuration only, with no memory, mutation,
+or gold identifiers.
+
+For a `user_id` rule, replica identity excludes only the memory ID, `raw`, and `user_id`. For an
+`agent_id` rule, it excludes only the memory ID, `raw`, and `agent_id`. Every other portable field
+must match exactly. The checker does not normalize text, compare meaning, or inspect backend-native
+data. Unknown principal values cannot satisfy a rule.
+
+Historical copy direction is not recoverable from two otherwise identical records without
+independent lineage evidence. The policy therefore supplies authoritative ownership for this audit;
+the checker does not reconstruct a copy event. For the same A/B store, an A-authoritative policy
+targets the prohibited B record, while a B-authoritative policy targets the prohibited A record.
+The destination memory alone receives the Finding, and authoritative records appear only in
+`prohibited_exact_replica` evidence.
+
+Confidence `1.0` means that the explicit policy and exact structural replica rule were satisfied. It
+is not a probability that a historical copy occurred. Independently created records could in
+principle have identical portable fields, so this is deterministic evidence of a policy-prohibited
+exact replica, not general privacy compliance or forensic proof of copying. The checker requires no
+transcripts and uses no model calls or tokens.
+
+```bash
+memlint audit \
+  --store scoped.json \
+  --checker privacy_scope_violation \
+  --scope-policy examples/scope-policy.json \
   --output findings.json
 ```

@@ -5,7 +5,7 @@ which memory defects can eventually be detected from an existing store and its s
 without external annotations or hidden canonical user state.
 
 This repository currently implements the frozen Foundation, the Part 2 taxonomy and mutation
-harness, and three structural checkers.
+harness, and four structural checkers.
 
 Implemented:
 
@@ -20,11 +20,12 @@ Implemented:
 - the `orphaned_provenance` checker;
 - the exact-duplicate `redundancy_bloat` checker;
 - the explicit-supersession `stale_active` checker;
+- the policy-directed exact-replica `privacy_scope_violation` checker;
 - `memlint dump`, `memlint mutate`, and `memlint audit`.
 
 Not implemented yet:
 
-- the other five defect checkers and semantic duplicate detection;
+- the other four defect checkers and semantic duplicate detection;
 - HaluMem, LongMemEval, or LoCoMo evaluation;
 - LLM, NLI, retrieval, embedding generation, automatic repair, or benchmark scoring.
 
@@ -220,6 +221,19 @@ memlint audit \
 
 The audit command has no manifest input. See [checker results](docs/checkers.md) for the result and
 evidence contracts.
+
+Scope audits require an explicit authoritative-principal policy:
+
+```bash
+memlint audit \
+  --store scoped.json \
+  --checker privacy_scope_violation \
+  --scope-policy examples/scope-policy.json \
+  --output findings.json
+```
+
+This checker identifies policy-prohibited exact portable replicas. It does not reconstruct
+historical copy direction or provide general privacy-compliance analysis.
 
 Committed source-shaped exports can exercise every adapter offline:
 
