@@ -96,7 +96,7 @@ def test_invalid_span_emits_length_without_transcript_content() -> None:
     assert len(result.findings) == 1
     evidence = result.findings[0].evidence[0]
     assert evidence.kind == "invalid_span"
-    assert evidence.data == {
+    assert evidence.model_dump(mode="json")["data"] == {
         "source_ref_index": 0,
         "transcript_id": "t1",
         "turn_idx": 0,

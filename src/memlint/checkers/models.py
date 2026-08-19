@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from pathlib import Path
+from types import MappingProxyType
+from typing import cast
 
 from pydantic import (
     BaseModel,
@@ -12,6 +15,7 @@ from pydantic import (
     FiniteFloat,
     JsonValue,
     NonNegativeInt,
+    field_serializer,
     field_validator,
     model_validator,
 )
@@ -21,6 +25,22 @@ from memlint.taxonomy import DefectClass
 CHECKER_RESULT_SCHEMA_VERSION = "0.2"
 
 
+def _freeze_json(value: JsonValue) -> object:
+    if isinstance(value, dict):
+        return MappingProxyType({key: _freeze_json(item) for key, item in value.items()})
+    if isinstance(value, list):
+        return tuple(_freeze_json(item) for item in value)
+    return value
+
+
+def _thaw_json(value: object) -> JsonValue:
+    if isinstance(value, Mapping):
+        return {str(key): _thaw_json(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return [_thaw_json(item) for item in value]
+    return cast(JsonValue, value)
+
+
 class EvidenceItem(BaseModel):
     """Minimal machine-readable and human-readable support for a finding."""
 
@@ -28,7 +48,7 @@ class EvidenceItem(BaseModel):
 
     kind: str
     message: str
-    data: dict[str, JsonValue] = Field(default_factory=dict)
+    data: Mapping[str, JsonValue] = Field(default_factory=dict, validate_default=True)
 
     @field_validator("kind", "message")
     @classmethod
@@ -39,12 +59,37 @@ class EvidenceItem(BaseModel):
 
     @field_validator("data")
     @classmethod
-    def data_must_be_strict_json(cls, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
+    def data_must_be_strict_json(
+        cls, value: Mapping[str, JsonValue]
+    ) -> Mapping[str, JsonValue]:
         try:
             json.dumps(value, allow_nan=False)
         except (TypeError, ValueError) as error:
             raise ValueError("evidence data must contain strict JSON values") from error
-        return value
+        return cast(Mapping[str, JsonValue], _freeze_json(dict(value)))
+
+    @field_serializer("data")
+    def serialize_data(self, value: Mapping[str, JsonValue]) -> dict[str, JsonValue]:
+        thawed = _thaw_json(value)
+        if not isinstance(thawed, dict):  # pragma: no cover - field validation guarantees this
+            raise TypeError("evidence data must be a JSON object")
+        return thawed
+
+
+def _evidence_identity(item: EvidenceItem) -> dict[str, JsonValue]:
+    serialized = item.model_dump(mode="json")
+    return {"data": cast(JsonValue, serialized["data"]), "kind": item.kind}
+
+
+def _evidence_sort_key(item: EvidenceItem) -> tuple[str, str]:
+    identity = json.dumps(
+        _evidence_identity(item),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
+    return identity, item.message
 
 
 class Finding(BaseModel):
@@ -74,7 +119,7 @@ class Finding(BaseModel):
             raise ValueError("memory IDs must not be blank")
         if len(set(value)) != len(value):
             raise ValueError("memory IDs must be unique")
-        return value
+        return tuple(sorted(value))
 
     @field_validator("evidence")
     @classmethod
@@ -83,7 +128,7 @@ class Finding(BaseModel):
     ) -> tuple[EvidenceItem, ...]:
         if not value:
             raise ValueError("evidence must not be empty")
-        return value
+        return tuple(sorted(value, key=_evidence_sort_key))
 
     def to_json(self, *, indent: int | None = 2) -> str:
         """Serialize the finding with stable key ordering."""
@@ -117,16 +162,20 @@ class CheckerStats(BaseModel):
 
     memories_scanned: NonNegativeInt
     findings_emitted: NonNegativeInt
-    details: dict[str, NonNegativeInt] = Field(default_factory=dict)
+    details: Mapping[str, NonNegativeInt] = Field(default_factory=dict, validate_default=True)
 
     @field_validator("details")
     @classmethod
     def detail_keys_must_not_be_blank(
-        cls, value: dict[str, NonNegativeInt]
-    ) -> dict[str, NonNegativeInt]:
+        cls, value: Mapping[str, NonNegativeInt]
+    ) -> Mapping[str, NonNegativeInt]:
         if any(not key.strip() for key in value):
             raise ValueError("checker stat detail keys must not be blank")
-        return value
+        return MappingProxyType(dict(value))
+
+    @field_serializer("details")
+    def serialize_details(self, value: Mapping[str, NonNegativeInt]) -> dict[str, int]:
+        return dict(value)
 
 
 class CheckerResult(BaseModel):

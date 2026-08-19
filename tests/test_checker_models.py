@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+
 import pytest
 from pydantic import ValidationError
 
@@ -58,8 +60,19 @@ def test_evidence_item_validates_identity_message_and_json_data() -> None:
         EvidenceItem(kind="kind", message=" ")
     with pytest.raises(ValidationError):
         EvidenceItem(kind="kind", message="message", data={"bad": object()})
-    with pytest.raises(ValidationError, match="strict JSON"):
-        EvidenceItem(kind="kind", message="message", data={"bad": float("nan")})
+    for nonfinite in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValidationError, match="strict JSON"):
+            EvidenceItem(
+                kind="kind",
+                message="message",
+                data={"outer": {"values": [1, nonfinite]}},
+            )
+    with pytest.raises(ValidationError):
+        EvidenceItem(
+            kind="kind",
+            message="message",
+            data={"outer": {"values": [object()]}},
+        )
 
 
 @pytest.mark.parametrize(
@@ -161,6 +174,10 @@ def test_checker_stats_is_frozen_and_serializes_details_deterministically() -> N
     second_result = _result().model_copy(update={"stats": second})
 
     assert first_result.to_json() == second_result.to_json()
+    before = first_result.to_json()
+    with pytest.raises(TypeError):
+        first.details["source_refs_scanned"] = 999
+    assert first_result.to_json() == before
     with pytest.raises(ValidationError, match="frozen"):
         first.memories_scanned = 3
     with pytest.raises(ValidationError):
@@ -220,11 +237,103 @@ def test_finding_id_ignores_message_but_tracks_semantic_identity_and_version() -
             evidence=(evidence,),
         )
 
-    changed_message = original.model_copy(update={"message": "Revised wording"})
-    changed_kind = original.model_copy(update={"kind": "invalid_span"})
-    changed_data = original.model_copy(update={"data": {"turn_idx": 10}})
+    changed_message = EvidenceItem(
+        kind="missing_turn",
+        message="Revised wording",
+        data={"turn_idx": 9},
+    )
+    changed_kind = EvidenceItem(
+        kind="invalid_span",
+        message="Original wording",
+        data={"turn_idx": 9},
+    )
+    changed_data = EvidenceItem(
+        kind="missing_turn",
+        message="Original wording",
+        data={"turn_idx": 10},
+    )
 
     assert finding_id(original) == finding_id(changed_message)
     assert finding_id(original) != finding_id(changed_kind)
     assert finding_id(original) != finding_id(changed_data)
     assert finding_id(original) != finding_id(original, checker_version="1.1")
+
+
+def test_evidence_is_deeply_immutable_after_finding_id_creation() -> None:
+    evidence = EvidenceItem(
+        kind="example",
+        message="Example.",
+        data={"outer": {"items": [1, 2]}},
+    )
+    finding_id = deterministic_finding_id(
+        checker_id="checker",
+        checker_version="1.0",
+        defect_class=DefectClass.ORPHANED_PROVENANCE,
+        memory_ids=("m1",),
+        evidence=(evidence,),
+    )
+    finding = Finding(
+        finding_id=finding_id,
+        defect_class=DefectClass.ORPHANED_PROVENANCE,
+        memory_ids=("m1",),
+        confidence=1.0,
+        evidence=(evidence,),
+    )
+    before = finding.to_json()
+    outer = evidence.data["outer"]
+    assert isinstance(outer, Mapping)
+    items = outer["items"]
+
+    with pytest.raises(TypeError):
+        evidence.data["outer"] = {}
+    with pytest.raises(TypeError):
+        outer["items"] = []
+    with pytest.raises(AttributeError):
+        items.append(3)
+
+    assert finding.to_json() == before
+    assert finding.finding_id == deterministic_finding_id(
+        checker_id="checker",
+        checker_version="1.0",
+        defect_class=DefectClass.ORPHANED_PROVENANCE,
+        memory_ids=finding.memory_ids,
+        evidence=finding.evidence,
+    )
+    assert finding.model_dump(mode="json")["evidence"][0]["data"] == {
+        "outer": {"items": [1, 2]}
+    }
+
+
+def test_finding_canonicalizes_visible_memory_and_evidence_order() -> None:
+    first = EvidenceItem(kind="missing_turn", message="First", data={"turn_idx": 9})
+    second = EvidenceItem(
+        kind="missing_transcript",
+        message="Second",
+        data={"transcript_id": "t1"},
+    )
+    finding_id = deterministic_finding_id(
+        checker_id="checker",
+        checker_version="1.0",
+        defect_class=DefectClass.ORPHANED_PROVENANCE,
+        memory_ids=("m1", "m2"),
+        evidence=(first, second),
+    )
+    forward = Finding(
+        finding_id=finding_id,
+        defect_class=DefectClass.ORPHANED_PROVENANCE,
+        memory_ids=("m1", "m2"),
+        confidence=1.0,
+        evidence=(first, second),
+    )
+    reversed_inputs = Finding(
+        finding_id=finding_id,
+        defect_class=DefectClass.ORPHANED_PROVENANCE,
+        memory_ids=("m2", "m1"),
+        confidence=1.0,
+        evidence=(second, first),
+    )
+
+    assert forward.memory_ids == ("m1", "m2")
+    assert reversed_inputs.memory_ids == ("m1", "m2")
+    assert forward.evidence == reversed_inputs.evidence
+    assert forward.to_json() == reversed_inputs.to_json()

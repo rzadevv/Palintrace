@@ -7,7 +7,7 @@ import json
 from collections.abc import Sequence
 from typing import Protocol
 
-from memlint.checkers.models import CheckerResult, EvidenceItem
+from memlint.checkers.models import CheckerResult, EvidenceItem, _evidence_identity
 from memlint.models import NormalizedStore, TranscriptSet
 from memlint.taxonomy import DefectClass
 
@@ -46,13 +46,7 @@ def deterministic_finding_id(
 ) -> str:
     """Build an opaque finding ID from stable semantic inputs."""
 
-    evidence_identities = [
-        {
-            "data": item.data,
-            "kind": item.kind,
-        }
-        for item in evidence
-    ]
+    evidence_identities = [_evidence_identity(item) for item in evidence]
     evidence_identities.sort(
         key=lambda item: json.dumps(
             item,
