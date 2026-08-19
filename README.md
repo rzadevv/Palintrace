@@ -5,7 +5,7 @@ which memory defects can eventually be detected from an existing store and its s
 without external annotations or hidden canonical user state.
 
 This repository currently implements the frozen Foundation, the Part 2 taxonomy and mutation
-harness, and two structural checkers.
+harness, and three structural checkers.
 
 Implemented:
 
@@ -19,11 +19,12 @@ Implemented:
 - a typed, deterministic checker result API;
 - the `orphaned_provenance` checker;
 - the exact-duplicate `redundancy_bloat` checker;
+- the explicit-supersession `stale_active` checker;
 - `memlint dump`, `memlint mutate`, and `memlint audit`.
 
 Not implemented yet:
 
-- the other six defect checkers and semantic duplicate detection;
+- the other five defect checkers and semantic duplicate detection;
 - HaluMem, LongMemEval, or LoCoMo evaluation;
 - LLM, NLI, retrieval, embedding generation, automatic repair, or benchmark scoring.
 

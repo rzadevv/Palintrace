@@ -86,3 +86,26 @@ memlint audit \
   --checker redundancy_bloat \
   --output findings.json
 ```
+
+## Stale active
+
+`stale_active` implements only the controlled `explicit_supersession` case. It emits a Finding for
+an old memory when another memory directly names its ID in `supersedes` and the old memory has
+`active=true`. An inactive old memory is already resolved, while `active=null` does not provide
+enough evidence that it remains current.
+
+Missing supersession targets and self-links do not create findings. One old memory receives one
+Finding even when several memories supersede it; each direct superseder contributes a separate
+`active_superseded` evidence item. Direct links in a chain are evaluated independently, without
+computing transitive supersession.
+
+The checker does not infer replacement from timestamps, similar content, changed values, scope, or
+other metadata. It requires no transcripts and uses no model calls or tokens. Its details report
+supersession links scanned, resolved links, missing targets skipped, and self-links skipped.
+
+```bash
+memlint audit \
+  --store stale.json \
+  --checker stale_active \
+  --output findings.json
+```
