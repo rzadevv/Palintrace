@@ -18,6 +18,10 @@ data. Human-readable evidence wording does not affect identity. Identical semant
 produce identical IDs and byte-stable sorted JSON. Results contain no execution timestamp or runtime
 duration.
 
+Validated findings canonicalize their visible memory-ID and evidence ordering. Evidence JSON and
+checker-specific statistics are recursively immutable in memory while retaining ordinary JSON object
+and array representations when serialized.
+
 Generic checker statistics contain `memories_scanned`, `findings_emitted`, and a `details` object.
 The orphaned-provenance checker reports its structural work as
 `details.source_refs_scanned`.
