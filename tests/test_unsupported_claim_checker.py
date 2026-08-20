@@ -723,10 +723,10 @@ def test_part_two_unsupported_gold_unit_matches_without_checker_manifest_access(
     assert checker_result.findings[0].memory_ids == manifest.gold_label.memory_ids
 
 
-def test_unsupported_claim_is_not_exposed_in_audit_cli_yet() -> None:
+def test_unsupported_claim_is_exposed_in_audit_cli() -> None:
     from memlint.cli import CHECKER_NAMES
 
-    assert "unsupported_claim" not in CHECKER_NAMES
+    assert "unsupported_claim" in CHECKER_NAMES
 
 
 @pytest.mark.skipif(
