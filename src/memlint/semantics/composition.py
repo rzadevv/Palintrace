@@ -68,6 +68,25 @@ def _duplicate_key(segment: EvidenceSegment) -> tuple[object, ...]:
     )
 
 
+def canonical_unique_evidence_segments(
+    segments: tuple[EvidenceSegment, ...],
+) -> tuple[EvidenceSegment, ...]:
+    """Return the exact canonical unique segments used by composition."""
+
+    if not segments:
+        raise SemanticCompositionError("at least one resolved evidence segment is required")
+
+    unique_segments: list[EvidenceSegment] = []
+    seen: set[tuple[object, ...]] = set()
+    for segment in sorted(segments, key=_canonical_key):
+        duplicate_key = _duplicate_key(segment)
+        if duplicate_key in seen:
+            continue
+        seen.add(duplicate_key)
+        unique_segments.append(segment)
+    return tuple(unique_segments)
+
+
 def compose_evidence(
     segments: tuple[EvidenceSegment, ...],
     *,
@@ -80,14 +99,7 @@ def compose_evidence(
     if not isinstance(style, EvidenceCompositionStyle):
         raise SemanticCompositionError("unsupported evidence composition style")
 
-    unique_segments: list[EvidenceSegment] = []
-    seen: set[tuple[object, ...]] = set()
-    for segment in sorted(segments, key=_canonical_key):
-        duplicate_key = _duplicate_key(segment)
-        if duplicate_key in seen:
-            continue
-        seen.add(duplicate_key)
-        unique_segments.append(segment)
+    unique_segments = canonical_unique_evidence_segments(segments)
 
     if style is EvidenceCompositionStyle.PLAIN:
         text = "\n".join(segment.text for segment in unique_segments)

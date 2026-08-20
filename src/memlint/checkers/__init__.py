@@ -25,6 +25,7 @@ from memlint.checkers.privacy_scope_violation import (
 )
 from memlint.checkers.redundancy_bloat import RedundancyBloatChecker
 from memlint.checkers.stale_active import StaleActiveChecker
+from memlint.checkers.unsupported_claim import UnsupportedClaimChecker
 
 __all__ = [
     "CHECKER_RESULT_SCHEMA_VERSION",
@@ -44,6 +45,7 @@ __all__ = [
     "ScopeDimension",
     "ScopeIsolationPolicy",
     "StaleActiveChecker",
+    "UnsupportedClaimChecker",
     "deterministic_finding_id",
     "load_scope_policy",
 ]

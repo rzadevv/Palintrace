@@ -18,6 +18,7 @@ from memlint.checkers import (
     ScopeDimension,
     ScopeIsolationPolicy,
     StaleActiveChecker,
+    UnsupportedClaimChecker,
     load_scope_policy,
 )
 from memlint.models import (
@@ -119,6 +120,7 @@ __all__ = [
     "SemanticRelation",
     "SemanticUsage",
     "StaleActiveChecker",
+    "UnsupportedClaimChecker",
     "ProvenanceStatus",
     "SourceRef",
     "Transcript",
