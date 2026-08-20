@@ -20,8 +20,8 @@ mem0 = ["mem0ai>=2"]
 graphiti = ["graphiti-core>=0.20"]
 letta = ["letta-client>=1"]
 semantic-local = [
-  "torch>=2.5,<3",
-  "transformers>=5.14,<6",
+  "torch>=2.13,<3",
+  "transformers>=5.15,<6",
 ]
 dev = [
   "mypy>=1.15",

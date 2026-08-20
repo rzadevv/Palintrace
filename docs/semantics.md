@@ -122,12 +122,16 @@ gold, and is not derived from mutation manifests or Part 2 controlled mutation t
 `tools/evaluate_semantic_judge.py` runs the fixture explicitly for one pinned checkpoint. It reports
 one correctness pass, per-relation and confusion counts, incorrect case IDs, and a median over at
 least three timed CPU passes after one warm-up call. Timing exists only in this selection tool. The
-Part 4B comparison is restricted to these two Apache-2.0 checkpoints:
+Part 4B comparison is restricted to these two checkpoints:
 
-| Candidate | Model ID | Pinned model revision |
-|---|---|---|
-| A | `cross-encoder/nli-MiniLM2-L6-H768` | `b95119ce93d3e065de6214e38cd4a97b0f2f2c6d` |
-| B | `cross-encoder/nli-deberta-v3-small` | `fa2804872c3b4bd748f38c0185cc85775361e735` |
+| Candidate | Model ID | Pinned model revision | License | Safetensors weights |
+|---|---|---|---|---:|
+| A | `cross-encoder/nli-MiniLM2-L6-H768` | `b95119ce93d3e065de6214e38cd4a97b0f2f2c6d` | Apache-2.0 | 328,499,560 bytes |
+| B | `cross-encoder/nli-deberta-v3-small` | `fa2804872c3b4bd748f38c0185cc85775361e735` | Apache-2.0 | 567,605,820 bytes |
+
+The recorded comparison environment used Python 3.14.7, Transformers 5.15.1, Torch 2.13.0+cpu,
+and an x86_64 CPU. The downloaded weight sizes above are for the pinned `model.safetensors` files,
+not the repositories' optional ONNX or pickle artifacts.
 
 For example:
 
