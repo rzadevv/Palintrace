@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from typing import cast
 
 import pytest
 from pydantic import ValidationError
@@ -23,6 +24,7 @@ from memlint.semantics import (
     SemanticRelation,
     SemanticUsage,
     resolve_declared_evidence,
+    semantic_judge_identity,
 )
 
 
@@ -64,6 +66,15 @@ class FakeJudge:
         return SemanticJudgment(relation=relation, score=1.0)
 
 
+class DynamicIdentityJudge:
+    def __init__(self, judge_id: object, judge_version: object) -> None:
+        self.judge_id = judge_id
+        self.judge_version = judge_version
+
+    def judge(self, *, premise: str, hypothesis: str) -> SemanticJudgment:
+        return SemanticJudgment(relation=SemanticRelation.NEUTRAL, score=0.5)
+
+
 def test_semantic_relation_has_exact_stable_values() -> None:
     assert tuple(SemanticRelation) == (
         SemanticRelation.ENTAILMENT,
@@ -93,16 +104,87 @@ def test_fake_judge_satisfies_directional_contract() -> None:
     )
 
 
+def test_semantic_judge_identity_validates_and_preserves_declared_strings() -> None:
+    assert semantic_judge_identity(FakeJudge()) == ("fake", "1")
+
+    judge = cast(SemanticJudge, DynamicIdentityJudge(" judge ", " version "))
+    assert semantic_judge_identity(judge) == (" judge ", " version ")
+
+
+@pytest.mark.parametrize(
+    ("judge_id", "judge_version"),
+    [
+        ("", "1"),
+        ("   ", "1"),
+        ("fake", ""),
+        ("fake", "   "),
+        (1, "1"),
+        ("fake", 1),
+    ],
+)
+def test_semantic_judge_identity_rejects_invalid_runtime_values(
+    judge_id: object,
+    judge_version: object,
+) -> None:
+    judge = cast(SemanticJudge, DynamicIdentityJudge(judge_id, judge_version))
+
+    with pytest.raises(ValueError, match="must be a nonblank string"):
+        semantic_judge_identity(judge)
+
+
 @pytest.mark.parametrize("field", ["model_calls", "input_tokens", "output_tokens"])
 def test_semantic_usage_rejects_negative_counts(field: str) -> None:
     with pytest.raises(ValidationError):
         SemanticUsage.model_validate({field: -1})
 
 
+@pytest.mark.parametrize("value", [True, 1.0, "1"])
+@pytest.mark.parametrize("field", ["model_calls", "input_tokens", "output_tokens"])
+def test_semantic_usage_rejects_coercible_non_integer_counts(
+    field: str,
+    value: object,
+) -> None:
+    with pytest.raises(ValidationError):
+        SemanticUsage.model_validate({field: value})
+
+
+def test_semantic_usage_accepts_real_nonnegative_integers() -> None:
+    assert SemanticUsage(model_calls=0, input_tokens=4, output_tokens=1) == SemanticUsage(
+        model_calls=0,
+        input_tokens=4,
+        output_tokens=1,
+    )
+
+
 @pytest.mark.parametrize("score", [-0.01, 1.01, float("inf"), float("nan")])
 def test_semantic_judgment_rejects_invalid_scores(score: float) -> None:
     with pytest.raises(ValidationError):
         SemanticJudgment(relation=SemanticRelation.NEUTRAL, score=score)
+
+
+@pytest.mark.parametrize("score", [True, "0.5"])
+def test_semantic_judgment_rejects_coercible_non_numeric_scores(score: object) -> None:
+    with pytest.raises(ValidationError):
+        SemanticJudgment.model_validate({"relation": "neutral", "score": score})
+
+
+def test_semantic_judgment_accepts_integer_score_endpoints() -> None:
+    zero = SemanticJudgment(relation=SemanticRelation.NEUTRAL, score=0)
+    one = SemanticJudgment(relation=SemanticRelation.ENTAILMENT, score=1)
+
+    assert zero.score == 0.0
+    assert one.score == 1.0
+    assert isinstance(zero.score, float)
+    assert isinstance(one.score, float)
+
+
+@pytest.mark.parametrize("relation", ["entailment", "contradiction", "neutral"])
+def test_semantic_relation_json_strings_remain_valid(relation: str) -> None:
+    judgment = SemanticJudgment.model_validate_json(
+        f'{{"relation":"{relation}","score":0.5}}'
+    )
+
+    assert judgment.relation.value == relation
 
 
 def test_semantic_judgment_rejects_invalid_relation_and_usage() -> None:
@@ -172,6 +254,37 @@ def test_evidence_segment_validation(factory: Callable[[], object]) -> None:
         factory()
 
 
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"source_ref_index": True},
+        {"source_ref_index": "1"},
+        {"source_ref_index": 1.0},
+        {"turn_idx": True},
+        {"turn_idx": "1"},
+        {"turn_idx": 1.0},
+        {"span": (True, 2)},
+        {"span": (0, "2")},
+        {"span": (0, 2.0)},
+    ],
+)
+def test_evidence_segment_rejects_coercible_numeric_coordinates(
+    overrides: dict[str, object],
+) -> None:
+    data: dict[str, object] = {
+        "source_ref_index": 0,
+        "transcript_id": "t1",
+        "turn_idx": 0,
+        "role": "user",
+        "span": (0, 2),
+        "text": "text",
+    }
+    data.update(overrides)
+
+    with pytest.raises(ValidationError):
+        EvidenceSegment.model_validate(data)
+
+
 def test_evidence_resolution_models_validate_issue_shapes_and_extra_fields() -> None:
     with pytest.raises(ValidationError):
         EvidenceResolutionIssue(
@@ -190,6 +303,56 @@ def test_evidence_resolution_models_validate_issue_shapes_and_extra_fields() -> 
         )
     with pytest.raises(ValidationError):
         EvidenceResolution.model_validate({"unexpected": True})
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {
+            "kind": "missing_transcript",
+            "source_ref_index": True,
+            "transcript_id": "t1",
+        },
+        {
+            "kind": "missing_transcript",
+            "source_ref_index": "0",
+            "transcript_id": "t1",
+        },
+        {
+            "kind": "missing_turn",
+            "source_ref_index": 0,
+            "transcript_id": "t1",
+            "turn_idx": True,
+        },
+        {
+            "kind": "missing_turn",
+            "source_ref_index": 0,
+            "transcript_id": "t1",
+            "turn_idx": "1",
+        },
+        {
+            "kind": "invalid_span",
+            "source_ref_index": 0,
+            "transcript_id": "t1",
+            "turn_idx": 0,
+            "span": (0, "3"),
+            "turn_length": 2,
+        },
+        {
+            "kind": "invalid_span",
+            "source_ref_index": 0,
+            "transcript_id": "t1",
+            "turn_idx": 0,
+            "span": (0, 3),
+            "turn_length": "2",
+        },
+    ],
+)
+def test_evidence_resolution_issue_rejects_coercible_numeric_coordinates(
+    payload: dict[str, object],
+) -> None:
+    with pytest.raises(ValidationError):
+        EvidenceResolutionIssue.model_validate(payload)
 
 
 def test_resolves_exact_character_span_with_python_character_indexing() -> None:
@@ -241,6 +404,15 @@ def test_resolves_whole_transcript_as_one_segment_per_ordered_turn() -> None:
         (1, "assistant", "Second."),
     ]
     assert all(segment.span is None for segment in resolution.segments)
+
+
+def test_existing_empty_transcript_resolves_without_segments_or_issues() -> None:
+    memory = _memory(SourceRef(transcript_id="t1"))
+    transcripts = _transcripts(Transcript(id="t1", turns=()))
+
+    resolution = resolve_declared_evidence(memory, transcripts)
+
+    assert resolution == EvidenceResolution(segments=(), issues=())
 
 
 def test_whole_transcript_defensively_sorts_out_of_order_turns() -> None:
