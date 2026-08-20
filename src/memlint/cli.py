@@ -22,6 +22,7 @@ from memlint.checkers import (
     PrivacyScopeViolationChecker,
     RedundancyBloatChecker,
     StaleActiveChecker,
+    UnsupportedClaimChecker,
     load_scope_policy,
 )
 from memlint.models import MemoryScope, NormalizedStore
@@ -32,6 +33,7 @@ from memlint.mutations import (
     MutationRequest,
     mutate,
 )
+from memlint.semantics import LocalNLISemanticJudge, SemanticJudgeError
 from memlint.serialization import load_store, load_transcripts
 from memlint.taxonomy import DefectClass
 
@@ -40,7 +42,7 @@ CHECKER_FACTORIES: dict[str, type[Checker]] = {
     "redundancy_bloat": RedundancyBloatChecker,
     "stale_active": StaleActiveChecker,
 }
-CHECKER_NAMES = (*CHECKER_FACTORIES, "privacy_scope_violation")
+CHECKER_NAMES = (*CHECKER_FACTORIES, "privacy_scope_violation", "unsupported_claim")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -96,6 +98,8 @@ def build_parser() -> argparse.ArgumentParser:
     audit.add_argument("--transcripts", type=Path, help="TranscriptSet JSON when required")
     audit.add_argument("--checker", choices=CHECKER_NAMES, required=True)
     audit.add_argument("--scope-policy", type=Path, help="JSON authoritative scope policy")
+    audit.add_argument("--semantic-model-id")
+    audit.add_argument("--semantic-model-revision")
     audit.add_argument("--output", type=Path, help="write checker result JSON instead of stdout")
     return parser
 
@@ -122,6 +126,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 def _run_audit(args: argparse.Namespace) -> str:
+    _validate_audit_arguments(args)
     input_paths = {args.store.resolve()}
     if args.transcripts is not None:
         input_paths.add(args.transcripts.resolve())
@@ -137,13 +142,42 @@ def _run_audit(args: argparse.Namespace) -> str:
     return result.to_json(args.output)
 
 
+def _validate_audit_arguments(args: argparse.Namespace) -> None:
+    semantic_configuration_supplied = (
+        args.semantic_model_id is not None or args.semantic_model_revision is not None
+    )
+    if args.checker != "unsupported_claim" and semantic_configuration_supplied:
+        raise ValueError(
+            "--semantic-model-id and --semantic-model-revision are only valid for "
+            "unsupported_claim"
+        )
+    if args.checker != "privacy_scope_violation" and args.scope_policy is not None:
+        raise ValueError("--scope-policy is only valid for privacy_scope_violation")
+    if args.checker != "unsupported_claim":
+        return
+    if args.transcripts is None:
+        raise ValueError("unsupported_claim checker requires --transcripts")
+    if args.semantic_model_id is None or not args.semantic_model_id.strip():
+        raise ValueError("unsupported_claim checker requires a nonblank --semantic-model-id")
+    if args.semantic_model_revision is None or not args.semantic_model_revision.strip():
+        raise ValueError("unsupported_claim checker requires a nonblank --semantic-model-revision")
+
+
 def _build_checker(args: argparse.Namespace) -> Checker:
     if args.checker == "privacy_scope_violation":
         if args.scope_policy is None:
             raise ValueError("privacy_scope_violation checker requires --scope-policy")
         return PrivacyScopeViolationChecker(load_scope_policy(args.scope_policy))
-    if args.scope_policy is not None:
-        raise ValueError("--scope-policy is only valid for privacy_scope_violation")
+    if args.checker == "unsupported_claim":
+        try:
+            judge = LocalNLISemanticJudge(
+                model_id=args.semantic_model_id,
+                revision=args.semantic_model_revision,
+                device="cpu",
+            )
+        except SemanticJudgeError as error:
+            raise ValueError(str(error)) from None
+        return UnsupportedClaimChecker(judge)
     return CHECKER_FACTORIES[args.checker]()
 
 
