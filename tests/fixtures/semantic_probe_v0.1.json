@@ -1,0 +1,110 @@
+[
+  {
+    "id": "E1",
+    "premise": "I work for Orion Systems.",
+    "hypothesis": "The user works for Orion Systems.",
+    "expected_relation": "entailment"
+  },
+  {
+    "id": "E2",
+    "premise": "My favorite color is blue.",
+    "hypothesis": "The user's favorite color is blue.",
+    "expected_relation": "entailment"
+  },
+  {
+    "id": "E3",
+    "premise": "I own a bicycle.",
+    "hypothesis": "The user owns a bicycle.",
+    "expected_relation": "entailment"
+  },
+  {
+    "id": "E4",
+    "premise": "I have two cats.",
+    "hypothesis": "The user has cats.",
+    "expected_relation": "entailment"
+  },
+  {
+    "id": "E5",
+    "premise": "I live in Hamburg.",
+    "hypothesis": "The user lives in Hamburg.",
+    "expected_relation": "entailment"
+  },
+  {
+    "id": "E6",
+    "premise": "I use Emacs as my preferred text editor.",
+    "hypothesis": "The user prefers Emacs.",
+    "expected_relation": "entailment"
+  },
+  {
+    "id": "C1",
+    "premise": "I do not own a car.",
+    "hypothesis": "The user owns a car.",
+    "expected_relation": "contradiction"
+  },
+  {
+    "id": "C2",
+    "premise": "My favorite color is blue, not red.",
+    "hypothesis": "The user's favorite color is red.",
+    "expected_relation": "contradiction"
+  },
+  {
+    "id": "C3",
+    "premise": "I live in Berlin and I do not live in Munich.",
+    "hypothesis": "The user lives in Munich.",
+    "expected_relation": "contradiction"
+  },
+  {
+    "id": "C4",
+    "premise": "I have no pets.",
+    "hypothesis": "The user has a pet.",
+    "expected_relation": "contradiction"
+  },
+  {
+    "id": "C5",
+    "premise": "My birthday is in October, not May.",
+    "hypothesis": "The user's birthday is in May.",
+    "expected_relation": "contradiction"
+  },
+  {
+    "id": "C6",
+    "premise": "I never drink coffee.",
+    "hypothesis": "The user drinks coffee.",
+    "expected_relation": "contradiction"
+  },
+  {
+    "id": "N1",
+    "premise": "I use Java at work.",
+    "hypothesis": "The user prefers Java.",
+    "expected_relation": "neutral"
+  },
+  {
+    "id": "N2",
+    "premise": "I may move to Cologne next year.",
+    "hypothesis": "The user lives in Cologne.",
+    "expected_relation": "neutral"
+  },
+  {
+    "id": "N3",
+    "premise": "My sister lives in Vienna.",
+    "hypothesis": "The user lives in Vienna.",
+    "expected_relation": "neutral"
+  },
+  {
+    "id": "N4",
+    "premise": "I bought a mechanical keyboard.",
+    "hypothesis": "The user prefers mechanical keyboards.",
+    "expected_relation": "neutral"
+  },
+  {
+    "id": "N5",
+    "premise": "I visited Paris last year.",
+    "hypothesis": "The user lives in Paris.",
+    "expected_relation": "neutral"
+  },
+  {
+    "id": "N6",
+    "premise": "Please remind me to call Alex tomorrow.",
+    "hypothesis": "The user called Alex.",
+    "expected_relation": "neutral"
+  }
+]
