@@ -148,9 +148,9 @@ selected class. It is a judge-specific classifier score, not a calibrated factua
 not an unsupported-claim threshold. Usage reports one model call, the actual encoded pair length as
 input tokens, and zero output tokens. No runtime duration is stored in semantic or checker models.
 
-The local judge remains dependency-injected semantic infrastructure and is not automatically loaded
-by the unsupported-claim checker. There is still no internal-contradiction, instruction, or retrieval
-checker, and the unsupported-claim checker is not registered with `memlint audit`.
+The local judge remains dependency-injected semantic infrastructure and is loaded by `memlint audit`
+only when `unsupported_claim` is explicitly selected and configured. There is still no
+internal-contradiction, instruction, or retrieval checker.
 
 ## Judge selection probe
 
@@ -186,6 +186,36 @@ Probe results select infrastructure for further validation only. They do not est
 unsupported-claim precision or recall, MemLint accuracy or F1, publication performance, or a final
 research winner. Part 2 mutation gold is not used to tune the model, labels, thresholds, or any
 future aggregation policy.
+
+## Contradiction pair-policy probe
+
+A future `internal_contradiction` finding covers an unordered memory pair, but an NLI judgment is
+directional. The `contradiction_pair_probe_v0.1.json` development fixture therefore judges every
+pair twice: memory A as premise with memory B as hypothesis, then memory B as premise with memory A
+as hypothesis. It compares exactly two symmetric relation-only rules:
+
+- `any_direction`: contradiction when either directional relation is `contradiction`;
+- `both_directions`: contradiction only when both directional relations are `contradiction`.
+
+Neither rule uses scores, thresholds, lexical exclusivity rules, transcripts, evidence composition,
+or mutation metadata. The 18 fixed pairs comprise six clear contradictions, six simultaneously
+compatible facts, and six temporal/change-compatible facts. This is a development probe, not
+publication benchmark data, Part 2 gold, or audit-time ground truth.
+
+The pinned CPU MiniLM run produced:
+
+| Policy | Correct | Clear contradictions | Normal-compatible false positives | Temporal-compatible false positives |
+|---|---:|---:|---|---|
+| `any_direction` | 8/18 | 6/6 | N1, N2, N3, N4, N5, N6 | T1, T3, T4, T5 |
+| `both_directions` | 11/18 | 6/6 | N1, N2, N3, N4 | T1, T4, T5 |
+
+Both policies were pair-order invariant. N5, N6, and T3 were directionally asymmetric. The frozen
+selection priority considers total compatible false positives first, then temporal false positives,
+clear-contradiction detection, directional asymmetry, and finally a conservative
+`both_directions` tie-break. That ordering makes `both_directions` the priority candidate here, but
+seven false positives across twelve compatible cases, including three temporal cases, are still
+substantial. No primary pair policy is frozen from this probe, no contradiction-performance claim is
+made, and no internal-contradiction checker exists.
 
 ## Isolation
 

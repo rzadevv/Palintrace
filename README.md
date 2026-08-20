@@ -270,6 +270,9 @@ and semantic performance has not been established. There is no score threshold, 
 does not imply that every memory was assessed; inspect the checker skip counters. Core installs and
 structural audits do not include, construct, or download the local semantic model.
 
+A development-only bidirectional pair-policy probe exists for a future `internal_contradiction`
+checker; it has not frozen a primary policy, and no such checker is implemented.
+
 Committed source-shaped exports can exercise every adapter offline:
 
 ```bash
