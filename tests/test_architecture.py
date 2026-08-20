@@ -84,7 +84,7 @@ def test_checker_package_does_not_read_raw_attributes() -> None:
     assert violations == []
 
 
-def test_part_three_has_only_implemented_checker_modules() -> None:
+def test_checker_package_has_only_implemented_modules() -> None:
     modules = {path.name for path in CHECKER_ROOT.glob("*.py")}
     assert modules == {
         "__init__.py",
@@ -94,6 +94,7 @@ def test_part_three_has_only_implemented_checker_modules() -> None:
         "privacy_scope_violation.py",
         "redundancy_bloat.py",
         "stale_active.py",
+        "unsupported_claim.py",
     }
 
 
