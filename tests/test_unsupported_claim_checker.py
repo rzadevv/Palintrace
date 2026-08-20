@@ -465,7 +465,7 @@ def test_default_plain_multi_evidence_uses_canonical_deduplicated_premise() -> N
 
     assert judge.calls == [("first\nsecond\nthird", "Exact hypothesis.")]
     evidence = result.findings[0].evidence[0]
-    assert evidence.data["segment_count"] == 4
+    assert "segment_count" not in evidence.data
     assert evidence.data["unique_segment_count"] == 3
     assert evidence.data["source_coordinates"] == (
         {"transcript_id": "t1", "turn_idx": 0, "span": None, "role": "user"},
@@ -477,6 +477,38 @@ def test_default_plain_multi_evidence_uses_canonical_deduplicated_premise() -> N
             "role": "assistant",
         },
     )
+
+
+def test_duplicate_source_ref_does_not_change_semantic_finding_identity() -> None:
+    premise = "Canonical evidence."
+    hypothesis = "Stored claim."
+    source_ref = SourceRef(transcript_id="t1", turn_idx=0)
+    single_declaration = _store(_memory("m1", hypothesis, source_ref))
+    duplicate_declaration = _store(_memory("m1", hypothesis, source_ref, source_ref))
+    transcripts = _single_turn_transcripts(premise)
+    judge = _FakeJudge(default=_judgment(SemanticRelation.NEUTRAL, score=0.73))
+    checker = UnsupportedClaimChecker(judge)
+
+    single_result = checker.check(single_declaration, transcripts=transcripts)
+    duplicate_result = checker.check(duplicate_declaration, transcripts=transcripts)
+
+    assert judge.calls == [(premise, hypothesis), (premise, hypothesis)]
+    single_finding = single_result.findings[0]
+    duplicate_finding = duplicate_result.findings[0]
+    single_evidence = single_finding.evidence[0].data
+    duplicate_evidence = duplicate_finding.evidence[0].data
+    assert single_evidence["premise_sha256"] == duplicate_evidence["premise_sha256"]
+    assert single_evidence["hypothesis_sha256"] == duplicate_evidence["hypothesis_sha256"]
+    assert single_evidence["source_coordinates"] == duplicate_evidence["source_coordinates"]
+    assert len(single_evidence["source_coordinates"]) == 1
+    assert single_evidence["unique_segment_count"] == 1
+    assert duplicate_evidence["unique_segment_count"] == 1
+    assert single_evidence["semantic_relation"] == "neutral"
+    assert duplicate_evidence["semantic_relation"] == "neutral"
+    assert "segment_count" not in single_evidence
+    assert "segment_count" not in duplicate_evidence
+    assert single_evidence == duplicate_evidence
+    assert single_finding.finding_id == duplicate_finding.finding_id
 
 
 def test_role_labeled_composition_override_changes_only_premise_and_evidence() -> None:
