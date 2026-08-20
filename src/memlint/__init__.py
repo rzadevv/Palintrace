@@ -44,6 +44,17 @@ from memlint.mutations import (
     RetrievalProbe,
     mutate,
 )
+from memlint.semantics import (
+    EvidenceIssueKind,
+    EvidenceResolution,
+    EvidenceResolutionIssue,
+    EvidenceSegment,
+    SemanticJudge,
+    SemanticJudgment,
+    SemanticRelation,
+    SemanticUsage,
+    resolve_declared_evidence,
+)
 from memlint.taxonomy import TAXONOMY_VERSION, DefectClass
 
 __all__ = [
@@ -55,6 +66,10 @@ __all__ = [
     "CheckerResult",
     "CheckerStats",
     "EvidenceItem",
+    "EvidenceIssueKind",
+    "EvidenceResolution",
+    "EvidenceResolutionIssue",
+    "EvidenceSegment",
     "Finding",
     "MemoryScope",
     "BaseStoreStatus",
@@ -77,6 +92,10 @@ __all__ = [
     "SCOPE_POLICY_SCHEMA_VERSION",
     "ScopeDimension",
     "ScopeIsolationPolicy",
+    "SemanticJudge",
+    "SemanticJudgment",
+    "SemanticRelation",
+    "SemanticUsage",
     "StaleActiveChecker",
     "ProvenanceStatus",
     "SourceRef",
@@ -87,6 +106,7 @@ __all__ = [
     "TAXONOMY_VERSION",
     "load_scope_policy",
     "mutate",
+    "resolve_declared_evidence",
 ]
 
 __version__ = "0.1.0"
