@@ -17,6 +17,8 @@ Implemented:
 - taxonomy version 1.0 with eight frozen defect classes;
 - deterministic controlled mutations and separate gold manifests;
 - a typed, deterministic checker result API;
+- deterministic semantic evidence-resolution primitives;
+- a provider-independent `SemanticJudge` contract;
 - the `orphaned_provenance` checker;
 - the exact-duplicate `redundancy_bloat` checker;
 - the explicit-supersession `stale_active` checker;
@@ -26,8 +28,9 @@ Implemented:
 Not implemented yet:
 
 - the other four defect checkers and semantic duplicate detection;
+- any concrete semantic judge, NLI model, or LLM provider;
 - HaluMem, LongMemEval, or LoCoMo evaluation;
-- LLM, NLI, retrieval, embedding generation, automatic repair, or benchmark scoring.
+- retrieval, embedding generation, automatic repair, or benchmark scoring.
 
 ## Architecture
 
@@ -234,6 +237,10 @@ memlint audit \
 
 This checker identifies policy-prohibited exact portable replicas. It does not reconstruct
 historical copy direction or provide general privacy-compliance analysis.
+
+The [semantic groundwork](docs/semantics.md) resolves declared transcript coordinates and defines a
+provider-independent judgment contract. It does not implement unsupported-claim or contradiction
+checking, and no concrete semantic model is included.
 
 Committed source-shaped exports can exercise every adapter offline:
 
