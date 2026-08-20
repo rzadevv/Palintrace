@@ -19,6 +19,16 @@ optional span, and exact source text. Repeated declarations are preserved even w
 the same turn or text. Memories whose provenance is `unavailable` or `known_absent` produce neither
 segments nor issues; that result makes no claim about support, correctness, or cleanliness.
 
+A whole-transcript reference to an existing empty transcript is structurally resolvable and
+produces zero segments and zero issues. This means no resolved semantic text is available; it does
+not mean entailed, neutral, unsupported, or clean. A future semantic checker must treat the absence
+of text as an assessability condition.
+
+The resolver does not decide which transcript roles are semantically authoritative. It preserves
+each turn's exact role, text, and coordinates. A future semantic checker or composition policy will
+decide how those segments are used. The resolver returns individual segments and does not
+concatenate them into a premise.
+
 Structural issues use the same `missing_transcript`, `missing_turn`, and `invalid_span` distinctions
 as the orphaned-provenance checker. A broken reference is therefore not converted into a semantic
 `neutral` or `contradiction` judgment. Resolution does not compare memory content with transcript
@@ -32,7 +42,8 @@ text output is explicitly required.
 ## Semantic judgment contract
 
 `SemanticJudge` is a provider-independent protocol with nonblank `judge_id` and `judge_version`
-identities and one directional operation:
+identities and one directional operation. `semantic_judge_identity()` provides reusable runtime
+validation for those identity strings and returns the exact declared values without normalization:
 
 ```python
 judgment = judge.judge(
@@ -56,6 +67,10 @@ These are semantic-layer relations, not taxonomy labels such as supported or uns
 `SemanticJudgment.score` is a judge-specific confidence or decision score in `[0, 1]`; it is not
 automatically a calibrated probability. `SemanticUsage` records nonnegative model-call and token
 counts without prices, timestamps, or runtime duration.
+
+Semantic numeric fields form a strict provider boundary. Usage counters and evidence coordinates
+accept only actual nonnegative Python integers, not booleans, floats, or numeric strings. Scores
+accept finite Python integers or floats in `[0, 1]`, but reject booleans and numeric strings.
 
 ## Isolation
 
