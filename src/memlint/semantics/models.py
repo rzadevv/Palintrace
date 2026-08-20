@@ -48,6 +48,13 @@ class SemanticJudgment(BaseModel):
     score: StrictUnitScore
     usage: SemanticUsage = Field(default_factory=SemanticUsage)
 
+    @field_validator("score", mode="before")
+    @classmethod
+    def score_must_be_a_python_number(cls, value: object) -> int | float:
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise ValueError("score must be a Python int or float")
+        return value
+
 
 class EvidenceIssueKind(StrEnum):
     """Structural failure modes shared with provenance resolution."""

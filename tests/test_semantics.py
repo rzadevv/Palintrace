@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from decimal import Decimal
 from typing import cast
 
 import pytest
@@ -162,7 +163,7 @@ def test_semantic_judgment_rejects_invalid_scores(score: float) -> None:
         SemanticJudgment(relation=SemanticRelation.NEUTRAL, score=score)
 
 
-@pytest.mark.parametrize("score", [True, "0.5"])
+@pytest.mark.parametrize("score", [True, "0.5", Decimal("0.5")])
 def test_semantic_judgment_rejects_coercible_non_numeric_scores(score: object) -> None:
     with pytest.raises(ValidationError):
         SemanticJudgment.model_validate({"relation": "neutral", "score": score})
