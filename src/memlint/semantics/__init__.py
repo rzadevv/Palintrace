@@ -1,6 +1,6 @@
 """Provider-independent semantic contracts and transcript evidence resolution."""
 
-from memlint.semantics.base import SemanticJudge
+from memlint.semantics.base import SemanticJudge, semantic_judge_identity
 from memlint.semantics.evidence import resolve_declared_evidence
 from memlint.semantics.models import (
     EvidenceIssueKind,
@@ -22,4 +22,5 @@ __all__ = [
     "SemanticRelation",
     "SemanticUsage",
     "resolve_declared_evidence",
+    "semantic_judge_identity",
 ]

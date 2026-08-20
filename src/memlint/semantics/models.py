@@ -4,16 +4,21 @@ from __future__ import annotations
 
 import json
 from enum import StrEnum
+from typing import Annotated
 
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    FiniteFloat,
-    NonNegativeInt,
     field_validator,
     model_validator,
 )
+
+StrictNonNegativeInt = Annotated[int, Field(strict=True, ge=0)]
+StrictUnitScore = Annotated[
+    float,
+    Field(strict=True, ge=0.0, le=1.0, allow_inf_nan=False),
+]
 
 
 class SemanticRelation(StrEnum):
@@ -29,9 +34,9 @@ class SemanticUsage(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    model_calls: NonNegativeInt = 0
-    input_tokens: NonNegativeInt = 0
-    output_tokens: NonNegativeInt = 0
+    model_calls: StrictNonNegativeInt = 0
+    input_tokens: StrictNonNegativeInt = 0
+    output_tokens: StrictNonNegativeInt = 0
 
 
 class SemanticJudgment(BaseModel):
@@ -40,7 +45,7 @@ class SemanticJudgment(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     relation: SemanticRelation
-    score: FiniteFloat = Field(ge=0.0, le=1.0)
+    score: StrictUnitScore
     usage: SemanticUsage = Field(default_factory=SemanticUsage)
 
 
@@ -57,11 +62,11 @@ class EvidenceSegment(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    source_ref_index: NonNegativeInt
+    source_ref_index: StrictNonNegativeInt
     transcript_id: str
-    turn_idx: NonNegativeInt
+    turn_idx: StrictNonNegativeInt
     role: str
-    span: tuple[NonNegativeInt, NonNegativeInt] | None = None
+    span: tuple[StrictNonNegativeInt, StrictNonNegativeInt] | None = None
     text: str
 
     @field_validator("transcript_id", "role")
@@ -85,11 +90,11 @@ class EvidenceResolutionIssue(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     kind: EvidenceIssueKind
-    source_ref_index: NonNegativeInt
+    source_ref_index: StrictNonNegativeInt
     transcript_id: str
-    turn_idx: NonNegativeInt | None = None
-    span: tuple[NonNegativeInt, NonNegativeInt] | None = None
-    turn_length: NonNegativeInt | None = None
+    turn_idx: StrictNonNegativeInt | None = None
+    span: tuple[StrictNonNegativeInt, StrictNonNegativeInt] | None = None
+    turn_length: StrictNonNegativeInt | None = None
 
     @field_validator("transcript_id")
     @classmethod

@@ -54,6 +54,7 @@ from memlint.semantics import (
     SemanticRelation,
     SemanticUsage,
     resolve_declared_evidence,
+    semantic_judge_identity,
 )
 from memlint.taxonomy import TAXONOMY_VERSION, DefectClass
 
@@ -107,6 +108,7 @@ __all__ = [
     "load_scope_policy",
     "mutate",
     "resolve_declared_evidence",
+    "semantic_judge_identity",
 ]
 
 __version__ = "0.1.0"
