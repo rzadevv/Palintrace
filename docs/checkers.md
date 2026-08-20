@@ -67,10 +67,11 @@ input paths. The audit command does not accept a mutation manifest.
 ## Unsupported claim
 
 `unsupported_claim` is the first semantic checker prototype. It requires a `TranscriptSet` and an
-injected `SemanticJudge`; the checker does not instantiate or configure a model itself. It assesses
-only memories whose provenance status is `declared`. The premise is the composed declared transcript
-evidence, and the hypothesis is the exact `memory.content`. PLAIN is the current primary development
-composition style.
+injected `SemanticJudge`; the checker itself does not instantiate or configure a model. The audit CLI
+constructs the existing local CPU judge only when this checker is selected. It assesses only memories
+whose provenance status is `declared`. The premise is the composed declared transcript evidence, and
+the hypothesis is the exact `memory.content`. PLAIN is the current primary development composition
+style.
 
 Assessability is deliberately narrower than non-entailment. If any declared source reference has a
 `missing_transcript`, `missing_turn`, or `invalid_span` issue, the checker abstains for that memory,
@@ -102,9 +103,29 @@ skip counts for non-declared provenance, structural issues, absent evidence, and
 counts for each semantic relation. These deterministic counters make abstention visible. In
 particular, zero unsupported-claim findings does not mean that every memory was assessed or supported.
 
-The current local MiniLM revision with PLAIN composition is a development configuration, not a final
-research winner, and semantic defect-detection performance has not been established. The checker is
-available programmatically but is intentionally not registered with `memlint audit` yet.
+Install the optional local semantic dependencies before using the CLI integration:
+
+```bash
+python -m pip install -e '.[semantic-local]'
+```
+
+Then provide both the model ID and an explicit, nonblank revision:
+
+```bash
+memlint audit \
+  --store normalized.json \
+  --transcripts transcripts.json \
+  --checker unsupported_claim \
+  --semantic-model-id cross-encoder/nli-MiniLM2-L6-H768 \
+  --semantic-model-revision b95119ce93d3e065de6214e38cd4a97b0f2f2c6d \
+  --output findings.json
+```
+
+The CLI uses the local classifier on CPU and has no hidden model revision, score threshold, or
+composition override. The shown MiniLM revision with PLAIN composition is a development
+configuration, not a final research winner, and semantic defect-detection performance has not been
+established. Zero findings does not imply full assessment: inspect the skip counters in
+`CheckerStats.details`. Structural audits neither construct nor download a semantic model.
 
 ## Redundancy / bloat
 

@@ -25,7 +25,7 @@ Implemented:
 - the exact-duplicate `redundancy_bloat` checker;
 - the explicit-supersession `stale_active` checker;
 - the policy-directed exact-replica `privacy_scope_violation` checker;
-- the dependency-injected `unsupported_claim` checker prototype;
+- the dependency-injected `unsupported_claim` checker with optional local CPU audit integration;
 - `memlint dump`, `memlint mutate`, and `memlint audit`.
 
 Not implemented yet:
@@ -249,11 +249,26 @@ memlint audit \
 This checker identifies policy-prohibited exact portable replicas. It does not reconstruct
 historical copy direction or provide general privacy-compliance analysis.
 
+Unsupported-claim semantic auditing is optional. Install `memlint[semantic-local]`, then provide an
+explicit local model and revision:
+
+```bash
+memlint audit \
+  --store normalized.json \
+  --transcripts transcripts.json \
+  --checker unsupported_claim \
+  --semantic-model-id cross-encoder/nli-MiniLM2-L6-H768 \
+  --semantic-model-revision b95119ce93d3e065de6214e38cd4a97b0f2f2c6d \
+  --output findings.json
+```
+
 The [semantic groundwork](docs/semantics.md) resolves and composes declared transcript coordinates
 and defines a provider-independent judgment contract. The dependency-injected `unsupported_claim`
 prototype uses that contract, while an optional pinned local CPU NLI implementation is available for
 explicit development use. The current MiniLM plus PLAIN configuration is not a final research winner,
-and semantic performance has not been established. The checker is not registered with `memlint audit`.
+and semantic performance has not been established. There is no score threshold, and zero findings
+does not imply that every memory was assessed; inspect the checker skip counters. Core installs and
+structural audits do not include, construct, or download the local semantic model.
 
 Committed source-shaped exports can exercise every adapter offline:
 
