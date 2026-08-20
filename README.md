@@ -5,7 +5,7 @@ which memory defects can eventually be detected from an existing store and its s
 without external annotations or hidden canonical user state.
 
 This repository currently implements the frozen Foundation, the Part 2 taxonomy and mutation
-harness, and four structural checkers.
+harness, four structural checkers, and the first semantic checker prototype.
 
 Implemented:
 
@@ -18,17 +18,18 @@ Implemented:
 - deterministic controlled mutations and separate gold manifests;
 - a typed, deterministic checker result API;
 - a deterministic semantic evidence resolver;
+- deterministic semantic evidence composition;
 - a provider-independent `SemanticJudge` contract;
 - an optional local CPU NLI `SemanticJudge` implementation;
 - the `orphaned_provenance` checker;
 - the exact-duplicate `redundancy_bloat` checker;
 - the explicit-supersession `stale_active` checker;
 - the policy-directed exact-replica `privacy_scope_violation` checker;
+- the dependency-injected `unsupported_claim` checker prototype;
 - `memlint dump`, `memlint mutate`, and `memlint audit`.
 
 Not implemented yet:
 
-- the `unsupported_claim` checker;
 - the `internal_contradiction` checker or semantic duplicate detection;
 - the instruction-related checker;
 - the retrieval or retrieval-shadowing checker;
@@ -248,10 +249,11 @@ memlint audit \
 This checker identifies policy-prohibited exact portable replicas. It does not reconstruct
 historical copy direction or provide general privacy-compliance analysis.
 
-The [semantic groundwork](docs/semantics.md) resolves declared transcript coordinates and defines a
-provider-independent judgment contract. An optional pinned local CPU NLI implementation is available
-for explicit use and model-selection probes. It does not implement unsupported-claim or contradiction
-checking and is not registered with `memlint audit`.
+The [semantic groundwork](docs/semantics.md) resolves and composes declared transcript coordinates
+and defines a provider-independent judgment contract. The dependency-injected `unsupported_claim`
+prototype uses that contract, while an optional pinned local CPU NLI implementation is available for
+explicit development use. The current MiniLM plus PLAIN configuration is not a final research winner,
+and semantic performance has not been established. The checker is not registered with `memlint audit`.
 
 Committed source-shaped exports can exercise every adapter offline:
 

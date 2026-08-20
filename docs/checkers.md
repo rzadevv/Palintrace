@@ -64,6 +64,47 @@ memlint audit \
 Omit `--output` to write deterministic JSON to standard output. The output path must differ from both
 input paths. The audit command does not accept a mutation manifest.
 
+## Unsupported claim
+
+`unsupported_claim` is the first semantic checker prototype. It requires a `TranscriptSet` and an
+injected `SemanticJudge`; the checker does not instantiate or configure a model itself. It assesses
+only memories whose provenance status is `declared`. The premise is the composed declared transcript
+evidence, and the hypothesis is the exact `memory.content`. PLAIN is the current primary development
+composition style.
+
+Assessability is deliberately narrower than non-entailment. If any declared source reference has a
+`missing_transcript`, `missing_turn`, or `invalid_span` issue, the checker abstains for that memory,
+even when another reference resolves. It also abstains when an existing declared source produces no
+segments, when the composed premise is whitespace-only, or when the complete premise/hypothesis pair
+exceeds the judge input limit. Evidence is never truncated, chunked, or summarized. Memories with
+`unavailable` or `known_absent` provenance are skipped because missing provenance does not establish
+an unsupported claim. Judge failures other than the typed over-limit condition fail the checker
+instead of becoming clean or defective results.
+
+For an assessed memory, the frozen three-class relation maps as follows:
+
+- `entailment`: emit no Finding;
+- `neutral`: emit one unsupported-claim Finding;
+- `contradiction`: emit one unsupported-claim Finding.
+
+There is no score threshold. `Finding.confidence` is the selected NLI class's softmax score without
+transformation; it is judge-specific and is not a calibrated probability that the memory is
+defective. Each unsupported memory receives one memory-level Finding. Evidence records the selected
+relation, captured judge identity and version, composition style, segment counts, SHA-256 digests,
+and canonical source coordinates. It does not copy premise, hypothesis, transcript, or backend-native
+text. The floating score is excluded from evidence identity, so score-only jitter does not change a
+Finding ID when the selected relation is unchanged.
+
+Semantic usage returned by every successful judgment is summed into `CheckerCost`; skipped memories
+contribute no model calls or tokens. Checker details report declared and assessed memories, separate
+skip counts for non-declared provenance, structural issues, absent evidence, and oversized input, and
+counts for each semantic relation. These deterministic counters make abstention visible. In
+particular, zero unsupported-claim findings does not mean that every memory was assessed or supported.
+
+The current local MiniLM revision with PLAIN composition is a development configuration, not a final
+research winner, and semantic defect-detection performance has not been established. The checker is
+available programmatically but is intentionally not registered with `memlint audit` yet.
+
 ## Redundancy / bloat
 
 `redundancy_bloat` implements only the structural `exact_duplicate` case. Two memories form a

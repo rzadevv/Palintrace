@@ -1,8 +1,9 @@
 # Semantic groundwork
 
-The semantic layer separates transcript evidence resolution from semantic judgment. It contains no
-defect checker. One optional implementation can run a pinned three-class NLI model locally on CPU;
-there is no API-hosted or generative-model provider.
+The semantic layer separates transcript evidence resolution, composition, and semantic judgment. It
+contains no checker module; the dependency-injected unsupported-claim checker consumes these frozen
+contracts from the separate checker package. One optional implementation can run a pinned
+three-class NLI model locally on CPU; there is no API-hosted or generative-model provider.
 
 ## Evidence resolution
 
@@ -22,20 +23,20 @@ segments nor issues; that result makes no claim about support, correctness, or c
 
 A whole-transcript reference to an existing empty transcript is structurally resolvable and
 produces zero segments and zero issues. This means no resolved semantic text is available; it does
-not mean entailed, neutral, unsupported, or clean. A future semantic checker must treat the absence
-of text as an assessability condition.
+not mean entailed, neutral, unsupported, or clean. The unsupported-claim checker treats the absence
+of text as an assessability condition and abstains.
 
 The resolver does not decide which transcript roles are semantically authoritative. It preserves
 each turn's exact role, text, and coordinates. The separate composition policy retains every role;
-a future semantic checker will decide how composed evidence is used. The resolver itself still
-returns individual segments and does not concatenate them into a premise.
+the unsupported-claim checker uses the frozen primary PLAIN representation by default. The resolver
+itself still returns individual segments and does not concatenate them into a premise.
 
 Structural issues use the same `missing_transcript`, `missing_turn`, and `invalid_span` distinctions
 as the orphaned-provenance checker. A broken reference is therefore not converted into a semantic
 `neutral` or `contradiction` judgment. Resolution does not compare memory content with transcript
 content.
 
-Resolved segments contain transcript text because a future semantic judge needs its premise. They
+Resolved segments contain transcript text because a semantic judge needs its premise. They
 are internal semantic inputs and are not automatically embedded into `CheckerResult`. Future
 semantic checkers should expose minimal coordinates and scores through `EvidenceItem` unless source
 text output is explicitly required.
@@ -70,12 +71,12 @@ development result: 15/18 overall, including 3/6 neutral, 6/6 entailment, and 6/
 Because all higher-priority semantic criteria tied, the frozen selection rule chose `plain` on fewer
 input tokens (1,702 versus 2,022 across the identically structured evaluation calls).
 `PRIMARY_EVIDENCE_COMPOSITION_STYLE` and the `compose_evidence()` default therefore use `plain` for
-the next checker prototype.
+the unsupported-claim checker prototype.
 
 This small probe is not a MemLint benchmark, publication evaluation, mutation gold, or audit-time
 labels. It was not derived from Part 2 mutation manifests and does not show that either style is
 universally better. The primary policy remains subject to later external evaluation. No
-unsupported-claim or internal-contradiction checker exists yet.
+internal-contradiction checker exists yet.
 
 ## Semantic judgment contract
 
@@ -85,15 +86,15 @@ validation for those identity strings and returns the exact declared values with
 
 ```python
 judgment = judge.judge(
-    premise=segment.text,
+    premise=composed.text,
     hypothesis=stored_claim,
 )
 ```
 
-The premise is evidence or context. The hypothesis is the claim being evaluated. A future
-unsupported-claim checker will use resolved transcript evidence as the premise and memory content as
-the hypothesis. A future contradiction checker may evaluate claims in both directions. Neither
-checker exists yet.
+The premise is evidence or context. The hypothesis is the claim being evaluated. The
+unsupported-claim checker uses composed resolved transcript evidence as the premise and memory
+content as the hypothesis. A future contradiction checker may evaluate claims in both directions;
+that checker does not exist yet.
 
 `SemanticRelation` has three generic NLI-style values:
 
@@ -147,8 +148,9 @@ selected class. It is a judge-specific classifier score, not a calibrated factua
 not an unsupported-claim threshold. Usage reports one model call, the actual encoded pair length as
 input tokens, and zero output tokens. No runtime duration is stored in semantic or checker models.
 
-There is still no unsupported-claim, internal-contradiction, instruction, or retrieval checker. The
-local judge is semantic infrastructure only and is not registered with `memlint audit`.
+The local judge remains dependency-injected semantic infrastructure and is not automatically loaded
+by the unsupported-claim checker. There is still no internal-contradiction, instruction, or retrieval
+checker, and the unsupported-claim checker is not registered with `memlint audit`.
 
 ## Judge selection probe
 
@@ -189,4 +191,6 @@ future aggregation policy.
 
 Production semantic code depends only on normalized models. It does not import checkers or mutation
 code, inspect backend-native `raw`, read mutation templates or manifests, or contain prompt text.
-No LLM client, remote provider adapter, embedding system, or semantic checker is implemented.
+No LLM client, remote provider adapter, or embedding system is implemented. The semantic package
+contains no checker module; dependency direction runs only from the unsupported-claim checker to the
+semantic contracts.
