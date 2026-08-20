@@ -155,7 +155,6 @@ class UnsupportedClaimChecker:
                         "judge_id": self._judge_id,
                         "judge_version": self._judge_version,
                         "composition_style": self.composition_style.value,
-                        "segment_count": composed.segment_count,
                         "unique_segment_count": composed.unique_segment_count,
                         "premise_sha256": _text_sha256(composed.text),
                         "hypothesis_sha256": _text_sha256(memory.content),
