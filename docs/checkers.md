@@ -90,10 +90,11 @@ For an assessed memory, the frozen three-class relation maps as follows:
 There is no score threshold. `Finding.confidence` is the selected NLI class's softmax score without
 transformation; it is judge-specific and is not a calibrated probability that the memory is
 defective. Each unsupported memory receives one memory-level Finding. Evidence records the selected
-relation, captured judge identity and version, composition style, segment counts, SHA-256 digests,
-and canonical source coordinates. It does not copy premise, hypothesis, transcript, or backend-native
-text. The floating score is excluded from evidence identity, so score-only jitter does not change a
-Finding ID when the selected relation is unchanged.
+relation, captured judge identity and version, composition style, unique-segment count, SHA-256
+digests, and canonical unique source coordinates. Repeated declarations removed by composition do
+not change semantic Finding identity. Evidence does not copy premise, hypothesis, transcript, or
+backend-native text. The floating score is excluded from evidence identity, so score-only jitter
+does not change a Finding ID when the selected relation is unchanged.
 
 Semantic usage returned by every successful judgment is summed into `CheckerCost`; skipped memories
 contribute no model calls or tokens. Checker details report declared and assessed memories, separate
