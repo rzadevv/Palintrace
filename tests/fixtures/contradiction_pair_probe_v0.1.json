@@ -1,0 +1,110 @@
+[
+  {
+    "id": "C1",
+    "memory_a": "The user's favorite color is blue.",
+    "memory_b": "The user's favorite color is red.",
+    "expected_pair_class": "contradiction"
+  },
+  {
+    "id": "C2",
+    "memory_a": "The user owns a car.",
+    "memory_b": "The user does not own a car.",
+    "expected_pair_class": "contradiction"
+  },
+  {
+    "id": "C3",
+    "memory_a": "The user has no pets.",
+    "memory_b": "The user has two cats.",
+    "expected_pair_class": "contradiction"
+  },
+  {
+    "id": "C4",
+    "memory_a": "The user's birthday is in March.",
+    "memory_b": "The user's birthday is in July.",
+    "expected_pair_class": "contradiction"
+  },
+  {
+    "id": "C5",
+    "memory_a": "The user's preferred text editor is Emacs.",
+    "memory_b": "The user's preferred text editor is Vim.",
+    "expected_pair_class": "contradiction"
+  },
+  {
+    "id": "C6",
+    "memory_a": "The user currently lives in Berlin and not Munich.",
+    "memory_b": "The user currently lives in Munich.",
+    "expected_pair_class": "contradiction"
+  },
+  {
+    "id": "N1",
+    "memory_a": "The user uses Python.",
+    "memory_b": "The user uses Rust.",
+    "expected_pair_class": "compatible"
+  },
+  {
+    "id": "N2",
+    "memory_a": "The user likes tea.",
+    "memory_b": "The user likes coffee.",
+    "expected_pair_class": "compatible"
+  },
+  {
+    "id": "N3",
+    "memory_a": "The user owns a bicycle.",
+    "memory_b": "The user owns a car.",
+    "expected_pair_class": "compatible"
+  },
+  {
+    "id": "N4",
+    "memory_a": "The user works at Atlas Corp.",
+    "memory_b": "The user volunteers at a museum.",
+    "expected_pair_class": "compatible"
+  },
+  {
+    "id": "N5",
+    "memory_a": "The user lives in Dresden.",
+    "memory_b": "The user visits Berlin often.",
+    "expected_pair_class": "compatible"
+  },
+  {
+    "id": "N6",
+    "memory_a": "The user prefers dark mode.",
+    "memory_b": "The user uses Linux.",
+    "expected_pair_class": "compatible"
+  },
+  {
+    "id": "T1",
+    "memory_a": "The user lived in Berlin in 2024.",
+    "memory_b": "The user lives in Munich in 2026.",
+    "expected_pair_class": "compatible"
+  },
+  {
+    "id": "T2",
+    "memory_a": "The user used to prefer Vim.",
+    "memory_b": "The user now prefers Emacs.",
+    "expected_pair_class": "compatible"
+  },
+  {
+    "id": "T3",
+    "memory_a": "The user owned a car in 2022.",
+    "memory_b": "The user does not own a car now.",
+    "expected_pair_class": "compatible"
+  },
+  {
+    "id": "T4",
+    "memory_a": "The user worked at Orion Labs until 2025.",
+    "memory_b": "The user works at Aster Labs in 2026.",
+    "expected_pair_class": "compatible"
+  },
+  {
+    "id": "T5",
+    "memory_a": "The user had two cats as a child.",
+    "memory_b": "The user has no pets now.",
+    "expected_pair_class": "compatible"
+  },
+  {
+    "id": "T6",
+    "memory_a": "The user planned to move to Cologne.",
+    "memory_b": "The user currently lives in Hamburg.",
+    "expected_pair_class": "compatible"
+  }
+]
