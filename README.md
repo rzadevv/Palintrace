@@ -17,8 +17,9 @@ Implemented:
 - taxonomy version 1.0 with eight frozen defect classes;
 - deterministic controlled mutations and separate gold manifests;
 - a typed, deterministic checker result API;
-- deterministic semantic evidence-resolution primitives;
+- a deterministic semantic evidence resolver;
 - a provider-independent `SemanticJudge` contract;
+- an optional local CPU NLI `SemanticJudge` implementation;
 - the `orphaned_provenance` checker;
 - the exact-duplicate `redundancy_bloat` checker;
 - the explicit-supersession `stale_active` checker;
@@ -27,10 +28,13 @@ Implemented:
 
 Not implemented yet:
 
-- the other four defect checkers and semantic duplicate detection;
-- any concrete semantic judge, NLI model, or LLM provider;
-- HaluMem, LongMemEval, or LoCoMo evaluation;
-- retrieval, embedding generation, automatic repair, or benchmark scoring.
+- the `unsupported_claim` checker;
+- the `internal_contradiction` checker or semantic duplicate detection;
+- the instruction-related checker;
+- the retrieval or retrieval-shadowing checker;
+- any API-hosted or generative LLM judge;
+- paper benchmark evaluation, including HaluMem, LongMemEval, or LoCoMo;
+- embedding generation, automatic repair, or benchmark scoring.
 
 ## Architecture
 
@@ -70,6 +74,12 @@ Backend SDKs are optional:
 python -m pip install -e '.[mem0]'
 python -m pip install -e '.[graphiti]'
 python -m pip install -e '.[letta]'
+```
+
+The local CPU NLI judge is also optional and does not affect a core install:
+
+```bash
+python -m pip install -e '.[semantic-local]'
 ```
 
 Development checks:
@@ -239,8 +249,9 @@ This checker identifies policy-prohibited exact portable replicas. It does not r
 historical copy direction or provide general privacy-compliance analysis.
 
 The [semantic groundwork](docs/semantics.md) resolves declared transcript coordinates and defines a
-provider-independent judgment contract. It does not implement unsupported-claim or contradiction
-checking, and no concrete semantic model is included.
+provider-independent judgment contract. An optional pinned local CPU NLI implementation is available
+for explicit use and model-selection probes. It does not implement unsupported-claim or contradiction
+checking and is not registered with `memlint audit`.
 
 Committed source-shaped exports can exercise every adapter offline:
 
