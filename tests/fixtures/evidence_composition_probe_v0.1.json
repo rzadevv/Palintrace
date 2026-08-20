@@ -1,0 +1,416 @@
+[
+  {
+    "id": "E1",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-E1",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "I started working at Northstar Labs."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-E1",
+        "turn_idx": 1,
+        "role": "user",
+        "span": null,
+        "text": "I still work there."
+      }
+    ],
+    "hypothesis": "The user works at Northstar Labs.",
+    "expected_relation": "entailment"
+  },
+  {
+    "id": "E2",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-E2",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "I have two pets."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-E2",
+        "turn_idx": 1,
+        "role": "user",
+        "span": null,
+        "text": "They are both cats."
+      }
+    ],
+    "hypothesis": "The user has two cats.",
+    "expected_relation": "entailment"
+  },
+  {
+    "id": "E3",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-E3",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "I moved last month."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-E3",
+        "turn_idx": 1,
+        "role": "user",
+        "span": null,
+        "text": "My new home is in Leipzig."
+      }
+    ],
+    "hypothesis": "The user lives in Leipzig.",
+    "expected_relation": "entailment"
+  },
+  {
+    "id": "E4",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-E4",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "I use Vim and Emacs."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-E4",
+        "turn_idx": 1,
+        "role": "user",
+        "span": null,
+        "text": "But Emacs is the editor I prefer."
+      }
+    ],
+    "hypothesis": "The user prefers Emacs.",
+    "expected_relation": "entailment"
+  },
+  {
+    "id": "E5",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-E5",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "My brother lives in Prague."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-E5",
+        "turn_idx": 1,
+        "role": "assistant",
+        "span": null,
+        "text": "And you said you live in Dresden."
+      }
+    ],
+    "hypothesis": "The user lives in Dresden.",
+    "expected_relation": "entailment"
+  },
+  {
+    "id": "E6",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-E6",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "My favorite drink is tea."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-E6",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "My favorite drink is tea."
+      }
+    ],
+    "hypothesis": "The user's favorite drink is tea.",
+    "expected_relation": "entailment"
+  },
+  {
+    "id": "C1",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-C1",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "I used to own a car."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-C1",
+        "turn_idx": 1,
+        "role": "user",
+        "span": null,
+        "text": "I sold it and do not own one now."
+      }
+    ],
+    "hypothesis": "The user currently owns a car.",
+    "expected_relation": "contradiction"
+  },
+  {
+    "id": "C2",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-C2",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "I live in Bremen."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-C2",
+        "turn_idx": 1,
+        "role": "user",
+        "span": null,
+        "text": "I have never lived in Hamburg."
+      }
+    ],
+    "hypothesis": "The user lives in Hamburg.",
+    "expected_relation": "contradiction"
+  },
+  {
+    "id": "C3",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-C3",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "I have no children."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-C3",
+        "turn_idx": 1,
+        "role": "assistant",
+        "span": null,
+        "text": "Understood."
+      }
+    ],
+    "hypothesis": "The user has children.",
+    "expected_relation": "contradiction"
+  },
+  {
+    "id": "C4",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-C4",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "My preferred editor is Helix."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-C4",
+        "turn_idx": 1,
+        "role": "user",
+        "span": null,
+        "text": "I don't prefer Vim."
+      }
+    ],
+    "hypothesis": "The user prefers Vim.",
+    "expected_relation": "contradiction"
+  },
+  {
+    "id": "C5",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-C5",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "I drink tea."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-C5",
+        "turn_idx": 1,
+        "role": "user",
+        "span": null,
+        "text": "I never drink coffee."
+      }
+    ],
+    "hypothesis": "The user drinks coffee.",
+    "expected_relation": "contradiction"
+  },
+  {
+    "id": "C6",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-C6",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "My birthday is in March."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-C6",
+        "turn_idx": 1,
+        "role": "assistant",
+        "span": null,
+        "text": "So not in July."
+      }
+    ],
+    "hypothesis": "The user's birthday is in July.",
+    "expected_relation": "contradiction"
+  },
+  {
+    "id": "N1",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-N1",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "I may move to Stuttgart."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-N1",
+        "turn_idx": 1,
+        "role": "assistant",
+        "span": null,
+        "text": "That could be exciting."
+      }
+    ],
+    "hypothesis": "The user lives in Stuttgart.",
+    "expected_relation": "neutral"
+  },
+  {
+    "id": "N2",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-N2",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "I use Rust at work."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-N2",
+        "turn_idx": 1,
+        "role": "assistant",
+        "span": null,
+        "text": "Rust is popular for systems programming."
+      }
+    ],
+    "hypothesis": "The user prefers Rust.",
+    "expected_relation": "neutral"
+  },
+  {
+    "id": "N3",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-N3",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "My father lives in Zurich."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-N3",
+        "turn_idx": 1,
+        "role": "assistant",
+        "span": null,
+        "text": "You visit him often."
+      }
+    ],
+    "hypothesis": "The user lives in Zurich.",
+    "expected_relation": "neutral"
+  },
+  {
+    "id": "N4",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-N4",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "I ordered a standing desk."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-N4",
+        "turn_idx": 1,
+        "role": "assistant",
+        "span": null,
+        "text": "It should arrive Friday."
+      }
+    ],
+    "hypothesis": "The user prefers standing desks.",
+    "expected_relation": "neutral"
+  },
+  {
+    "id": "N5",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-N5",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "I have an interview with Atlas Corp."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-N5",
+        "turn_idx": 1,
+        "role": "assistant",
+        "span": null,
+        "text": "Good luck."
+      }
+    ],
+    "hypothesis": "The user works for Atlas Corp.",
+    "expected_relation": "neutral"
+  },
+  {
+    "id": "N6",
+    "segments": [
+      {
+        "source_ref_index": 0,
+        "transcript_id": "composition-N6",
+        "turn_idx": 0,
+        "role": "user",
+        "span": null,
+        "text": "Please remind me to email Maya tomorrow."
+      },
+      {
+        "source_ref_index": 1,
+        "transcript_id": "composition-N6",
+        "turn_idx": 1,
+        "role": "assistant",
+        "span": null,
+        "text": "I can help you remember."
+      }
+    ],
+    "hypothesis": "The user emailed Maya.",
+    "expected_relation": "neutral"
+  }
+]
