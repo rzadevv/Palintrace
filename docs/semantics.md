@@ -26,9 +26,9 @@ not mean entailed, neutral, unsupported, or clean. A future semantic checker mus
 of text as an assessability condition.
 
 The resolver does not decide which transcript roles are semantically authoritative. It preserves
-each turn's exact role, text, and coordinates. A future semantic checker or composition policy will
-decide how those segments are used. The resolver returns individual segments and does not
-concatenate them into a premise.
+each turn's exact role, text, and coordinates. The separate composition policy retains every role;
+a future semantic checker will decide how composed evidence is used. The resolver itself still
+returns individual segments and does not concatenate them into a premise.
 
 Structural issues use the same `missing_transcript`, `missing_turn`, and `invalid_span` distinctions
 as the orphaned-provenance checker. A broken reference is therefore not converted into a semantic
@@ -39,6 +39,43 @@ Resolved segments contain transcript text because a future semantic judge needs 
 are internal semantic inputs and are not automatically embedded into `CheckerResult`. Future
 semantic checkers should expose minimal coordinates and scores through `EvidenceItem` unless source
 text output is explicitly required.
+
+## Evidence composition
+
+`compose_evidence()` runs only after structural evidence resolution. It receives a nonempty tuple of
+resolved `EvidenceSegment` values and never reaches back into `TranscriptSet` or bypasses the frozen
+resolver. An empty tuple raises `SemanticCompositionError` because zero resolved evidence is
+unassessable; the function does not invent an empty premise.
+
+Composition is independent of caller tuple order. Segments are sorted by transcript ID, turn index,
+span, source-reference index, role, and exact text. Declarations that are identical in transcript
+ID, turn index, span, text, and role are then deduplicated. The original declaration count remains
+in `segment_count`, while `unique_segment_count` records the post-deduplication count. Equal text at
+different transcript coordinates remains separate evidence.
+
+`EvidenceCompositionStyle` contains exactly two representations:
+
+- `plain`: exact segment texts joined by one newline;
+- `role_labeled`: each segment rendered as its exact normalized role, `": "`, and exact text, with
+  rendered segments joined by one newline.
+
+Neither style filters roles, expands character spans, strips text, normalizes Unicode or case,
+rewrites pronouns, summarizes, or adds instructions. Composition does not truncate or chunk. If the
+complete composed premise and hypothesis exceed the local judge limit,
+`LocalNLISemanticJudge` remains responsible for raising `SemanticInputTooLongError`.
+
+The fixed 18-case `evidence_composition_probe_v0.1.json` development probe compared both styles with
+the pinned MiniLM Part 4B development judge. Both representations produced the same aggregate
+development result: 15/18 overall, including 3/6 neutral, 6/6 entailment, and 6/6 contradiction.
+Because all higher-priority semantic criteria tied, the frozen selection rule chose `plain` on fewer
+input tokens (1,702 versus 2,022 across the identically structured evaluation calls).
+`PRIMARY_EVIDENCE_COMPOSITION_STYLE` and the `compose_evidence()` default therefore use `plain` for
+the next checker prototype.
+
+This small probe is not a MemLint benchmark, publication evaluation, mutation gold, or audit-time
+labels. It was not derived from Part 2 mutation manifests and does not show that either style is
+universally better. The primary policy remains subject to later external evaluation. No
+unsupported-claim or internal-contradiction checker exists yet.
 
 ## Semantic judgment contract
 
