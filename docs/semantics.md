@@ -217,6 +217,23 @@ seven false positives across twelve compatible cases, including three temporal c
 substantial. No primary pair policy is frozen from this probe, no contradiction-performance claim is
 made, and no internal-contradiction checker exists.
 
+## Contradiction NLI robustness sweep
+
+Part 4F showed that MiniLM pair aggregation failed the high-precision goal for an eventual internal
+contradiction checker. Part 4F2 uses the same frozen 18-pair probe to distinguish a checkpoint-specific
+failure from a broader limitation of ordinary pairwise three-class NLI. It compares exactly the two
+existing MemLint development candidates, a stronger conventional SNLI/MNLI DeBERTa baseline, and a
+DeBERTa checkpoint trained across broader adversarial, logical, fact-verification, and varied NLI
+tasks. Each model is pinned to a full immutable repository commit and is evaluated by the unchanged
+local CPU judge with `any_direction` and `both_directions` relation-only aggregation.
+
+The readiness criteria were fixed before the new model outputs: at least five of six clear
+contradictions detected, zero temporal-compatible false positives, and at most one false positive
+across all twelve compatible pairs. These are development criteria, not a paper benchmark or a
+publication performance claim. They do not change the unsupported-claim judge selection, and later
+held-out evaluation would still be required before making any performance claim. The internal
+contradiction checker still does not exist.
+
 ## Isolation
 
 Production semantic code depends only on normalized models. It does not import checkers or mutation
