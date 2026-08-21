@@ -234,6 +234,30 @@ publication performance claim. They do not change the unsupported-claim judge se
 held-out evaluation would still be required before making any performance claim. The internal
 contradiction checker still does not exist.
 
+## Simultaneous-compatibility reframing probe
+
+Ordinary claim-to-claim NLI failed the Part 4F2 high-precision gate. Part 4G changes the semantic
+question rather than adding a score threshold: it asks whether two explicitly rendered memory claims
+can both be true as stated. The premise wording, hypothesis, relation mapping, and aggregation rule
+were frozen before model outputs. The premise is exactly `Memory claim 1: <CLAIM_1>`, a newline, and
+`Memory claim 2: <CLAIM_2>`; the hypothesis is exactly
+`These two memory claims can both be true as stated.` NLI entailment maps to `compatible`,
+contradiction maps to `incompatible`, and neutral maps to `uncertain`; scores remain diagnostic only.
+The pair is rendered in both claim orders. It is `incompatible` only when both renderings are
+incompatible, `compatible` only when both are compatible, and otherwise `uncertain`.
+
+The pre-frozen readiness gate requires at least five of six clear incompatibilities, no false
+incompatibilities among twelve compatible pairs or six temporal-compatible pairs, at least ten of
+twelve compatible pairs labeled compatible, and at least five of six temporal-compatible pairs
+labeled compatible. This remains a development probe, not benchmark performance, and no internal
+contradiction checker or production compatibility judge exists.
+
+Part 2 `conflict_relation = exclusive_value` is mutation and gold-generation context, not
+detector-visible evidence. A future checker must never use it. A controlled mutation is suitable for
+semantic detector evaluation only when incompatibility is recoverable from detector-visible
+normalized content and state. Cases whose incompatibility depends on hidden mutation assumptions
+must be excluded or separately marked in future benchmark construction.
+
 ## Isolation
 
 Production semantic code depends only on normalized models. It does not import checkers or mutation
