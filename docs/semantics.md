@@ -258,6 +258,55 @@ semantic detector evaluation only when incompatibility is recoverable from detec
 normalized content and state. Cases whose incompatibility depends on hidden mutation assumptions
 must be excluded or separately marked in future benchmark construction.
 
+## Local instruction compatibility probe
+
+Part 4F and Part 4F2 showed that ordinary claim-to-claim three-class NLI did not meet
+the high-precision requirement for internal contradiction. Part 4G's simultaneous-compatibility
+reframing instead collapsed the relevant cases to neutral or uncertain. Part 4H therefore tests a
+different development method: a small instruction-tuned causal language model answers whether the
+two detector-visible memory strings themselves establish that both claims cannot be true.
+
+The system instruction and user-message template were frozen before any Qwen output. Their
+canonical role-aware JSON representation has SHA-256
+`db693fce727ae6007a5e1c5897c16d42025ade823ed5121d49d11756f299e558`. The instruction exposes
+exactly two valid outputs, `INCOMPATIBLE` and `NOT_ESTABLISHED`; every other decoded string is
+invalid. Qwen thinking is explicitly disabled, generation is greedy with at most 12 new tokens,
+and outputs are neither retried nor repaired. Each pair is classified in AB and BA order and is
+finally incompatible only when both directions emit `INCOMPATIBLE`.
+
+The independent `instruction_contradiction_probe_v0.1.json` fixture was also frozen before model
+outputs. It contains 24 new pairs: eight text-explicit incompatibilities, eight compatible pairs of
+different facts, and eight temporal or change-compatible pairs. Its SHA-256 is
+`e381b9f0091b3277602ea30d9eef07766e49823c56c7747128e1936bd6202c50`. The pairs are not derived from
+a `MutationManifest` or Part 2 mutation parameters, and the old 18-case contradiction probe was not
+used for model selection. Two individual sentences in the exact 24-case specification do overlap
+the old fixture: `The user owns a bicycle.` and `The user prefers dark mode.` The pair-level cases
+remain new, but the fixture is therefore not fully disjoint at sentence level.
+
+The gate was fixed before inference: detect at least seven of eight explicit incompatibilities,
+produce no final false incompatibilities across the 16 N/T cases or the eight temporal cases,
+produce no invalid directional output among 48 generations, and disagree across directions on no
+more than two of 24 pairs. Both pinned models were loaded with safetensors on CPU and evaluated once
+per direction with the same frozen method:
+
+| Candidate | Pinned revision | Explicit | N false | T false | Disagreements | Invalid | Correct | Median direction |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `Qwen/Qwen3-0.6B` | `c1899de289a04d12100db370d81485cdf75e47ca` | 8/8 | 8/8 | 8/8 | 0/24 | 0/48 | 8/24 | 2,611.283 ms |
+| `Qwen/Qwen3-1.7B` | `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e` | 1/8 | 0/8 | 0/8 | 3/24 | 0/48 | 17/24 | 8,142.730 ms |
+
+The 0.6B candidate labeled every direction incompatible, creating false incompatibilities on N1-N8
+and T1-T8. The 1.7B candidate missed I1, I2, I3, I4, I5, I6, and I8; I1, I3, and I6 also disagreed
+by direction. Neither candidate produced an invalid output. Both fail the pre-frozen gate, so no
+model is selected and the local instruction compatibility method is not ready. The optional Part 2
+visible-editor diagnostic was not run because no model was selected; hidden `exclusive_value`
+metadata would not have been supplied in any case.
+
+Incompatibility in this task must be established by detector-visible wording, scope, or time. Hidden
+mutation exclusivity is not detector evidence, and different values alone do not establish a
+contradiction. No internal-contradiction checker or production instruction judge exists. These
+results are development evidence from a small diagnostic fixture, not publication benchmark
+performance.
+
 ## Isolation
 
 Production semantic code depends only on normalized models. It does not import checkers or mutation
