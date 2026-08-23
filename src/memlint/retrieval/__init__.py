@@ -16,6 +16,11 @@ from memlint.retrieval.models import (
     RetrievalResponse,
     RetrievalUsage,
 )
+from memlint.retrieval.policy import (
+    RetrievalSufficiencyAssessment,
+    RetrievalSufficiencyPolicy,
+    assess_retrieval_sufficiency,
+)
 
 __all__ = [
     "RetrievalAuditRequest",
@@ -25,8 +30,11 @@ __all__ = [
     "RetrievalObservation",
     "RetrievalObservationError",
     "RetrievalResponse",
+    "RetrievalSufficiencyAssessment",
+    "RetrievalSufficiencyPolicy",
     "RetrievalUsage",
     "Retriever",
+    "assess_retrieval_sufficiency",
     "retriever_identity",
     "run_retrieval_audit",
     "validate_retrieval_audit_request",
