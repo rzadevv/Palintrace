@@ -45,6 +45,20 @@ from memlint.mutations import (
     RetrievalProbe,
     mutate,
 )
+from memlint.retrieval import (
+    RetrievalAuditRequest,
+    RetrievalError,
+    RetrievalHit,
+    RetrievalInputError,
+    RetrievalObservation,
+    RetrievalObservationError,
+    RetrievalResponse,
+    RetrievalUsage,
+    Retriever,
+    retriever_identity,
+    run_retrieval_audit,
+    validate_retrieval_audit_request,
+)
 from memlint.semantics import (
     PRIMARY_EVIDENCE_COMPOSITION_STYLE,
     ComposedEvidence,
@@ -106,6 +120,15 @@ __all__ = [
     "PrincipalBoundaryRule",
     "PrivacyScopeViolationChecker",
     "RedundancyBloatChecker",
+    "RetrievalAuditRequest",
+    "RetrievalError",
+    "RetrievalHit",
+    "RetrievalInputError",
+    "RetrievalObservation",
+    "RetrievalObservationError",
+    "RetrievalResponse",
+    "RetrievalUsage",
+    "Retriever",
     "SCOPE_POLICY_SCHEMA_VERSION",
     "ScopeDimension",
     "ScopeIsolationPolicy",
@@ -132,7 +155,10 @@ __all__ = [
     "load_scope_policy",
     "mutate",
     "resolve_declared_evidence",
+    "retriever_identity",
+    "run_retrieval_audit",
     "semantic_judge_identity",
+    "validate_retrieval_audit_request",
 ]
 
 __version__ = "0.1.0"
