@@ -1,4 +1,4 @@
-"""Command-line entry points for normalized exports, mutations, and audits."""
+"""Command-line entry points for normalized exports, mutations, and recorded audits."""
 
 from __future__ import annotations
 
@@ -24,6 +24,7 @@ from memlint.checkers import (
     StaleActiveChecker,
     UnsupportedClaimChecker,
     load_scope_policy,
+    project_retrieval_shadowing_result,
 )
 from memlint.models import MemoryScope, NormalizedStore
 from memlint.mutations import (
@@ -33,6 +34,7 @@ from memlint.mutations import (
     MutationRequest,
     mutate,
 )
+from memlint.retrieval import RetrievalObservation, RetrievalSufficiencyPolicy
 from memlint.semantics import LocalNLISemanticJudge, SemanticJudgeError
 from memlint.serialization import load_store, load_transcripts
 from memlint.taxonomy import DefectClass
@@ -101,6 +103,28 @@ def build_parser() -> argparse.ArgumentParser:
     audit.add_argument("--semantic-model-id")
     audit.add_argument("--semantic-model-revision")
     audit.add_argument("--output", type=Path, help="write checker result JSON instead of stdout")
+
+    retrieval_audit = commands.add_parser(
+        "retrieval-audit",
+        help="project a recorded RetrievalObservation into a checker result",
+    )
+    retrieval_audit.add_argument(
+        "--observation",
+        type=Path,
+        required=True,
+        help="recorded RetrievalObservation JSON",
+    )
+    retrieval_audit.add_argument(
+        "--policy",
+        type=RetrievalSufficiencyPolicy,
+        choices=tuple(RetrievalSufficiencyPolicy),
+        required=True,
+    )
+    retrieval_audit.add_argument(
+        "--output",
+        type=Path,
+        help="write checker result JSON instead of stdout",
+    )
     return parser
 
 
@@ -116,6 +140,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             if args.output is None:
                 sys.stdout.write(text)
             return 0
+        if args.command == "retrieval-audit":
+            text = _run_recorded_retrieval_audit(args)
+            if args.output is None:
+                sys.stdout.write(text)
+            return 0
         store = _build_store(args)
         text = store.to_json(args.output)
     except (AdapterError, OSError, ValueError) as error:
@@ -123,6 +152,21 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.output is None:
         sys.stdout.write(text)
     return 0
+
+
+def _load_retrieval_observation(path: Path) -> RetrievalObservation:
+    try:
+        return RetrievalObservation.model_validate_json(path.read_text(encoding="utf-8"))
+    except ValueError:
+        raise ValueError(f"invalid RetrievalObservation JSON: {path}") from None
+
+
+def _run_recorded_retrieval_audit(args: argparse.Namespace) -> str:
+    if args.output is not None and args.output.resolve() == args.observation.resolve():
+        raise ValueError("retrieval audit output must not overwrite the observation input")
+    observation = _load_retrieval_observation(args.observation)
+    result = project_retrieval_shadowing_result(observation, policy=args.policy)
+    return result.to_json(args.output)
 
 
 def _run_audit(args: argparse.Namespace) -> str:
