@@ -30,6 +30,7 @@ Implemented:
   retriever orchestration remains pending;
 - gold-safe controlled-mutation and paired-retrieval evaluation accounting, without benchmark
   performance claims;
+- controlled benchmark v0.1 specification frozen; benchmark execution has not yet been run;
 - `memlint dump`, `memlint mutate`, `memlint audit`, and `memlint retrieval-audit`.
 
 Not implemented yet:

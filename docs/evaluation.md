@@ -100,3 +100,58 @@ No final research benchmark has been run. No precision or F1 claim is supported.
 alerts remain unlabeled, mutation-context alerts remain unscored, injected-positive recall applies
 only to controlled injected positives, and retrieval induced-shadowing rates apply only to
 baseline-eligible paired challenges under one fixed retrieval condition.
+
+## Benchmark v0.1 freeze
+
+The controlled benchmark specification was frozen on 2026-08-23 before detector inference:
+
+- schema: `0.1`;
+- benchmark ID: `memlint-controlled-v0.1`;
+- execution status: `NOT_RUN`; and
+- canonical specification SHA-256:
+  `309fc9e18356c8dd3fd38dc2a47295dea43b22189889ceba78599488cabf9940`.
+
+The static held-out scope contains only implemented detector classes: 9 orphaned-provenance, 6
+redundancy/bloat, 6 stale-active, 6 privacy/scope, and 12 unsupported-claim mutation cases, for 39
+controlled static trials. Fifteen separate held-out clean controls provide one unmutated H1, H2,
+and H3 case for each of those five classes. `internal_contradiction` and
+`injected_instruction` remain deferred negative method-development results and are not benchmarked
+as implemented detectors. No overall eight-class accuracy is defined.
+
+Three newly authored synthetic fixture bundles, H1 through H3, are explicitly `CURATED_CLEAN` for
+these controlled conditions. Their label comes from deliberate construction and input-suitability
+audits, not from a claim that natural deployed stores are globally clean. Structural checkers are
+used only to validate the unmutated input fixtures. Unsupported-claim cleanliness is established by
+the explicit memory/source construction; MiniLM is not used to certify the labels.
+
+The operational matrix contains 12 retrieval challenges, four per fixture, under the sole intended
+condition `lexical-baseline-k3`: `all_expected`, `top_k=3`, experimental retriever kind
+`experimental_lexical`, configuration version `0.1`. Each challenge is constructible with the
+unchanged Part 2 `distractor_crowding` mutation and its fixed editor-family distractors. The
+retriever is specified but not implemented or executed in this phase; no paired observations or
+retrieval rates exist.
+
+The old example store and transcripts and all Part 4 semantic, composition, contradiction,
+instruction-compatibility, and injection probes are registered as `DEVELOPMENT`. They are excluded
+from held-out evaluation. Deterministic collision checks cover exact IDs, contents, case IDs, and
+Part 4 premise/hypothesis pairs; these checks are leakage sanity tests, not proof of semantic
+independence.
+
+The byte-level held-out file hashes are frozen in
+`tests/fixtures/benchmark_v0.1.sha256.json`:
+
+| File | SHA-256 |
+|---|---|
+| `README.md` | `5037ed3d59a3680ef51371dd5f982eb3abc887e1e9c6c3226ecf28f13222226c` |
+| `benchmark.json` | `46a2fb7986b9e4e6fe8f3056f37ff4655cf337fc113824cc728bc0e395e720f9` |
+| `fixture_h1_store.json` | `2b688007a19a88835779b9ad44d02891f5c2f643930811a21d4ac477904a7474` |
+| `fixture_h1_transcripts.json` | `0ac39a2003056e8d48a91bc597cf1c8e73477afe85a4daadd59e46169a66b9d9` |
+| `fixture_h2_store.json` | `a185a5bd05351253383fe5b5e709a3ba9309879b145b109ce6f153bfb4518ca9` |
+| `fixture_h2_transcripts.json` | `f63a9785cee8962522aa866f3e2996a50471a96d99656417bcb7d297174d2ba6` |
+| `fixture_h3_store.json` | `0cbd93b42229ca94f672ceee788f8133bf150a0a2499d561eb537f5821a51fed` |
+| `fixture_h3_transcripts.json` | `1e159f90df2b29f447b94658b3b92450927b4c3f903b16e07cbfd513ca02323a` |
+| `scope_policy.json` | `ed412b9dbb8b1e13bb8a42c66a03ab191a3d6bf45906cee126229974b510a999` |
+
+The benchmark has not been executed. No detector output, performance metric, result file, or model
+download was produced during the freeze. Editing held-out contents after observing outputs is not
+permitted under v0.1; any such change requires a new explicitly versioned benchmark.
