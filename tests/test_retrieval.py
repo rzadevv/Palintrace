@@ -413,6 +413,7 @@ def test_retrieval_architecture_has_contract_only() -> None:
         "__init__.py",
         "base.py",
         "models.py",
+        "policy.py",
     }
     assert "RetrievalShadowingChecker" not in {
         node.name
