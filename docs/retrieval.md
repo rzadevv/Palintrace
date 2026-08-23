@@ -92,15 +92,43 @@ assessment. Returned non-target memories are allowed and are not themselves clas
 The assessment needs neither query text nor store or retriever access, and its deterministic JSON is
 derived only from the recorded observation and explicit policy.
 
-An insufficient assessment is not yet emitted as a `retrieval_shadowing` `Finding`. No
-`RetrievalShadowingChecker` exists. Part 5C must first resolve two representation issues without
-silently changing frozen schemas:
+The sufficiency assessment itself is not a `Finding`. Part 5C's projection below maps an insufficient
+case into the frozen result envelope without changing the Part 5B policies or generic checker
+schemas.
 
-- retrieval-shadowing mutation gold uses the `RETRIEVAL_CASE` unit, while the generic `Finding`
-  requires one or more `memory_ids`; Part 5B does not decide that mapping or modify `Finding`; and
-- `CheckerCost` records model calls and token counts, while `RetrievalUsage` records retrieval calls
-  and candidate counts; Part 5B does not modify `CheckerCost` or decide whether later retrieval usage
-  belongs in `CheckerStats.details` or another explicitly versioned representation.
+## Retrieval-shadowing result projection
+
+`project_retrieval_shadowing_result` consumes one recorded observation plus one explicit policy and
+recomputes the sufficiency assessment internally. One runtime retrieval case remains the scientific
+unit. A sufficient case emits no findings; an insufficient case emits exactly one
+`retrieval_shadowing` `Finding`, regardless of how many expected targets are missing.
+
+The frozen generic `Finding` requires nonempty `memory_ids`, so the one finding uses only
+`missing_expected_memory_ids` as normalized-memory anchors. Successfully retrieved targets are not
+anchors. This does not change the taxonomy gold unit from `RETRIEVAL_CASE` to `MEMORY` and does not
+claim that each missing record independently has a retrieval defect. The defect is the case-level
+combination of request identity, query digest, retriever identity and version, top-k window, explicit
+policy, and target retrieval outcome. The complete expected/retrieved/missing partition remains in
+the single evidence item.
+
+Finding confidence is `1.0` because the recorded observation deterministically fails the
+caller-declared policy. It does not mean that the caller's declared relevance targets are
+objectively correct with 100 percent probability. Hit scores, ranks, retrieval usage, and ordinary
+non-target result IDs are excluded from finding evidence and identity because they do not affect the
+frozen presence-based policies. Changes to target membership or operational identity do affect the
+finding ID.
+
+Retrieval work is diagnostic accounting rather than model-token cost. `CheckerCost` remains all
+zeros, while `retrieval_calls`, `candidate_count`, target counts, hit count, and the one assessed case
+are recorded in `CheckerStats.details`. `memories_scanned` remains zero because projection reads no
+memory contents.
+
+This function is an operational result projection, not an implementation of the generic `Checker`
+protocol. It accepts no store, transcripts, retriever, external assessment, or query text and never
+executes retrieval. No `RetrievalShadowingChecker` class or retrieval CLI integration exists yet.
+Persisted observations rely on Part 5A's execution-time reconciliation with the audited store
+snapshot; they are not yet cryptographically bound to the complete store contents. That is a known
+reproducibility limitation rather than a hidden redesign of the frozen observation schema.
 
 ## Part 2 isolation
 

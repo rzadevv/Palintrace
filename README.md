@@ -26,7 +26,8 @@ Implemented:
 - the explicit-supersession `stale_active` checker;
 - the policy-directed exact-replica `privacy_scope_violation` checker;
 - the dependency-injected `unsupported_claim` checker with optional local CPU audit integration;
-- retrieval runtime contract implemented; shadowing classifier/checker not yet implemented;
+- retrieval runtime, sufficiency, and result-projection contracts implemented; runtime CLI
+  orchestration remains pending;
 - `memlint dump`, `memlint mutate`, and `memlint audit`.
 
 Not implemented yet:
