@@ -1,0 +1,170 @@
+[
+  {
+    "id": "I1",
+    "group": "I",
+    "memory_a": "The user's account is currently enabled.",
+    "memory_b": "The user's account is currently not enabled.",
+    "expected": "incompatible"
+  },
+  {
+    "id": "I2",
+    "group": "I",
+    "memory_a": "The user currently owns no dogs.",
+    "memory_b": "The user currently owns one dog.",
+    "expected": "incompatible"
+  },
+  {
+    "id": "I3",
+    "group": "I",
+    "memory_a": "As of August 2026, the user is exactly 30 years old.",
+    "memory_b": "As of August 2026, the user is exactly 35 years old.",
+    "expected": "incompatible"
+  },
+  {
+    "id": "I4",
+    "group": "I",
+    "memory_a": "The user currently has exactly one child.",
+    "memory_b": "The user currently has exactly three children.",
+    "expected": "incompatible"
+  },
+  {
+    "id": "I5",
+    "group": "I",
+    "memory_a": "The user's only current residence is in Madrid.",
+    "memory_b": "The user's only current residence is in Lisbon.",
+    "expected": "incompatible"
+  },
+  {
+    "id": "I6",
+    "group": "I",
+    "memory_a": "The user's sole preferred text editor is Emacs.",
+    "memory_b": "The user's sole preferred text editor is Helix.",
+    "expected": "incompatible"
+  },
+  {
+    "id": "I7",
+    "group": "I",
+    "memory_a": "The user is currently employed exclusively by Northstar Labs.",
+    "memory_b": "The user is currently employed exclusively by Cedar Systems.",
+    "expected": "incompatible"
+  },
+  {
+    "id": "I8",
+    "group": "I",
+    "memory_a": "The user's current subscription status is active.",
+    "memory_b": "The user's current subscription status is inactive.",
+    "expected": "incompatible"
+  },
+  {
+    "id": "N1",
+    "group": "N",
+    "memory_a": "The user programs in Python.",
+    "memory_b": "The user programs in Go.",
+    "expected": "not_established"
+  },
+  {
+    "id": "N2",
+    "group": "N",
+    "memory_a": "The user enjoys tea.",
+    "memory_b": "The user enjoys orange juice.",
+    "expected": "not_established"
+  },
+  {
+    "id": "N3",
+    "group": "N",
+    "memory_a": "The user owns a motorcycle.",
+    "memory_b": "The user owns a bicycle.",
+    "expected": "not_established"
+  },
+  {
+    "id": "N4",
+    "group": "N",
+    "memory_a": "The user has a dog.",
+    "memory_b": "The user has a rabbit.",
+    "expected": "not_established"
+  },
+  {
+    "id": "N5",
+    "group": "N",
+    "memory_a": "The user lives in Frankfurt.",
+    "memory_b": "The user works remotely for a company based in Cologne.",
+    "expected": "not_established"
+  },
+  {
+    "id": "N6",
+    "group": "N",
+    "memory_a": "The user uses a mechanical keyboard.",
+    "memory_b": "The user uses an ultrawide monitor.",
+    "expected": "not_established"
+  },
+  {
+    "id": "N7",
+    "group": "N",
+    "memory_a": "The user speaks German.",
+    "memory_b": "The user is learning Japanese.",
+    "expected": "not_established"
+  },
+  {
+    "id": "N8",
+    "group": "N",
+    "memory_a": "The user prefers dark mode.",
+    "memory_b": "The user uses Fedora Linux.",
+    "expected": "not_established"
+  },
+  {
+    "id": "T1",
+    "group": "T",
+    "memory_a": "The user studied in Boston in 2021.",
+    "memory_b": "The user studies in Seattle in 2026.",
+    "expected": "not_established"
+  },
+  {
+    "id": "T2",
+    "group": "T",
+    "memory_a": "The user drove a Honda until 2023.",
+    "memory_b": "The user drives a Toyota now.",
+    "expected": "not_established"
+  },
+  {
+    "id": "T3",
+    "group": "T",
+    "memory_a": "The user was vegetarian in college.",
+    "memory_b": "The user eats meat now.",
+    "expected": "not_established"
+  },
+  {
+    "id": "T4",
+    "group": "T",
+    "memory_a": "The user used an Android phone before 2024.",
+    "memory_b": "The user uses an iPhone in 2026.",
+    "expected": "not_established"
+  },
+  {
+    "id": "T5",
+    "group": "T",
+    "memory_a": "The user rented an apartment in Vienna in 2022.",
+    "memory_b": "The user owns a house in Graz now.",
+    "expected": "not_established"
+  },
+  {
+    "id": "T6",
+    "group": "T",
+    "memory_a": "The user worked night shifts in 2020.",
+    "memory_b": "The user works daytime hours now.",
+    "expected": "not_established"
+  },
+  {
+    "id": "T7",
+    "group": "T",
+    "memory_a": "The user's last name was Meyer before marriage.",
+    "memory_b": "The user's last name is Schulz now.",
+    "expected": "not_established"
+  },
+  {
+    "id": "T8",
+    "group": "T",
+    "memory_a": "The user supported Project Alpha in 2023.",
+    "memory_b": "The user supports Project Beta in 2026.",
+    "expected": "not_established"
+  }
+]
