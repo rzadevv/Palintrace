@@ -127,9 +127,8 @@ the explicit memory/source construction; MiniLM is not used to certify the label
 The operational matrix contains 12 retrieval challenges, four per fixture, under the sole intended
 condition `lexical-baseline-k3`: `all_expected`, `top_k=3`, experimental retriever kind
 `experimental_lexical`, configuration version `0.1`. Each challenge is constructible with the
-unchanged Part 2 `distractor_crowding` mutation and its fixed editor-family distractors. The
-retriever is specified but not implemented or executed in this phase; no paired observations or
-retrieval rates exist.
+unchanged Part 2 `distractor_crowding` mutation and its fixed editor-family distractors. No paired
+observations or retrieval rates were produced during the specification freeze.
 
 The old example store and transcripts and all Part 4 semantic, composition, contradiction,
 instruction-compatibility, and injection probes are registered as `DEVELOPMENT`. They are excluded
@@ -155,3 +154,90 @@ The byte-level held-out file hashes are frozen in
 The benchmark has not been executed. No detector output, performance metric, result file, or model
 download was produced during the freeze. Editing held-out contents after observing outputs is not
 permitted under v0.1; any such change requires a new explicitly versioned benchmark.
+
+## Benchmark execution methodology
+
+Part 6C freezes how benchmark v0.1 will be executed and summarized without executing any held-out
+case. The Part 6B case specification, fixture bytes, canonical benchmark SHA, mutation requests,
+queries, targets, checker identities, semantic method identity, and retrieval condition remain
+unchanged. The research runner performs all benchmark and fixture hash checks before constructing
+the pinned CPU MiniLM judge. It accepts no threshold, model, retriever, or condition override.
+
+### Static and clean-control accounting
+
+Static mutation trials retain the Part 6A injected-positive accounting. Per defect class, the
+descriptive positive metric is:
+
+```text
+injected-positive trials detected / injected-positive trials
+```
+
+Each unmutated clean control is an explicitly `CURATED_CLEAN` whole-store audit case. Its case-level
+alert rate is:
+
+```text
+clean-control cases containing one or more findings / clean-control cases
+```
+
+One control containing two findings therefore contributes one alerting case and two verified-clean
+alerts. `clean_control_alert_rate` is not a generic false-positive rate: the controls are whole-store
+audits, not an exhaustive enumeration of every negative memory or memory-pair unit. The methodology
+does not compute precision, F1, accuracy, specificity, or generic false-positive rate. It continues
+to report unknown-natural alerts, mutation-context alerts, and duplicate-positive findings as
+separate diagnostics.
+
+Benchmark v0.1 has 39 mutations but only three independently authored synthetic base fixtures.
+Cases derived from the same fixture are correlated. Results must therefore retain exact counts and
+per-defect reporting; this methodology defines no naive confidence intervals, p-values, or other
+inferential statistics that treat all mutation trials as independently sampled deployed systems.
+The holdout is a content-and-case holdout. It is not evidence of complete generalization across a
+mutation family or representative real-world stores.
+
+### Frozen experimental lexical baseline
+
+The evaluation-only `experimental_lexical` retriever, version `0.1`, implements the one frozen
+`lexical-baseline-k3` condition. It is deliberately not part of `memlint.retrieval` and is not a
+production backend. It scores every normalized memory's `content` and no other field. Tokenization
+uses exactly the ASCII-alphanumeric regular expression `[A-Za-z0-9]+`, with each match lowercased.
+There is no stemming, lemmatization, synonym expansion, stop-word list, query rewriting, embedding,
+or domain vocabulary.
+
+For each distinct query token `q`, with `N` candidate memories:
+
+```text
+df(q)  = number of memory contents containing q
+idf(q) = ln(1 + (N - df(q) + 0.5) / (df(q) + 0.5))
+```
+
+The document contribution is standard deterministic BM25-style scoring with `k1 = 1.2` and
+`b = 0.75`:
+
+```text
+idf(q) * tf(q,d) * (k1 + 1)
+         ---------------------------------------------
+         tf(q,d) + k1 * (1 - b + b * dl / avgdl)
+```
+
+Only candidates with total score greater than zero are returned. Results sort by descending score,
+then ascending memory ID, and receive one-based ranks after the `top_k` cut. Empty stores and
+token-free queries return no hits. Usage records one retrieval call and the complete store memory
+count. The retriever receives only the store at construction and `query` plus `top_k` at execution;
+it never receives expected targets, distractor IDs, manifests, mutation IDs, or gold labels.
+
+Retrieval orchestration creates separate baseline and mutated retrievers, then reuses the frozen
+Part 5 audit observation, explicit sufficiency, paired challenge, and baseline-eligible summary
+contracts. The public execution artifact retains query hashes rather than query text. The sole
+retrieval metric remains `induced_shadowing_rate` among baseline-eligible cases; it is not retrieval
+accuracy.
+
+### Artifacts and non-execution status
+
+The future runner writes one canonical benchmark result at schema `0.1` and a separate environment
+provenance artifact. Canonical results contain no timestamps, latency, transcripts, memory contents,
+mutation substitution parameters, or runtime host identity. Safe provenance records version-only
+Python/platform and local semantic dependency information, the pinned model identity/revision,
+CPU device, and benchmark SHA; it does not affect scoring.
+
+Benchmark v0.1 remains `NOT_RUN`. Part 6C produced no held-out static predictions, clean-control
+predictions, paired retrieval outcomes, benchmark result files, semantic model inference, or
+performance metrics.
