@@ -69,6 +69,39 @@ returned alongside all other targets, or satisfy a recall threshold. Those are l
 decisions. No `RetrievalShadowingChecker`, retrieval audit CLI checker, or concrete backend retriever
 exists yet.
 
+## Retrieval sufficiency policies
+
+Part 5B evaluates an already-valid `RetrievalObservation` under one caller-selected
+`RetrievalSufficiencyPolicy`. Exactly two policies are supported:
+
+- `ALL_EXPECTED` (`all_expected`) is sufficient only when every expected memory ID appears
+  somewhere in the observed hits; and
+- `ANY_EXPECTED` (`any_expected`) is sufficient when at least one expected memory ID appears
+  somewhere in the observed hits.
+
+Neither policy is a universal or implicit default. Every assessment call must explicitly supply the
+policy because a multi-target audit may mean that all targets are required or that any target is an
+adequate answer. For a single expected target, the two policies necessarily produce the same
+decision: present is sufficient and absent is insufficient.
+
+`RetrievalSufficiencyAssessment` records the request ID, explicit policy, strict sufficiency boolean,
+the canonical expected/retrieved/missing target partition, and `top_k`. An expected target counts if
+it appears anywhere in the valid observed hit window; rank one is not required. Hit scores and
+`RetrievalUsage` do not affect the target partition or decision and are not copied into the
+assessment. Returned non-target memories are allowed and are not themselves classified as defects.
+The assessment needs neither query text nor store or retriever access, and its deterministic JSON is
+derived only from the recorded observation and explicit policy.
+
+An insufficient assessment is not yet emitted as a `retrieval_shadowing` `Finding`. No
+`RetrievalShadowingChecker` exists. Part 5C must first resolve two representation issues without
+silently changing frozen schemas:
+
+- retrieval-shadowing mutation gold uses the `RETRIEVAL_CASE` unit, while the generic `Finding`
+  requires one or more `memory_ids`; Part 5B does not decide that mapping or modify `Finding`; and
+- `CheckerCost` records model calls and token counts, while `RetrievalUsage` records retrieval calls
+  and candidate counts; Part 5B does not modify `CheckerCost` or decide whether later retrieval usage
+  belongs in `CheckerStats.details` or another explicitly versioned representation.
+
 ## Part 2 isolation
 
 Part 2 retrieval challenges are evaluation artifacts. Their mutation `RetrievalProbe` declares a
