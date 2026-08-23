@@ -9,6 +9,12 @@ from memlint.retrieval.base import (
     run_retrieval_audit,
     validate_retrieval_audit_request,
 )
+from memlint.retrieval.challenge import (
+    PairedRetrievalChallengeAssessment,
+    RetrievalChallengeInputError,
+    RetrievalChallengeOutcome,
+    assess_paired_retrieval_challenge,
+)
 from memlint.retrieval.models import (
     RetrievalAuditRequest,
     RetrievalHit,
@@ -24,6 +30,8 @@ from memlint.retrieval.policy import (
 
 __all__ = [
     "RetrievalAuditRequest",
+    "RetrievalChallengeInputError",
+    "RetrievalChallengeOutcome",
     "RetrievalError",
     "RetrievalHit",
     "RetrievalInputError",
@@ -34,6 +42,8 @@ __all__ = [
     "RetrievalSufficiencyPolicy",
     "RetrievalUsage",
     "Retriever",
+    "PairedRetrievalChallengeAssessment",
+    "assess_paired_retrieval_challenge",
     "assess_retrieval_sufficiency",
     "retriever_identity",
     "run_retrieval_audit",
