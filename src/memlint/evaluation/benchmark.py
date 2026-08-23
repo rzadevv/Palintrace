@@ -19,7 +19,7 @@ from memlint.taxonomy import DefectClass
 
 BENCHMARK_SCHEMA_VERSION = "0.1"
 BENCHMARK_ID = "memlint-controlled-v0.1"
-BENCHMARK_SPEC_SHA256 = "309fc9e18356c8dd3fd38dc2a47295dea43b22189889ceba78599488cabf9940"
+BENCHMARK_SPEC_SHA256 = "fd11b0d547197495d51684f005ac17c861392891e464d818815e04eb6f37dad0"
 
 StrictPositiveInt = Annotated[int, Field(strict=True, ge=1)]
 

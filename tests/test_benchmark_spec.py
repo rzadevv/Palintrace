@@ -56,7 +56,7 @@ EXPECTED_SOURCE_VALUES = {
     "h2-terminal-editor": "server configuration files with micro",
     "h2-diff-tool": "local diffs in Meld",
     "h2-employer": "Cedar Harbor Analytics",
-    "h2-home-city": "Porto",
+    "h2-home-city": "Porto's Cedofeita district",
     "h2-work-laptop": "ThinkPad T14",
     "h2-office-day": "Wednesdays",
     "h3-documentation-editor": "project documentation in Typora",
@@ -154,7 +154,7 @@ def test_benchmark_spec_loads_and_serializes_deterministically(
 def test_benchmark_canonical_sha_is_frozen(benchmark_spec: BenchmarkSpec) -> None:
     digest = hashlib.sha256(benchmark_spec.to_json(indent=None).encode("utf-8")).hexdigest()
     assert digest == BENCHMARK_SPEC_SHA256
-    assert digest == "309fc9e18356c8dd3fd38dc2a47295dea43b22189889ceba78599488cabf9940"
+    assert digest == "fd11b0d547197495d51684f005ac17c861392891e464d818815e04eb6f37dad0"
 
 
 def test_every_benchmark_fixture_file_hash_is_frozen() -> None:

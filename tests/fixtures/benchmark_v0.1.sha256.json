@@ -1,10 +1,10 @@
 {
   "tests/fixtures/benchmark_v0.1/README.md": "5037ed3d59a3680ef51371dd5f982eb3abc887e1e9c6c3226ecf28f13222226c",
-  "tests/fixtures/benchmark_v0.1/benchmark.json": "46a2fb7986b9e4e6fe8f3056f37ff4655cf337fc113824cc728bc0e395e720f9",
+  "tests/fixtures/benchmark_v0.1/benchmark.json": "93013dccf171db8ca6cb8558bccbd10021a19d65673a31a490e99fc39baaa9fc",
   "tests/fixtures/benchmark_v0.1/fixture_h1_store.json": "2b688007a19a88835779b9ad44d02891f5c2f643930811a21d4ac477904a7474",
   "tests/fixtures/benchmark_v0.1/fixture_h1_transcripts.json": "0ac39a2003056e8d48a91bc597cf1c8e73477afe85a4daadd59e46169a66b9d9",
-  "tests/fixtures/benchmark_v0.1/fixture_h2_store.json": "a185a5bd05351253383fe5b5e709a3ba9309879b145b109ce6f153bfb4518ca9",
-  "tests/fixtures/benchmark_v0.1/fixture_h2_transcripts.json": "f63a9785cee8962522aa866f3e2996a50471a96d99656417bcb7d297174d2ba6",
+  "tests/fixtures/benchmark_v0.1/fixture_h2_store.json": "6eef745671708adb38844c358bb25a29692657478331df49f1bad9aab5df0728",
+  "tests/fixtures/benchmark_v0.1/fixture_h2_transcripts.json": "23adf3c70943bb9f0a5c633bed9a59cafede2018398f7f47121643338ebfe9c0",
   "tests/fixtures/benchmark_v0.1/fixture_h3_store.json": "0cbd93b42229ca94f672ceee788f8133bf150a0a2499d561eb537f5821a51fed",
   "tests/fixtures/benchmark_v0.1/fixture_h3_transcripts.json": "1e159f90df2b29f447b94658b3b92450927b4c3f903b16e07cbfd513ca02323a",
   "tests/fixtures/benchmark_v0.1/scope_policy.json": "ed412b9dbb8b1e13bb8a42c66a03ab191a3d6bf45906cee126229974b510a999"

@@ -40,7 +40,7 @@
     },
     {
       "active": true,
-      "content": "Kenji works for Cedar Harbor Analytics.",
+      "content": "Kenji is on Cedar Harbor Analytics' forecasting team.",
       "created_at": "2026-02-07T08:50:00+01:00",
       "id": "h2-employer",
       "provenance_status": "declared",
@@ -49,7 +49,7 @@
     },
     {
       "active": true,
-      "content": "Kenji lives in Porto.",
+      "content": "Kenji's home is in Porto's Cedofeita district.",
       "created_at": "2026-02-08T13:15:00+01:00",
       "id": "h2-home-city",
       "provenance_status": "declared",

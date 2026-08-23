@@ -5,8 +5,8 @@
     {"id": "h2-transcript-android", "turns": [{"content": "I build Android prototypes in Android Studio.", "index": 0, "role": "user", "timestamp": "2026-02-04T10:25:00+01:00"}]},
     {"id": "h2-transcript-terminal", "turns": [{"content": "I edit server configuration files with micro.", "index": 0, "role": "user", "timestamp": "2026-02-05T11:30:00+01:00"}]},
     {"id": "h2-transcript-diffs", "turns": [{"content": "I review local diffs in Meld.", "index": 0, "role": "user", "timestamp": "2026-02-06T15:40:00+01:00"}]},
-    {"id": "h2-transcript-employer", "turns": [{"content": "I work for Cedar Harbor Analytics.", "index": 0, "role": "user", "timestamp": "2026-02-07T08:50:00+01:00"}]},
-    {"id": "h2-transcript-city", "turns": [{"content": "I live in Porto.", "index": 0, "role": "user", "timestamp": "2026-02-08T13:15:00+01:00"}]},
+    {"id": "h2-transcript-employer", "turns": [{"content": "Cedar Harbor Analytics employs me on its forecasting team.", "index": 0, "role": "user", "timestamp": "2026-02-07T08:50:00+01:00"}]},
+    {"id": "h2-transcript-city", "turns": [{"content": "My home is in Porto's Cedofeita district.", "index": 0, "role": "user", "timestamp": "2026-02-08T13:15:00+01:00"}]},
     {"id": "h2-transcript-laptop", "turns": [{"content": "My work laptop is a ThinkPad T14.", "index": 0, "role": "user", "timestamp": "2026-02-09T14:35:00+01:00"}]},
     {"id": "h2-transcript-office", "turns": [{"content": "I work from the office on Wednesdays.", "index": 0, "role": "user", "timestamp": "2026-02-10T17:05:00+01:00"}]}
   ]
