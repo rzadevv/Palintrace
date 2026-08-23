@@ -412,6 +412,7 @@ def test_retrieval_architecture_has_contract_only() -> None:
     assert {path.name for path in RETRIEVAL_ROOT.glob("*.py")} == {
         "__init__.py",
         "base.py",
+        "challenge.py",
         "models.py",
         "policy.py",
     }
