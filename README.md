@@ -26,9 +26,9 @@ Implemented:
 - the explicit-supersession `stale_active` checker;
 - the policy-directed exact-replica `privacy_scope_violation` checker;
 - the dependency-injected `unsupported_claim` checker with optional local CPU audit integration;
-- retrieval runtime, sufficiency, and result-projection contracts implemented; runtime CLI
-  orchestration remains pending;
-- `memlint dump`, `memlint mutate`, and `memlint audit`.
+- retrieval runtime, sufficiency, result-projection, and recorded-observation CLI contracts; live
+  retriever orchestration remains pending;
+- `memlint dump`, `memlint mutate`, `memlint audit`, and `memlint retrieval-audit`.
 
 Not implemented yet:
 
@@ -224,6 +224,19 @@ Retrieval-shadowing mutations create distractor-crowding challenges and a retrie
 `requires_runtime_validation: true`; adding distractors alone is not evidence that shadowing occurred.
 See [the frozen taxonomy](docs/taxonomy.md) and [mutation harness](docs/mutations.md) for precise
 boundaries and supported subtypes.
+
+Project a recorded retrieval observation into a retrieval-shadowing audit result without executing
+a backend retriever:
+
+```bash
+memlint retrieval-audit \
+  --observation retrieval-observation.json \
+  --policy all_expected \
+  --output retrieval-findings.json
+```
+
+See [the retrieval runtime contract](docs/retrieval.md) for the observation, explicit-policy, and
+result-projection boundaries.
 
 Run the structural provenance audit separately from mutation gold data:
 

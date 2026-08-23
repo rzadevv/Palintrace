@@ -130,6 +130,33 @@ Persisted observations rely on Part 5A's execution-time reconciliation with the 
 snapshot; they are not yet cryptographically bound to the complete store contents. That is a known
 reproducibility limitation rather than a hidden redesign of the frozen observation schema.
 
+## Recorded retrieval CLI
+
+Project a previously recorded observation into the frozen checker result envelope with an explicit
+policy:
+
+```bash
+memlint retrieval-audit \
+  --observation retrieval-observation.json \
+  --policy all_expected \
+  --output findings.json
+```
+
+The input must be UTF-8 JSON conforming to the frozen `RetrievalObservation` schema. This command
+does not execute retrieval, contact a backend, accept a store, or reconstruct the absent query text.
+It accepts no query, expected-target, top-k, retriever-identity, usage, mutation, manifest, or model
+overrides. The policy is required on every invocation and must be `all_expected` or `any_expected`;
+there is no default.
+
+Output is deterministic `CheckerResult` schema `0.2` JSON. A sufficient recorded case contains zero
+findings, while an insufficient case contains the one case-level finding frozen in Part 5C. Omitting
+`--output` writes only that JSON to stdout. An output path cannot overwrite the recorded observation.
+
+Static `memlint audit --checker ...` still does not expose `retrieval_shadowing`, and no concrete
+backend retriever or `RetrievalShadowingChecker` class exists. The CLI projects recorded evidence;
+it does not resolve the known limitation that persisted observations are not cryptographically bound
+to complete audited-store contents.
+
 ## Part 2 isolation
 
 Part 2 retrieval challenges are evaluation artifacts. Their mutation `RetrievalProbe` declares a
