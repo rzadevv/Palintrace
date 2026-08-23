@@ -157,6 +157,42 @@ backend retriever or `RetrievalShadowingChecker` class exists. The CLI projects 
 it does not resolve the known limitation that persisted observations are not cryptographically bound
 to complete audited-store contents.
 
+## Paired retrieval challenges
+
+A mutated-store miss alone cannot support a causal claim that a distractor-crowding mutation induced
+retrieval shadowing: the configured retriever may already have missed the target on the base store.
+Controlled mutation-effect experiments therefore assess a recorded baseline observation together
+with a recorded mutated observation under one explicit `ALL_EXPECTED` or `ANY_EXPECTED` policy. A
+baseline-sufficient run is an eligibility condition for an induced-shadowing result.
+
+`assess_paired_retrieval_challenge` requires the two observations to have exactly the same query
+SHA-256, canonical expected target set, `top_k`, retriever ID, and retriever version. Their request
+IDs may differ because they are separate runtime records; a nonblank caller-supplied `case_id` binds
+them into one experimental challenge. The function reuses the frozen Part 5B sufficiency assessment
+for both runs and never executes retrieval or reads a store.
+
+Exactly three outcomes exist:
+
+- `induced_shadowing`: the baseline is sufficient and the mutated observation is insufficient;
+- `resilient`: both observations are sufficient; and
+- `baseline_insufficient`: the baseline is insufficient, regardless of the mutated result.
+
+Baseline-insufficient cases are excluded from mutation-effect success counts. A mutated success
+after a baseline failure remains `baseline_insufficient`; Part 5E deliberately does not add an
+"improved" outcome. Scores, retrieval usage, ordinary non-target hits, and a target's rank within
+the valid top-k window do not affect these presence-based outcomes.
+
+Part 2 distractor mutations define retrieval challenges, but their probe, manifest, mutation ID,
+distractor IDs, and gold label remain evaluation-only metadata. Test or future evaluation harness
+code may translate the public query and expected IDs into independent baseline and mutated audit
+requests, but production paired assessment consumes only the two recorded observations. There is no
+concrete retriever and no paired-challenge CLI command in this phase.
+
+The compatibility checks do not independently prove that the observations came from the intended
+base and corresponding mutated store snapshots. Part 5A observations are not yet cryptographically
+bound to complete store contents; an outer controlled-evaluation harness may check mutation and store
+digests later without changing this frozen paired contract.
+
 ## Part 2 isolation
 
 Part 2 retrieval challenges are evaluation artifacts. Their mutation `RetrievalProbe` declares a
