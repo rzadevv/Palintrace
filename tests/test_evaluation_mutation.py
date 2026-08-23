@@ -589,6 +589,32 @@ def test_trial_model_is_self_validating_and_canonical() -> None:
             MutationTrialEvaluation.model_validate(payload)
 
 
+def test_trial_serialization_is_deterministic_and_excludes_sensitive_payloads() -> None:
+    trial = _trial_model(
+        mutation_id="mutation",
+        detected=True,
+        gold_ids=("gold",),
+        unknown_ids=("unknown",),
+    )
+
+    first = trial.to_json()
+    second = trial.to_json()
+    assert first == second
+    assert MutationTrialEvaluation.model_validate_json(first) == trial
+    assert set(MutationTrialEvaluation.model_fields).isdisjoint(
+        {
+            "memory_content",
+            "transcript_text",
+            "raw",
+            "parameters",
+            "replace_from",
+            "replace_to",
+            "distractor_ids",
+            "query",
+        }
+    )
+
+
 def test_mutation_summary_counts_safe_buckets_and_recall_without_precision_metrics() -> None:
     trials = (
         _trial_model(
