@@ -28,6 +28,8 @@ Implemented:
 - the dependency-injected `unsupported_claim` checker with optional local CPU audit integration;
 - retrieval runtime, sufficiency, result-projection, and recorded-observation CLI contracts; live
   retriever orchestration remains pending;
+- gold-safe controlled-mutation and paired-retrieval evaluation accounting, without benchmark
+  performance claims;
 - `memlint dump`, `memlint mutate`, `memlint audit`, and `memlint retrieval-audit`.
 
 Not implemented yet:
