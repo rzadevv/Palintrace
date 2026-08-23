@@ -93,6 +93,7 @@ def test_checker_package_has_only_implemented_modules() -> None:
         "orphaned_provenance.py",
         "privacy_scope_violation.py",
         "redundancy_bloat.py",
+        "retrieval_shadowing.py",
         "stale_active.py",
         "unsupported_claim.py",
     }
