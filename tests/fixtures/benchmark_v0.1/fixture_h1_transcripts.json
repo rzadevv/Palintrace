@@ -1,0 +1,13 @@
+{
+  "schema_version": "0.1",
+  "transcripts": [
+    {"id": "h1-transcript-journal", "turns": [{"content": "I write my morning journal in Obsidian.", "index": 0, "role": "user", "timestamp": "2026-01-08T07:20:00+01:00"}]},
+    {"id": "h1-transcript-writing", "turns": [{"content": "I draft distraction-free essays in FocusWriter.", "index": 0, "role": "user", "timestamp": "2026-01-09T18:10:00+01:00"}]},
+    {"id": "h1-transcript-recipes", "turns": [{"content": "I edit my recipe notes with MarkText.", "index": 0, "role": "user", "timestamp": "2026-01-10T12:05:00+01:00"}]},
+    {"id": "h1-transcript-research", "turns": [{"content": "I organize research excerpts in Logseq.", "index": 0, "role": "user", "timestamp": "2026-01-11T20:40:00+01:00"}]},
+    {"id": "h1-transcript-breakfast", "turns": [{"content": "I eat breakfast at 7:15 a.m.", "index": 0, "role": "user", "timestamp": "2026-01-12T07:18:00+01:00"}]},
+    {"id": "h1-transcript-yoga", "turns": [{"content": "I attend yoga on Tuesdays.", "index": 0, "role": "user", "timestamp": "2026-01-13T19:00:00+01:00"}]},
+    {"id": "h1-transcript-tea", "turns": [{"content": "I order two tins of oolong each month.", "index": 0, "role": "user", "timestamp": "2026-01-14T17:45:00+01:00"}]},
+    {"id": "h1-transcript-library", "turns": [{"content": "I pick up my holds at the Riverside branch.", "index": 0, "role": "user", "timestamp": "2026-01-15T16:30:00+01:00"}]}
+  ]
+}

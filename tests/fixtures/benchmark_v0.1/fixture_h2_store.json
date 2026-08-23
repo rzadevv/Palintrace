@@ -1,0 +1,79 @@
+{
+  "adapter": "benchmark-synthetic",
+  "exported_at": null,
+  "memories": [
+    {
+      "active": true,
+      "content": "Kenji edits Clojure services in Kate.",
+      "created_at": "2026-02-03T09:10:00+01:00",
+      "id": "h2-code-editor",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h2-sage", "session_id": "session-h2-work", "user_id": "user-h2-kenji"},
+      "source_refs": [{"transcript_id": "h2-transcript-code", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Kenji builds Android prototypes in Android Studio.",
+      "created_at": "2026-02-04T10:25:00+01:00",
+      "id": "h2-android-ide",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h2-sage", "session_id": "session-h2-work", "user_id": "user-h2-kenji"},
+      "source_refs": [{"transcript_id": "h2-transcript-android", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Kenji edits server configuration files with micro.",
+      "created_at": "2026-02-05T11:30:00+01:00",
+      "id": "h2-terminal-editor",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h2-sage", "session_id": "session-h2-work", "user_id": "user-h2-kenji"},
+      "source_refs": [{"transcript_id": "h2-transcript-terminal", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Kenji reviews local diffs in Meld.",
+      "created_at": "2026-02-06T15:40:00+01:00",
+      "id": "h2-diff-tool",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h2-sage", "session_id": "session-h2-work", "user_id": "user-h2-kenji"},
+      "source_refs": [{"transcript_id": "h2-transcript-diffs", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Kenji works for Cedar Harbor Analytics.",
+      "created_at": "2026-02-07T08:50:00+01:00",
+      "id": "h2-employer",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h2-sage", "session_id": "session-h2-work", "user_id": "user-h2-kenji"},
+      "source_refs": [{"transcript_id": "h2-transcript-employer", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Kenji lives in Porto.",
+      "created_at": "2026-02-08T13:15:00+01:00",
+      "id": "h2-home-city",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h2-sage", "session_id": "session-h2-work", "user_id": "user-h2-kenji"},
+      "source_refs": [{"transcript_id": "h2-transcript-city", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Kenji's work laptop is a ThinkPad T14.",
+      "created_at": "2026-02-09T14:35:00+01:00",
+      "id": "h2-work-laptop",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h2-sage", "session_id": "session-h2-work", "user_id": "user-h2-kenji"},
+      "source_refs": [{"transcript_id": "h2-transcript-laptop", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Kenji works from the office on Wednesdays.",
+      "created_at": "2026-02-10T17:05:00+01:00",
+      "id": "h2-office-day",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h2-sage", "session_id": "session-h2-work", "user_id": "user-h2-kenji"},
+      "source_refs": [{"transcript_id": "h2-transcript-office", "turn_idx": 0}]
+    }
+  ],
+  "schema_version": "0.1"
+}

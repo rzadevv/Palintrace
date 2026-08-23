@@ -1,0 +1,35 @@
+{
+  "rules": [
+    {
+      "authoritative_source_principal": "user-h1-ava",
+      "dimension": "user_id",
+      "prohibited_destination_principals": ["user-heldout-isolated"]
+    },
+    {
+      "authoritative_source_principal": "user-h2-kenji",
+      "dimension": "user_id",
+      "prohibited_destination_principals": ["user-heldout-isolated"]
+    },
+    {
+      "authoritative_source_principal": "user-h3-lina",
+      "dimension": "user_id",
+      "prohibited_destination_principals": ["user-heldout-isolated"]
+    },
+    {
+      "authoritative_source_principal": "agent-h1-nova",
+      "dimension": "agent_id",
+      "prohibited_destination_principals": ["agent-heldout-isolated"]
+    },
+    {
+      "authoritative_source_principal": "agent-h2-sage",
+      "dimension": "agent_id",
+      "prohibited_destination_principals": ["agent-heldout-isolated"]
+    },
+    {
+      "authoritative_source_principal": "agent-h3-cobalt",
+      "dimension": "agent_id",
+      "prohibited_destination_principals": ["agent-heldout-isolated"]
+    }
+  ],
+  "schema_version": "0.1"
+}

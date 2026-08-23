@@ -1,0 +1,13 @@
+{
+  "schema_version": "0.1",
+  "transcripts": [
+    {"id": "h3-transcript-docs", "turns": [{"content": "I write project documentation in Typora.", "index": 0, "role": "user", "timestamp": "2026-03-02T09:30:00+01:00"}]},
+    {"id": "h3-transcript-ide", "turns": [{"content": "I maintain the Kestrel mobile app in Eclipse.", "index": 0, "role": "user", "timestamp": "2026-03-03T10:45:00+01:00"}]},
+    {"id": "h3-transcript-config", "turns": [{"content": "I edit deployment manifests in Kakoune.", "index": 0, "role": "user", "timestamp": "2026-03-04T11:55:00+01:00"}]},
+    {"id": "h3-transcript-release", "turns": [{"content": "I prepare release notes in HedgeDoc.", "index": 0, "role": "user", "timestamp": "2026-03-05T14:20:00+01:00"}]},
+    {"id": "h3-transcript-project", "turns": [{"content": "I lead the Kestrel migration project.", "index": 0, "role": "user", "timestamp": "2026-03-06T08:35:00+01:00"}]},
+    {"id": "h3-transcript-subscription", "turns": [{"content": "My design-tool subscription renews monthly.", "index": 0, "role": "user", "timestamp": "2026-03-07T16:10:00+01:00"}]},
+    {"id": "h3-transcript-channel", "turns": [{"content": "I prefer status updates by email.", "index": 0, "role": "user", "timestamp": "2026-03-08T17:25:00+01:00"}]},
+    {"id": "h3-transcript-support", "turns": [{"content": "I monitor three support queues.", "index": 0, "role": "user", "timestamp": "2026-03-09T18:40:00+01:00"}]}
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "adapter": "benchmark-synthetic",
+  "exported_at": null,
+  "memories": [
+    {
+      "active": true,
+      "content": "Lina writes project documentation in Typora.",
+      "created_at": "2026-03-02T09:30:00+01:00",
+      "id": "h3-documentation-editor",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h3-cobalt", "session_id": "session-h3-kestrel", "user_id": "user-h3-lina"},
+      "source_refs": [{"transcript_id": "h3-transcript-docs", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Lina maintains the Kestrel mobile app in Eclipse.",
+      "created_at": "2026-03-03T10:45:00+01:00",
+      "id": "h3-project-ide",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h3-cobalt", "session_id": "session-h3-kestrel", "user_id": "user-h3-lina"},
+      "source_refs": [{"transcript_id": "h3-transcript-ide", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Lina edits deployment manifests in Kakoune.",
+      "created_at": "2026-03-04T11:55:00+01:00",
+      "id": "h3-config-editor",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h3-cobalt", "session_id": "session-h3-kestrel", "user_id": "user-h3-lina"},
+      "source_refs": [{"transcript_id": "h3-transcript-config", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Lina prepares release notes in HedgeDoc.",
+      "created_at": "2026-03-05T14:20:00+01:00",
+      "id": "h3-release-editor",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h3-cobalt", "session_id": "session-h3-kestrel", "user_id": "user-h3-lina"},
+      "source_refs": [{"transcript_id": "h3-transcript-release", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Lina leads the Kestrel migration project.",
+      "created_at": "2026-03-06T08:35:00+01:00",
+      "id": "h3-project-name",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h3-cobalt", "session_id": "session-h3-kestrel", "user_id": "user-h3-lina"},
+      "source_refs": [{"transcript_id": "h3-transcript-project", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Lina's design-tool subscription renews monthly.",
+      "created_at": "2026-03-07T16:10:00+01:00",
+      "id": "h3-subscription-cycle",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h3-cobalt", "session_id": "session-h3-kestrel", "user_id": "user-h3-lina"},
+      "source_refs": [{"transcript_id": "h3-transcript-subscription", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Lina prefers status updates by email.",
+      "created_at": "2026-03-08T17:25:00+01:00",
+      "id": "h3-status-channel",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h3-cobalt", "session_id": "session-h3-kestrel", "user_id": "user-h3-lina"},
+      "source_refs": [{"transcript_id": "h3-transcript-channel", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Lina monitors three support queues.",
+      "created_at": "2026-03-09T18:40:00+01:00",
+      "id": "h3-support-count",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h3-cobalt", "session_id": "session-h3-kestrel", "user_id": "user-h3-lina"},
+      "source_refs": [{"transcript_id": "h3-transcript-support", "turn_idx": 0}]
+    }
+  ],
+  "schema_version": "0.1"
+}

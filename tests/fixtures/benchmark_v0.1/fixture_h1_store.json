@@ -1,0 +1,79 @@
+{
+  "adapter": "benchmark-synthetic",
+  "exported_at": null,
+  "memories": [
+    {
+      "active": true,
+      "content": "Ava writes her morning journal in Obsidian.",
+      "created_at": "2026-01-08T07:20:00+01:00",
+      "id": "h1-journal-app",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h1-nova", "session_id": "session-h1-dawn", "user_id": "user-h1-ava"},
+      "source_refs": [{"transcript_id": "h1-transcript-journal", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Ava drafts distraction-free essays in FocusWriter.",
+      "created_at": "2026-01-09T18:10:00+01:00",
+      "id": "h1-writing-tool",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h1-nova", "session_id": "session-h1-dawn", "user_id": "user-h1-ava"},
+      "source_refs": [{"transcript_id": "h1-transcript-writing", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Ava edits recipe notes with MarkText.",
+      "created_at": "2026-01-10T12:05:00+01:00",
+      "id": "h1-recipe-editor",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h1-nova", "session_id": "session-h1-dawn", "user_id": "user-h1-ava"},
+      "source_refs": [{"transcript_id": "h1-transcript-recipes", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Ava organizes research excerpts in Logseq.",
+      "created_at": "2026-01-11T20:40:00+01:00",
+      "id": "h1-research-notes",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h1-nova", "session_id": "session-h1-dawn", "user_id": "user-h1-ava"},
+      "source_refs": [{"transcript_id": "h1-transcript-research", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Ava eats breakfast at 7:15 a.m.",
+      "created_at": "2026-01-12T07:18:00+01:00",
+      "id": "h1-breakfast-time",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h1-nova", "session_id": "session-h1-dawn", "user_id": "user-h1-ava"},
+      "source_refs": [{"transcript_id": "h1-transcript-breakfast", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Ava attends yoga on Tuesdays.",
+      "created_at": "2026-01-13T19:00:00+01:00",
+      "id": "h1-yoga-day",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h1-nova", "session_id": "session-h1-dawn", "user_id": "user-h1-ava"},
+      "source_refs": [{"transcript_id": "h1-transcript-yoga", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Ava orders two tins of oolong each month.",
+      "created_at": "2026-01-14T17:45:00+01:00",
+      "id": "h1-tea-count",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h1-nova", "session_id": "session-h1-dawn", "user_id": "user-h1-ava"},
+      "source_refs": [{"transcript_id": "h1-transcript-tea", "turn_idx": 0}]
+    },
+    {
+      "active": true,
+      "content": "Ava picks up holds at the Riverside branch.",
+      "created_at": "2026-01-15T16:30:00+01:00",
+      "id": "h1-library-branch",
+      "provenance_status": "declared",
+      "scope": {"agent_id": "agent-h1-nova", "session_id": "session-h1-dawn", "user_id": "user-h1-ava"},
+      "source_refs": [{"transcript_id": "h1-transcript-library", "turn_idx": 0}]
+    }
+  ],
+  "schema_version": "0.1"
+}

@@ -1,0 +1,242 @@
+{
+  "benchmark_id": "memlint-controlled-v0.1",
+  "checker_identities": [
+    {"checker_id": "orphaned_provenance", "checker_version": "1.0", "defect_class": "orphaned_provenance"},
+    {"checker_id": "privacy_scope_violation", "checker_version": "1.0", "defect_class": "privacy_scope_violation"},
+    {"checker_id": "redundancy_bloat", "checker_version": "1.0", "defect_class": "redundancy_bloat"},
+    {"checker_id": "stale_active", "checker_version": "1.0", "defect_class": "stale_active"},
+    {"checker_id": "unsupported_claim", "checker_version": "1.0", "defect_class": "unsupported_claim"}
+  ],
+  "clean_control_cases": [
+    {"base_fixture_id": "H1", "case_id": "CC-OP-H1", "defect_class": "orphaned_provenance", "kind": "clean_control", "split": "held_out", "transcript_fixture_id": "H1"},
+    {"base_fixture_id": "H2", "case_id": "CC-OP-H2", "defect_class": "orphaned_provenance", "kind": "clean_control", "split": "held_out", "transcript_fixture_id": "H2"},
+    {"base_fixture_id": "H3", "case_id": "CC-OP-H3", "defect_class": "orphaned_provenance", "kind": "clean_control", "split": "held_out", "transcript_fixture_id": "H3"},
+    {"base_fixture_id": "H1", "case_id": "CC-PV-H1", "defect_class": "privacy_scope_violation", "kind": "clean_control", "scope_policy_fixture_id": "H1", "split": "held_out"},
+    {"base_fixture_id": "H2", "case_id": "CC-PV-H2", "defect_class": "privacy_scope_violation", "kind": "clean_control", "scope_policy_fixture_id": "H2", "split": "held_out"},
+    {"base_fixture_id": "H3", "case_id": "CC-PV-H3", "defect_class": "privacy_scope_violation", "kind": "clean_control", "scope_policy_fixture_id": "H3", "split": "held_out"},
+    {"base_fixture_id": "H1", "case_id": "CC-RB-H1", "defect_class": "redundancy_bloat", "kind": "clean_control", "split": "held_out"},
+    {"base_fixture_id": "H2", "case_id": "CC-RB-H2", "defect_class": "redundancy_bloat", "kind": "clean_control", "split": "held_out"},
+    {"base_fixture_id": "H3", "case_id": "CC-RB-H3", "defect_class": "redundancy_bloat", "kind": "clean_control", "split": "held_out"},
+    {"base_fixture_id": "H1", "case_id": "CC-SA-H1", "defect_class": "stale_active", "kind": "clean_control", "split": "held_out"},
+    {"base_fixture_id": "H2", "case_id": "CC-SA-H2", "defect_class": "stale_active", "kind": "clean_control", "split": "held_out"},
+    {"base_fixture_id": "H3", "case_id": "CC-SA-H3", "defect_class": "stale_active", "kind": "clean_control", "split": "held_out"},
+    {"base_fixture_id": "H1", "case_id": "CC-UC-H1", "defect_class": "unsupported_claim", "kind": "clean_control", "split": "held_out", "transcript_fixture_id": "H1"},
+    {"base_fixture_id": "H2", "case_id": "CC-UC-H2", "defect_class": "unsupported_claim", "kind": "clean_control", "split": "held_out", "transcript_fixture_id": "H2"},
+    {"base_fixture_id": "H3", "case_id": "CC-UC-H3", "defect_class": "unsupported_claim", "kind": "clean_control", "split": "held_out", "transcript_fixture_id": "H3"}
+  ],
+  "development_artifacts": [
+    "examples/mutation-store.json",
+    "examples/mutation-transcripts.json",
+    "tests/fixtures/contradiction_pair_probe_v0.1.json",
+    "tests/fixtures/evidence_composition_probe_v0.1.json",
+    "tests/fixtures/injected_instruction_probe_v0.1.json",
+    "tests/fixtures/instruction_contradiction_probe_v0.1.json",
+    "tests/fixtures/semantic_probe_v0.1.json"
+  ],
+  "fixtures": [
+    {
+      "base_store_status": "curated_clean",
+      "fixture_id": "H1",
+      "scope_policy_path": "tests/fixtures/benchmark_v0.1/scope_policy.json",
+      "store_path": "tests/fixtures/benchmark_v0.1/fixture_h1_store.json",
+      "transcripts_path": "tests/fixtures/benchmark_v0.1/fixture_h1_transcripts.json"
+    },
+    {
+      "base_store_status": "curated_clean",
+      "fixture_id": "H2",
+      "scope_policy_path": "tests/fixtures/benchmark_v0.1/scope_policy.json",
+      "store_path": "tests/fixtures/benchmark_v0.1/fixture_h2_store.json",
+      "transcripts_path": "tests/fixtures/benchmark_v0.1/fixture_h2_transcripts.json"
+    },
+    {
+      "base_store_status": "curated_clean",
+      "fixture_id": "H3",
+      "scope_policy_path": "tests/fixtures/benchmark_v0.1/scope_policy.json",
+      "store_path": "tests/fixtures/benchmark_v0.1/fixture_h3_store.json",
+      "transcripts_path": "tests/fixtures/benchmark_v0.1/fixture_h3_transcripts.json"
+    }
+  ],
+  "retrieval_cases": [
+    {
+      "base_fixture_id": "H1",
+      "case_id": "RS-H1-01",
+      "kind": "retrieval_challenge",
+      "mutation_request": {"base_store_status": "curated_clean", "defect_class": "retrieval_shadowing", "distractor_count": 3, "distractor_family": "editor", "query": "Which application does Ava use for her morning journal?", "seed": 101, "subtype": "distractor_crowding", "target_memory_id": "h1-journal-app"},
+      "policy": "all_expected",
+      "retrieval_condition_id": "lexical-baseline-k3",
+      "split": "held_out",
+      "top_k": 3
+    },
+    {
+      "base_fixture_id": "H1",
+      "case_id": "RS-H1-02",
+      "kind": "retrieval_challenge",
+      "mutation_request": {"base_store_status": "curated_clean", "defect_class": "retrieval_shadowing", "distractor_count": 3, "distractor_family": "editor", "query": "What software does Ava use for distraction-free essay drafting?", "seed": 102, "subtype": "distractor_crowding", "target_memory_id": "h1-writing-tool"},
+      "policy": "all_expected",
+      "retrieval_condition_id": "lexical-baseline-k3",
+      "split": "held_out",
+      "top_k": 3
+    },
+    {
+      "base_fixture_id": "H1",
+      "case_id": "RS-H1-03",
+      "kind": "retrieval_challenge",
+      "mutation_request": {"base_store_status": "curated_clean", "defect_class": "retrieval_shadowing", "distractor_count": 3, "distractor_family": "editor", "query": "Which editor does Ava use for recipe notes?", "seed": 103, "subtype": "distractor_crowding", "target_memory_id": "h1-recipe-editor"},
+      "policy": "all_expected",
+      "retrieval_condition_id": "lexical-baseline-k3",
+      "split": "held_out",
+      "top_k": 3
+    },
+    {
+      "base_fixture_id": "H1",
+      "case_id": "RS-H1-04",
+      "kind": "retrieval_challenge",
+      "mutation_request": {"base_store_status": "curated_clean", "defect_class": "retrieval_shadowing", "distractor_count": 3, "distractor_family": "editor", "query": "Where does Ava organize research excerpts?", "seed": 104, "subtype": "distractor_crowding", "target_memory_id": "h1-research-notes"},
+      "policy": "all_expected",
+      "retrieval_condition_id": "lexical-baseline-k3",
+      "split": "held_out",
+      "top_k": 3
+    },
+    {
+      "base_fixture_id": "H2",
+      "case_id": "RS-H2-01",
+      "kind": "retrieval_challenge",
+      "mutation_request": {"base_store_status": "curated_clean", "defect_class": "retrieval_shadowing", "distractor_count": 3, "distractor_family": "editor", "query": "Which editor does Kenji use for Clojure services?", "seed": 201, "subtype": "distractor_crowding", "target_memory_id": "h2-code-editor"},
+      "policy": "all_expected",
+      "retrieval_condition_id": "lexical-baseline-k3",
+      "split": "held_out",
+      "top_k": 3
+    },
+    {
+      "base_fixture_id": "H2",
+      "case_id": "RS-H2-02",
+      "kind": "retrieval_challenge",
+      "mutation_request": {"base_store_status": "curated_clean", "defect_class": "retrieval_shadowing", "distractor_count": 3, "distractor_family": "editor", "query": "Which IDE does Kenji use for Android prototypes?", "seed": 202, "subtype": "distractor_crowding", "target_memory_id": "h2-android-ide"},
+      "policy": "all_expected",
+      "retrieval_condition_id": "lexical-baseline-k3",
+      "split": "held_out",
+      "top_k": 3
+    },
+    {
+      "base_fixture_id": "H2",
+      "case_id": "RS-H2-03",
+      "kind": "retrieval_challenge",
+      "mutation_request": {"base_store_status": "curated_clean", "defect_class": "retrieval_shadowing", "distractor_count": 3, "distractor_family": "editor", "query": "What editor does Kenji use for server configuration files?", "seed": 203, "subtype": "distractor_crowding", "target_memory_id": "h2-terminal-editor"},
+      "policy": "all_expected",
+      "retrieval_condition_id": "lexical-baseline-k3",
+      "split": "held_out",
+      "top_k": 3
+    },
+    {
+      "base_fixture_id": "H2",
+      "case_id": "RS-H2-04",
+      "kind": "retrieval_challenge",
+      "mutation_request": {"base_store_status": "curated_clean", "defect_class": "retrieval_shadowing", "distractor_count": 3, "distractor_family": "editor", "query": "Which application does Kenji use to review local diffs?", "seed": 204, "subtype": "distractor_crowding", "target_memory_id": "h2-diff-tool"},
+      "policy": "all_expected",
+      "retrieval_condition_id": "lexical-baseline-k3",
+      "split": "held_out",
+      "top_k": 3
+    },
+    {
+      "base_fixture_id": "H3",
+      "case_id": "RS-H3-01",
+      "kind": "retrieval_challenge",
+      "mutation_request": {"base_store_status": "curated_clean", "defect_class": "retrieval_shadowing", "distractor_count": 3, "distractor_family": "editor", "query": "Which editor does Lina use for project documentation?", "seed": 301, "subtype": "distractor_crowding", "target_memory_id": "h3-documentation-editor"},
+      "policy": "all_expected",
+      "retrieval_condition_id": "lexical-baseline-k3",
+      "split": "held_out",
+      "top_k": 3
+    },
+    {
+      "base_fixture_id": "H3",
+      "case_id": "RS-H3-02",
+      "kind": "retrieval_challenge",
+      "mutation_request": {"base_store_status": "curated_clean", "defect_class": "retrieval_shadowing", "distractor_count": 3, "distractor_family": "editor", "query": "Which IDE does Lina use for the Kestrel mobile app?", "seed": 302, "subtype": "distractor_crowding", "target_memory_id": "h3-project-ide"},
+      "policy": "all_expected",
+      "retrieval_condition_id": "lexical-baseline-k3",
+      "split": "held_out",
+      "top_k": 3
+    },
+    {
+      "base_fixture_id": "H3",
+      "case_id": "RS-H3-03",
+      "kind": "retrieval_challenge",
+      "mutation_request": {"base_store_status": "curated_clean", "defect_class": "retrieval_shadowing", "distractor_count": 3, "distractor_family": "editor", "query": "What editor does Lina use for deployment manifests?", "seed": 303, "subtype": "distractor_crowding", "target_memory_id": "h3-config-editor"},
+      "policy": "all_expected",
+      "retrieval_condition_id": "lexical-baseline-k3",
+      "split": "held_out",
+      "top_k": 3
+    },
+    {
+      "base_fixture_id": "H3",
+      "case_id": "RS-H3-04",
+      "kind": "retrieval_challenge",
+      "mutation_request": {"base_store_status": "curated_clean", "defect_class": "retrieval_shadowing", "distractor_count": 3, "distractor_family": "editor", "query": "Where does Lina prepare release notes?", "seed": 304, "subtype": "distractor_crowding", "target_memory_id": "h3-release-editor"},
+      "policy": "all_expected",
+      "retrieval_condition_id": "lexical-baseline-k3",
+      "split": "held_out",
+      "top_k": 3
+    }
+  ],
+  "retrieval_conditions": [
+    {
+      "condition_id": "lexical-baseline-k3",
+      "policy": "all_expected",
+      "retriever_config_version": "0.1",
+      "retriever_kind": "experimental_lexical",
+      "top_k": 3
+    }
+  ],
+  "schema_version": "0.1",
+  "static_mutation_cases": [
+    {"base_fixture_id": "H1", "case_id": "OP-H1-01", "defect_class": "orphaned_provenance", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "orphaned_provenance", "seed": 11, "subtype": "missing_transcript", "target_memory_id": "h1-breakfast-time"}, "split": "held_out", "subtype": "missing_transcript", "transcript_fixture_id": "H1"},
+    {"base_fixture_id": "H1", "case_id": "OP-H1-02", "defect_class": "orphaned_provenance", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "orphaned_provenance", "seed": 12, "subtype": "missing_turn", "target_memory_id": "h1-research-notes"}, "split": "held_out", "subtype": "missing_turn", "transcript_fixture_id": "H1"},
+    {"base_fixture_id": "H1", "case_id": "OP-H1-03", "defect_class": "orphaned_provenance", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "orphaned_provenance", "seed": 13, "subtype": "invalid_span", "target_memory_id": "h1-library-branch"}, "split": "held_out", "subtype": "invalid_span", "transcript_fixture_id": "H1"},
+    {"base_fixture_id": "H2", "case_id": "OP-H2-01", "defect_class": "orphaned_provenance", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "orphaned_provenance", "seed": 21, "subtype": "missing_transcript", "target_memory_id": "h2-employer"}, "split": "held_out", "subtype": "missing_transcript", "transcript_fixture_id": "H2"},
+    {"base_fixture_id": "H2", "case_id": "OP-H2-02", "defect_class": "orphaned_provenance", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "orphaned_provenance", "seed": 22, "subtype": "missing_turn", "target_memory_id": "h2-terminal-editor"}, "split": "held_out", "subtype": "missing_turn", "transcript_fixture_id": "H2"},
+    {"base_fixture_id": "H2", "case_id": "OP-H2-03", "defect_class": "orphaned_provenance", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "orphaned_provenance", "seed": 23, "subtype": "invalid_span", "target_memory_id": "h2-office-day"}, "split": "held_out", "subtype": "invalid_span", "transcript_fixture_id": "H2"},
+    {"base_fixture_id": "H3", "case_id": "OP-H3-01", "defect_class": "orphaned_provenance", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "orphaned_provenance", "seed": 31, "subtype": "missing_transcript", "target_memory_id": "h3-project-name"}, "split": "held_out", "subtype": "missing_transcript", "transcript_fixture_id": "H3"},
+    {"base_fixture_id": "H3", "case_id": "OP-H3-02", "defect_class": "orphaned_provenance", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "orphaned_provenance", "seed": 32, "subtype": "missing_turn", "target_memory_id": "h3-documentation-editor"}, "split": "held_out", "subtype": "missing_turn", "transcript_fixture_id": "H3"},
+    {"base_fixture_id": "H3", "case_id": "OP-H3-03", "defect_class": "orphaned_provenance", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "orphaned_provenance", "seed": 33, "subtype": "invalid_span", "target_memory_id": "h3-support-count"}, "split": "held_out", "subtype": "invalid_span", "transcript_fixture_id": "H3"},
+
+    {"base_fixture_id": "H1", "case_id": "PV-H1-01", "defect_class": "privacy_scope_violation", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "privacy_scope_violation", "destination_user_id": "user-heldout-isolated", "seed": 41, "subtype": "cross_user_copy", "target_memory_id": "h1-recipe-editor"}, "split": "held_out", "subtype": "cross_user_copy"},
+    {"base_fixture_id": "H1", "case_id": "PV-H1-02", "defect_class": "privacy_scope_violation", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "privacy_scope_violation", "destination_agent_id": "agent-heldout-isolated", "seed": 42, "subtype": "cross_agent_copy", "target_memory_id": "h1-research-notes"}, "split": "held_out", "subtype": "cross_agent_copy"},
+    {"base_fixture_id": "H2", "case_id": "PV-H2-01", "defect_class": "privacy_scope_violation", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "privacy_scope_violation", "destination_user_id": "user-heldout-isolated", "seed": 43, "subtype": "cross_user_copy", "target_memory_id": "h2-diff-tool"}, "split": "held_out", "subtype": "cross_user_copy"},
+    {"base_fixture_id": "H2", "case_id": "PV-H2-02", "defect_class": "privacy_scope_violation", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "privacy_scope_violation", "destination_agent_id": "agent-heldout-isolated", "seed": 44, "subtype": "cross_agent_copy", "target_memory_id": "h2-code-editor"}, "split": "held_out", "subtype": "cross_agent_copy"},
+    {"base_fixture_id": "H3", "case_id": "PV-H3-01", "defect_class": "privacy_scope_violation", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "privacy_scope_violation", "destination_user_id": "user-heldout-isolated", "seed": 45, "subtype": "cross_user_copy", "target_memory_id": "h3-release-editor"}, "split": "held_out", "subtype": "cross_user_copy"},
+    {"base_fixture_id": "H3", "case_id": "PV-H3-02", "defect_class": "privacy_scope_violation", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "privacy_scope_violation", "destination_agent_id": "agent-heldout-isolated", "seed": 46, "subtype": "cross_agent_copy", "target_memory_id": "h3-config-editor"}, "split": "held_out", "subtype": "cross_agent_copy"},
+
+    {"base_fixture_id": "H1", "case_id": "RB-H1-01", "defect_class": "redundancy_bloat", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "redundancy_bloat", "seed": 51, "subtype": "exact_duplicate", "target_memory_id": "h1-journal-app"}, "split": "held_out", "subtype": "exact_duplicate"},
+    {"base_fixture_id": "H1", "case_id": "RB-H1-02", "defect_class": "redundancy_bloat", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "redundancy_bloat", "seed": 52, "subtype": "exact_duplicate", "target_memory_id": "h1-tea-count"}, "split": "held_out", "subtype": "exact_duplicate"},
+    {"base_fixture_id": "H2", "case_id": "RB-H2-01", "defect_class": "redundancy_bloat", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "redundancy_bloat", "seed": 53, "subtype": "exact_duplicate", "target_memory_id": "h2-code-editor"}, "split": "held_out", "subtype": "exact_duplicate"},
+    {"base_fixture_id": "H2", "case_id": "RB-H2-02", "defect_class": "redundancy_bloat", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "redundancy_bloat", "seed": 54, "subtype": "exact_duplicate", "target_memory_id": "h2-work-laptop"}, "split": "held_out", "subtype": "exact_duplicate"},
+    {"base_fixture_id": "H3", "case_id": "RB-H3-01", "defect_class": "redundancy_bloat", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "redundancy_bloat", "seed": 55, "subtype": "exact_duplicate", "target_memory_id": "h3-documentation-editor"}, "split": "held_out", "subtype": "exact_duplicate"},
+    {"base_fixture_id": "H3", "case_id": "RB-H3-02", "defect_class": "redundancy_bloat", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "redundancy_bloat", "seed": 56, "subtype": "exact_duplicate", "target_memory_id": "h3-subscription-cycle"}, "split": "held_out", "subtype": "exact_duplicate"},
+
+    {"base_fixture_id": "H1", "case_id": "SA-H1-01", "defect_class": "stale_active", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "stale_active", "replace_from": "FocusWriter", "replace_to": "iA Writer", "seed": 61, "subtype": "explicit_supersession", "target_memory_id": "h1-writing-tool"}, "semantic_domain": "preference", "split": "held_out", "subtype": "explicit_supersession"},
+    {"base_fixture_id": "H1", "case_id": "SA-H1-02", "defect_class": "stale_active", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "stale_active", "replace_from": "Tuesdays", "replace_to": "Fridays", "seed": 62, "subtype": "explicit_supersession", "target_memory_id": "h1-yoga-day"}, "semantic_domain": "location_device_subscription", "split": "held_out", "subtype": "explicit_supersession"},
+    {"base_fixture_id": "H2", "case_id": "SA-H2-01", "defect_class": "stale_active", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "stale_active", "replace_from": "Cedar Harbor Analytics", "replace_to": "Northwind Cartography", "seed": 63, "subtype": "explicit_supersession", "target_memory_id": "h2-employer"}, "semantic_domain": "employment_project", "split": "held_out", "subtype": "explicit_supersession"},
+    {"base_fixture_id": "H2", "case_id": "SA-H2-02", "defect_class": "stale_active", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "stale_active", "replace_from": "ThinkPad T14", "replace_to": "System76 Lemur", "seed": 64, "subtype": "explicit_supersession", "target_memory_id": "h2-work-laptop"}, "semantic_domain": "location_device_subscription", "split": "held_out", "subtype": "explicit_supersession"},
+    {"base_fixture_id": "H3", "case_id": "SA-H3-01", "defect_class": "stale_active", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "stale_active", "replace_from": "Kestrel", "replace_to": "Tern", "seed": 65, "subtype": "explicit_supersession", "target_memory_id": "h3-project-name"}, "semantic_domain": "employment_project", "split": "held_out", "subtype": "explicit_supersession"},
+    {"base_fixture_id": "H3", "case_id": "SA-H3-02", "defect_class": "stale_active", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "stale_active", "replace_from": "monthly", "replace_to": "quarterly", "seed": 66, "subtype": "explicit_supersession", "target_memory_id": "h3-subscription-cycle"}, "semantic_domain": "location_device_subscription", "split": "held_out", "subtype": "explicit_supersession"},
+
+    {"base_fixture_id": "H1", "case_id": "UC-H1-01", "defect_class": "unsupported_claim", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "unsupported_claim", "replace_from": "Obsidian", "replace_to": "Joplin", "seed": 71, "subtype": "factual_substitution", "target_memory_id": "h1-journal-app"}, "semantic_domain": "device_tool_preference", "split": "held_out", "subtype": "factual_substitution", "transcript_fixture_id": "H1"},
+    {"base_fixture_id": "H1", "case_id": "UC-H1-02", "defect_class": "unsupported_claim", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "unsupported_claim", "replace_from": "7:15 a.m.", "replace_to": "8:30 a.m.", "seed": 72, "subtype": "factual_substitution", "target_memory_id": "h1-breakfast-time"}, "semantic_domain": "schedule", "split": "held_out", "subtype": "factual_substitution", "transcript_fixture_id": "H1"},
+    {"base_fixture_id": "H1", "case_id": "UC-H1-03", "defect_class": "unsupported_claim", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "unsupported_claim", "replace_from": "two", "replace_to": "four", "seed": 73, "subtype": "factual_substitution", "target_memory_id": "h1-tea-count"}, "semantic_domain": "count", "split": "held_out", "subtype": "factual_substitution", "transcript_fixture_id": "H1"},
+    {"base_fixture_id": "H1", "case_id": "UC-H1-04", "defect_class": "unsupported_claim", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "unsupported_claim", "replace_from": "Riverside", "replace_to": "Hillcrest", "seed": 74, "subtype": "factual_substitution", "target_memory_id": "h1-library-branch"}, "semantic_domain": "location", "split": "held_out", "subtype": "factual_substitution", "transcript_fixture_id": "H1"},
+    {"base_fixture_id": "H2", "case_id": "UC-H2-01", "defect_class": "unsupported_claim", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "unsupported_claim", "replace_from": "Cedar Harbor Analytics", "replace_to": "Marble Peak Research", "seed": 75, "subtype": "factual_substitution", "target_memory_id": "h2-employer"}, "semantic_domain": "employment_project", "split": "held_out", "subtype": "factual_substitution", "transcript_fixture_id": "H2"},
+    {"base_fixture_id": "H2", "case_id": "UC-H2-02", "defect_class": "unsupported_claim", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "unsupported_claim", "replace_from": "Porto", "replace_to": "Braga", "seed": 76, "subtype": "factual_substitution", "target_memory_id": "h2-home-city"}, "semantic_domain": "location", "split": "held_out", "subtype": "factual_substitution", "transcript_fixture_id": "H2"},
+    {"base_fixture_id": "H2", "case_id": "UC-H2-03", "defect_class": "unsupported_claim", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "unsupported_claim", "replace_from": "ThinkPad T14", "replace_to": "Framework 13", "seed": 77, "subtype": "factual_substitution", "target_memory_id": "h2-work-laptop"}, "semantic_domain": "device_tool_preference", "split": "held_out", "subtype": "factual_substitution", "transcript_fixture_id": "H2"},
+    {"base_fixture_id": "H2", "case_id": "UC-H2-04", "defect_class": "unsupported_claim", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "unsupported_claim", "replace_from": "Wednesdays", "replace_to": "Mondays", "seed": 78, "subtype": "factual_substitution", "target_memory_id": "h2-office-day"}, "semantic_domain": "schedule", "split": "held_out", "subtype": "factual_substitution", "transcript_fixture_id": "H2"},
+    {"base_fixture_id": "H3", "case_id": "UC-H3-01", "defect_class": "unsupported_claim", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "unsupported_claim", "replace_from": "Kestrel", "replace_to": "Juniper", "seed": 79, "subtype": "factual_substitution", "target_memory_id": "h3-project-name"}, "semantic_domain": "employment_project", "split": "held_out", "subtype": "factual_substitution", "transcript_fixture_id": "H3"},
+    {"base_fixture_id": "H3", "case_id": "UC-H3-02", "defect_class": "unsupported_claim", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "unsupported_claim", "replace_from": "monthly", "replace_to": "annually", "seed": 80, "subtype": "factual_substitution", "target_memory_id": "h3-subscription-cycle"}, "semantic_domain": "subscription", "split": "held_out", "subtype": "factual_substitution", "transcript_fixture_id": "H3"},
+    {"base_fixture_id": "H3", "case_id": "UC-H3-03", "defect_class": "unsupported_claim", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "unsupported_claim", "replace_from": "email", "replace_to": "Signal", "seed": 81, "subtype": "factual_substitution", "target_memory_id": "h3-status-channel"}, "semantic_domain": "communication_preference", "split": "held_out", "subtype": "factual_substitution", "transcript_fixture_id": "H3"},
+    {"base_fixture_id": "H3", "case_id": "UC-H3-04", "defect_class": "unsupported_claim", "kind": "static_mutation", "mutation_request": {"base_store_status": "curated_clean", "defect_class": "unsupported_claim", "replace_from": "three", "replace_to": "five", "seed": 82, "subtype": "factual_substitution", "target_memory_id": "h3-support-count"}, "semantic_domain": "count", "split": "held_out", "subtype": "factual_substitution", "transcript_fixture_id": "H3"}
+  ],
+  "unsupported_claim_method": {
+    "checker_id": "unsupported_claim",
+    "composition": "plain",
+    "semantic_model": "cross-encoder/nli-MiniLM2-L6-H768",
+    "semantic_revision": "b95119ce93d3e065de6214e38cd4a97b0f2f2c6d"
+  }
+}
