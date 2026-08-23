@@ -24,6 +24,7 @@ from memlint.checkers.privacy_scope_violation import (
     load_scope_policy,
 )
 from memlint.checkers.redundancy_bloat import RedundancyBloatChecker
+from memlint.checkers.retrieval_shadowing import project_retrieval_shadowing_result
 from memlint.checkers.stale_active import StaleActiveChecker
 from memlint.checkers.unsupported_claim import UnsupportedClaimChecker
 
@@ -48,4 +49,5 @@ __all__ = [
     "UnsupportedClaimChecker",
     "deterministic_finding_id",
     "load_scope_policy",
+    "project_retrieval_shadowing_result",
 ]

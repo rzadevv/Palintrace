@@ -20,6 +20,7 @@ from memlint.checkers import (
     StaleActiveChecker,
     UnsupportedClaimChecker,
     load_scope_policy,
+    project_retrieval_shadowing_result,
 )
 from memlint.models import (
     MemoryScope,
@@ -160,6 +161,7 @@ __all__ = [
     "compose_evidence",
     "load_scope_policy",
     "mutate",
+    "project_retrieval_shadowing_result",
     "resolve_declared_evidence",
     "retriever_identity",
     "run_retrieval_audit",
