@@ -22,12 +22,17 @@ def _absolute_imports(path: Path) -> tuple[str, ...]:
     return tuple(imports)
 
 
-def test_evaluation_package_contains_frozen_accounting_plus_benchmark_spec() -> None:
+def test_evaluation_package_contains_frozen_accounting_and_execution_layers() -> None:
     assert {path.name for path in EVALUATION_ROOT.glob("*.py")} == {
         "__init__.py",
         "benchmark.py",
+        "clean_control.py",
+        "execution.py",
+        "execution_models.py",
+        "experimental_lexical.py",
         "models.py",
         "mutation.py",
+        "preflight.py",
         "retrieval.py",
     }
 
