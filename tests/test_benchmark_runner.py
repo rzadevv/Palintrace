@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import hashlib
+import json
+import shutil
 from pathlib import Path
 
 import pytest
 
 import memlint.cli as cli
+import memlint.evaluation.preflight as preflight
 import tools.run_benchmark_v0_1 as runner
 from memlint.evaluation import EvaluationInputError, load_benchmark_spec
 
@@ -55,6 +59,67 @@ def test_preflight_failure_occurs_before_model_construction(
     assert constructed is False
     assert not output_dir.exists()
     assert "frozen benchmark mismatch" in capsys.readouterr().err
+
+
+def test_coordinated_fixture_and_manifest_tamper_fails_before_parser_and_model(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    fixture_root = tmp_path / "tests/fixtures/benchmark_v0.1"
+    shutil.copytree(runner.FROZEN_FIXTURE_ROOT, fixture_root)
+    manifest_path = tmp_path / preflight.DEFAULT_FIXTURE_HASH_MANIFEST_PATH
+    shutil.copy2(preflight.DEFAULT_FIXTURE_HASH_MANIFEST_PATH, manifest_path)
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    fixture_relative_path = next(
+        relative_path
+        for relative_path in sorted(manifest)
+        if relative_path.endswith("_store.json")
+    )
+    fixture_path = tmp_path / fixture_relative_path
+    fixture_path.write_bytes(fixture_path.read_bytes() + b"\n")
+    modified_fixture_sha = hashlib.sha256(fixture_path.read_bytes()).hexdigest()
+    manifest[fixture_relative_path] = modified_fixture_sha
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    assert json.loads(manifest_path.read_text(encoding="utf-8"))[
+        fixture_relative_path
+    ] == modified_fixture_sha
+
+    parser_called = False
+    model_constructed = False
+    original_load_hash_manifest = preflight._load_hash_manifest
+
+    def record_manifest_parse(path: Path) -> dict[str, str]:
+        nonlocal parser_called
+        parser_called = True
+        return original_load_hash_manifest(path)
+
+    def model_constructor(**kwargs: object) -> object:
+        nonlocal model_constructed
+        del kwargs
+        model_constructed = True
+        return object()
+
+    monkeypatch.setattr(preflight, "_load_hash_manifest", record_manifest_parse)
+    with pytest.raises(EvaluationInputError, match="hash-manifest SHA mismatch"):
+        preflight.preflight_benchmark_v0_1(repository_root=tmp_path)
+    assert parser_called is False
+
+    monkeypatch.setattr(runner, "REPOSITORY_ROOT", tmp_path)
+    monkeypatch.setattr(runner, "FROZEN_FIXTURE_ROOT", fixture_root)
+    monkeypatch.setattr(runner, "LocalNLISemanticJudge", model_constructor)
+    output_dir = tmp_path / "output"
+    with pytest.raises(SystemExit) as error:
+        runner.main(["--output-dir", str(output_dir)])
+    assert error.value.code == 2
+    assert parser_called is False
+    assert model_constructed is False
+    assert not output_dir.exists()
+    assert "hash-manifest SHA mismatch" in capsys.readouterr().err
 
 
 def test_runner_uses_fixed_model_only_after_preflight_and_writes_two_artifacts(

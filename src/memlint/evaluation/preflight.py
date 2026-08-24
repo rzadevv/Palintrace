@@ -17,6 +17,9 @@ from memlint.evaluation.models import EvaluationInputError
 
 DEFAULT_BENCHMARK_PATH = Path("tests/fixtures/benchmark_v0.1/benchmark.json")
 DEFAULT_FIXTURE_HASH_MANIFEST_PATH = Path("tests/fixtures/benchmark_v0.1.sha256.json")
+FROZEN_FIXTURE_HASH_MANIFEST_SHA256 = (
+    "de4bb8c2076a2c89b7e2df95518ef5588934644b711119fccc8727e0e9ac73fb"
+)
 
 
 def _sha256_bytes(path: Path) -> str:
@@ -77,6 +80,8 @@ def preflight_benchmark_v0_1(
         if hash_manifest_path.is_absolute()
         else repository_root / hash_manifest_path
     )
+    if _sha256_bytes(resolved_manifest) != FROZEN_FIXTURE_HASH_MANIFEST_SHA256:
+        raise EvaluationInputError("frozen fixture hash-manifest SHA mismatch")
     expected_hashes = _load_hash_manifest(resolved_manifest)
     frozen_root = repository_root / "tests/fixtures/benchmark_v0.1"
     actual_fixture_paths = {

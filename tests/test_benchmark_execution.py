@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 import memlint.evaluation.execution as execution
+import memlint.evaluation.preflight as preflight
 from memlint.checkers import load_scope_policy
 from memlint.evaluation import (
     BENCHMARK_SPEC_SHA256,
@@ -339,7 +340,11 @@ def test_preflight_verifies_canonical_and_fixture_hashes(
 
     monkeypatch.setattr(
         "memlint.evaluation.preflight._sha256_bytes",
-        lambda path: "0" * 64,
+        lambda path: (
+            preflight.FROZEN_FIXTURE_HASH_MANIFEST_SHA256
+            if path.name == "benchmark_v0.1.sha256.json"
+            else "0" * 64
+        ),
     )
     with pytest.raises(EvaluationInputError, match="SHA mismatch"):
         preflight_benchmark_v0_1(

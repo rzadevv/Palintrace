@@ -161,7 +161,9 @@ Part 6C freezes how benchmark v0.1 will be executed and summarized without execu
 case. The Part 6B case specification, fixture bytes, canonical benchmark SHA, mutation requests,
 queries, targets, checker identities, semantic method identity, and retrieval condition remain
 unchanged. The research runner performs all benchmark and fixture hash checks before constructing
-the pinned CPU MiniLM judge. It accepts no threshold, model, retriever, or condition override.
+the pinned CPU MiniLM judge. Preflight anchors the canonical benchmark specification SHA, the
+frozen fixture hash-manifest byte SHA, and every fixture byte SHA. The runner accepts no threshold,
+model, retriever, or condition override.
 
 ### Static and clean-control accounting
 
