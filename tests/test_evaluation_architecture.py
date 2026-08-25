@@ -30,6 +30,7 @@ def test_evaluation_package_contains_frozen_accounting_and_execution_layers() ->
         "execution.py",
         "execution_models.py",
         "experimental_lexical.py",
+        "identity_probe.py",
         "models.py",
         "mutation.py",
         "preflight.py",
