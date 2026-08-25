@@ -96,10 +96,12 @@ it is not accuracy, recall, precision, or generic checker performance.
 
 ## Current evidence boundary
 
-No final research benchmark has been run. No precision or F1 claim is supported. Unknown-natural
-alerts remain unlabeled, mutation-context alerts remain unscored, injected-positive recall applies
-only to controlled injected positives, and retrieval induced-shadowing rates apply only to
-baseline-eligible paired challenges under one fixed retrieval condition.
+Controlled benchmark v0.1 has now been executed once under the frozen Part 6D methodology. It
+remains a small controlled synthetic benchmark rather than a final claim of real-world detector
+performance. No precision or F1 claim is supported. Unknown-natural alerts remain unlabeled,
+mutation-context alerts remain unscored, injected-positive recall applies only to controlled
+injected positives, and retrieval induced-shadowing rates apply only to baseline-eligible paired
+challenges under one fixed retrieval condition.
 
 ## Benchmark v0.1 freeze
 
@@ -107,7 +109,7 @@ The controlled benchmark specification was frozen on 2026-08-23 before detector 
 
 - schema: `0.1`;
 - benchmark ID: `memlint-controlled-v0.1`;
-- execution status: `NOT_RUN`; and
+- execution status at specification freeze time: `NOT_RUN`; and
 - canonical specification SHA-256:
   `fd11b0d547197495d51684f005ac17c861392891e464d818815e04eb6f37dad0`.
 
@@ -151,9 +153,10 @@ The byte-level held-out file hashes are frozen in
 | `fixture_h3_transcripts.json` | `1e159f90df2b29f447b94658b3b92450927b4c3f903b16e07cbfd513ca02323a` |
 | `scope_policy.json` | `ed412b9dbb8b1e13bb8a42c66a03ab191a3d6bf45906cee126229974b510a999` |
 
-The benchmark has not been executed. No detector output, performance metric, result file, or model
-download was produced during the freeze. Editing held-out contents after observing outputs is not
-permitted under v0.1; any such change requires a new explicitly versioned benchmark.
+At specification freeze time, the benchmark had not been executed. No detector output, performance
+metric, result file, or model download was produced during that freeze phase. Editing held-out
+contents after observing outputs is not permitted under v0.1; any such change requires a new
+explicitly versioned benchmark.
 
 ## Benchmark execution methodology
 
@@ -232,17 +235,32 @@ contracts. The public execution artifact retains query hashes rather than query 
 retrieval metric remains `induced_shadowing_rate` among baseline-eligible cases; it is not retrieval
 accuracy.
 
-### Artifacts and non-execution status
+### Artifacts and execution history
 
-The future runner writes one canonical benchmark result at schema `0.1` and a separate environment
+The Part 6C runner writes one canonical benchmark result at schema `0.1` and a separate environment
 provenance artifact. Canonical results contain no timestamps, latency, transcripts, memory contents,
 mutation substitution parameters, or runtime host identity. Safe provenance records version-only
 Python/platform and local semantic dependency information, the pinned model identity/revision,
 CPU device, and benchmark SHA; it does not affect scoring.
 
-Benchmark v0.1 remains `NOT_RUN`. Part 6C produced no held-out static predictions, clean-control
-predictions, paired retrieval outcomes, benchmark result files, semantic model inference, or
-performance metrics.
+Part 6C froze the execution harness and itself produced no held-out predictions, retrieval outcomes,
+benchmark result files, semantic inference, or performance metrics. The first Part 6D attempt then
+failed during environment/model construction before any held-out case executed and produced no
+result artifact; that failed startup is not a benchmark result. After isolating the Python
+environment, Part 6D completed the first successful frozen benchmark execution without method
+changes. That successful run is the canonical v0.1 execution. Part 6E subsequently performed
+descriptive post-hoc analysis without rerunning the benchmark or changing methods.
+
+The canonical outputs are external research artifacts and are not committed to this repository:
+
+- `benchmark-result.json` SHA-256:
+  `fe20c4e8c6512da9874318129464bd896871ec5257520870df746e630346d5af`;
+- `execution-provenance.json` SHA-256:
+  `56b7998089d2da271a1ac879dfb4f30f6ed453f6eff073fefaf35ce65304c8b2`;
+- Part 6E `benchmark-analysis.json` SHA-256:
+  `860b13dfd7c98c962353bbec54bf38663f78ba2312923b65bd04b4afe59ba1c2`;
+- Part 6E `benchmark-analysis.md` SHA-256:
+  `cb0cac7ab4ba242e593b1f9081ffd2d42845fe1165491182751c543e9176fe3b`.
 
 ## Post-v0.1 speaker-identity probe
 
