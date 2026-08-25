@@ -243,3 +243,49 @@ CPU device, and benchmark SHA; it does not affect scoring.
 Benchmark v0.1 remains `NOT_RUN`. Part 6C produced no held-out static predictions, clean-control
 predictions, paired retrieval outcomes, benchmark result files, semantic model inference, or
 performance metrics.
+
+## Post-v0.1 speaker-identity probe
+
+Part 6F-A freezes a new DEVELOPMENT hypothesis experiment motivated by the frozen Part 6E
+post-hoc analysis. Part 6E found that unsupported-claim clean alerts were associated with
+first-person transcript claims normalized into named-person memories while PLAIN evidence
+composition did not explicitly identify the speaker. The probe addresses H1 (explicit
+speaker-identity grounding) and only the narrow representation-level part of H2. It does not test
+H3 confidence/selectivity policies or H4 retrieval challenge design.
+
+The fixture `tests/fixtures/unsupported_identity_probe_v0.1.json` contains 24 fresh scenarios that
+do not reuse the v0.1 held-out people or sentences: 18 identity-sensitive cases and six
+identity-free controls. Every scenario has a clean hypothesis and a one-value unsupported
+hypothesis. Future execution evaluates both hypotheses under both frozen premise conditions, for
+exactly 96 judgments:
+
+- `plain` uses `source_text` unchanged;
+- `speaker_grounded_v0.1` uses exactly
+  `The speaker is {person_name}.\n{source_text}`.
+
+The identity-free controls already name the person in `source_text` but still receive the same
+prefix. They test whether the prefix itself perturbs ordinary explicit-name relations. The future
+execution model is frozen as `cross-encoder/nli-MiniLM2-L6-H768` at revision
+`b95119ce93d3e065de6214e38cd4a97b0f2f2c6d`, on CPU, with no threshold, truncation, replacement
+model, or role-labeled composition.
+
+The outcomes and interpretation are preregistered before semantic execution. PLAIN reproduces the
+failure pattern only when identity-sensitive clean entailments are at most 12/18. If reproduced,
+the clean-rescue gate requires at least 16/18 grounded clean entailments and an increase of at least
+four. The unsupported-safety gate requires at least 17/18 grounded unsupported detections and no
+drop larger than one from PLAIN. The prefix-stability gate allows at most one exact clean-relation
+change and at most one unsupported detected-to-missed transition among the six identity-free
+controls. These gates map to exactly `SUPPORTS_H1`, `DOES_NOT_SUPPORT_H1`, or
+`INCONCLUSIVE_FAILURE_NOT_REPRODUCED`.
+
+`speaker_grounded_v0.1` assumes a trustworthy mapping from transcript speaker to `person_name`.
+MemLint production does not currently expose a general, proven source for that human-readable
+identity mapping. Passing this probe would therefore support a DEVELOPMENT representation
+hypothesis, not automatically justify adding the prefix to `UnsupportedClaimChecker`. A later phase
+must establish whether identity grounding is available and valid in a deployable memory-system
+contract.
+
+This probe is not a second held-out benchmark or independent validation of an improved method. If
+it informs v0.2, that method requires a new future held-out set. Part 6F-A did not instantiate or run
+MiniLM, did not observe semantic outputs, and did not test H3 or H4. The real frozen probe may be
+executed once only in Part 6F-B after fixture/hash/schema/model preflight succeeds.
