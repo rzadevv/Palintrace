@@ -127,6 +127,43 @@ configuration, not a final research winner, and semantic defect-detection perfor
 established. Zero findings does not imply full assessment: inspect the skip counters in
 `CheckerStats.details`. Structural audits neither construct nor download a semantic model.
 
+## Identity-grounded unsupported-claim candidate
+
+`IdentityGroundedUnsupportedClaimChecker` version `0.1` is a DEVELOPMENT candidate that is separate
+from the frozen `UnsupportedClaimChecker` version `1.0`. It is not a replacement, is not exported
+from the public checker package, and is not available through the CLI, benchmark v0.1 dispatch, or
+default checker lists. It has not received fresh held-out validation.
+
+The constructor requires explicit version `0.1` `SpeakerIdentityBindings` in addition to an injected
+`SemanticJudge`. For each declared memory, the candidate first resolves transcript evidence and
+requires complete, nonempty evidence. It composes that evidence with fixed PLAIN composition, then
+resolves the memory's exact `(transcript_id, turn_idx)` source coordinates against the explicit
+bindings. Only `RESOLVED` identity is assessed. The premise is built by the frozen helper in exactly
+this form:
+
+```text
+The speaker is {speaker_label}.
+{plain_composed_evidence}
+```
+
+`UNAVAILABLE` identity and `CONFLICT` identity both abstain without a semantic call or Finding.
+There is no PLAIN fallback. This freezes a reduced-coverage policy because ungrounded PLAIN evidence
+is the representation implicated by the v0.1 clean-selectivity failure. Identity abstentions remain
+visible as `skipped_identity_unavailable` and `skipped_identity_conflict` in
+`CheckerStats.details`; they are capability limitations, not unsupported-claim defects.
+
+For assessed memories, the relation policy is unchanged: entailment emits no Finding, while neutral
+and contradiction each emit one unsupported-claim Finding. Candidate evidence records the fixed
+PLAIN and explicit-binding method, canonical source coordinates and counts, and premise/hypothesis
+SHA-256 digests. It does not serialize the speaker label, premise, hypothesis, transcript text,
+memory text, or raw bindings.
+
+Speaker-grounded checking trades semantic selectivity for an explicit capability requirement.
+Memories without trustworthy bindings for every relevant source turn are not assessed. A future
+evaluation must report both semantic outcomes on assessed memories and identity-grounding coverage
+and abstention counts. Abstentions must not be hidden or interpreted as clean memories. H3
+confidence/selectivity policy and H4 retrieval design remain untested.
+
 ## Redundancy / bloat
 
 `redundancy_bloat` implements only the structural `exact_duplicate` case. Two memories form a

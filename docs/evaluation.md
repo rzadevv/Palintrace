@@ -326,3 +326,14 @@ This is a DEVELOPMENT experiment, not independent held-out validation of a v0.2 
 not make identity grounding production-ready, show real-world generalization, or prove that speaker
 identity is the sole semantic failure mechanism. No production method was changed after observing
 the result. H3 confidence/selectivity policy and H4 retrieval challenge design remain untested.
+
+### Part 6G-B candidate integration freeze
+
+Part 6G-B freezes a separate identity-grounded unsupported-claim candidate implementation before
+designing or running a new held-out evaluation. The method requires explicit turn-level speaker
+bindings, uses fixed PLAIN evidence plus the exact Part 6F speaker prefix, and abstains without a
+PLAIN fallback when identity is unavailable or conflicting. It is not a CLI or default method.
+
+No semantic model or held-out benchmark is run in Part 6G-B, so there are no candidate performance
+results to report. A future fresh evaluation must report both semantic outcomes among assessed
+memories and identity-grounding coverage and abstention counts. H3 and H4 remain untested.
