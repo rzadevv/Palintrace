@@ -337,3 +337,91 @@ PLAIN fallback when identity is unavailable or conflicting. It is not a CLI or d
 No semantic model or held-out benchmark is run in Part 6G-B, so there are no candidate performance
 results to report. A future fresh evaluation must report both semantic outcomes among assessed
 memories and identity-grounding coverage and abstention counts. H3 and H4 remain untested.
+
+## Part 6G-C identity-grounded held-out preregistration
+
+Part 6G-C is an independently constructed synthetic held-out evaluation of the frozen
+`IdentityGroundedUnsupportedClaimChecker` version `0.1`. It is isolated from benchmark v0.1 and
+does not promote the candidate into the public API, CLI, defaults, or benchmark dispatch. The
+fixture is `tests/fixtures/unsupported_identity_grounded_heldout_v0.1.json`, schema `0.1`, with
+SHA-256 `a0384e2d4e5d7764c45c87e1c729762cbd2714ced2faa3cb7e36a2b50283169b`.
+
+The semantic matrix has 40 fresh fictional scenarios, each evaluated with a clean and an exact
+one-value unsupported hypothesis under both frozen checkers: 160 paired semantic judgments. Thirty
+scenarios are identity-sensitive and ten are identity-free controls. Ten factual domains each
+contribute four scenarios: software/tool, device/hardware, workplace/project, location, schedule,
+subscription/preference, education/course, travel, ordinary possession, and biography. The
+identity-sensitive transformations comprise 20 first-person-subject and ten
+first-person-possessive cases; the controls already name their subjects. Identities, case IDs, and
+sentences do not overlap the Part 6F development probe, and a preregistered lexical-similarity guard
+rejects close copies of its source sentences.
+
+The baseline remains `UnsupportedClaimChecker` version `1.0` with PLAIN evidence. The candidate
+remains `IdentityGroundedUnsupportedClaimChecker` version `0.1`, also with PLAIN evidence followed
+by the exact frozen prefix `The speaker is {speaker_label}.\n{evidence_text}`. Both conditions use
+`cross-encoder/nli-MiniLM2-L6-H768` at revision
+`b95119ce93d3e065de6214e38cd4a97b0f2f2c6d` on CPU. There is no score threshold, truncation,
+confidence abstention, alternate composition, or model override.
+
+Six additional capability cases separately cover one resolved turn, multiple same-speaker turns,
+a missing binding, a transcript-level reference, incomplete multi-turn bindings, and conflicting
+speakers. Their preregistered statuses are two `RESOLVED`, three `UNAVAILABLE`, and one `CONFLICT`.
+The last four must abstain with zero semantic calls and zero findings. Including the 80 resolved
+candidate semantic memories, the complete candidate population is 86 memories: 82 resolved and
+four capability abstentions if no resolved input exceeds the model limit. Coverage is reported
+over all 86; it is never folded into conditional semantic accuracy.
+
+### Frozen metrics and execution order
+
+Raw counts precede rates. For identity-sensitive clean cases the result reports entailments, false
+alerts, paired non-entailment-to-entailment rescues, and paired entailment-to-non-entailment
+regressions. For identity-sensitive unsupported cases it reports detections, misses, and both paired
+detection transitions. Controls report exact relation changes, clean regressions, and
+detected-to-missed regressions. Candidate clean-entailment and unsupported-detection rates are
+reported both conditionally among assessed cases and effectively over the entire eligible stratum,
+so semantic abstentions reduce the effective rate.
+
+Coverage reports total and declared candidate memories, evidence-resolvable memories, identity
+`RESOLVED`/`UNAVAILABLE`/`CONFLICT`, assessed and abstained memories, semantic calls, assessment
+coverage, unavailable rate, and conflict rate. Abstention is not a correct prediction.
+
+Execution order is frozen as semantic case ID; within each case, clean then unsupported hypothesis;
+within each hypothesis, baseline then candidate. The six coverage cases follow in case-ID order.
+The successful full execution therefore makes 160 paired semantic calls plus two calls for the
+resolved capability cases, while the four unavailable/conflicting capability cases make no call.
+
+### Frozen gates and interpretation
+
+The baseline failure pattern is reproduced only with at least 8/30 identity-sensitive clean false
+alerts. This is a deliberately nontrivial more-than-one-quarter failure floor, not a threshold
+derived to match the 6F score. If that floor is not reached, the only interpretation is
+`INCONCLUSIVE_BASELINE_FAILURE_NOT_REPRODUCED`.
+
+If the baseline pattern is reproduced, all of these preregistered gates must pass to produce
+`SUPPORTS_CANDIDATE`:
+
+- clean selectivity: at least 24/30 candidate clean entailments, at least eight paired rescues, at
+  most two clean regressions, and at least eight fewer candidate false alerts than baseline;
+- unsupported safety: at least 27/30 candidate detections, at most two detected-to-missed
+  transitions, and a detection-count drop from baseline of at most two;
+- identity-free stability: at most two exact relation changes across the 20 clean/unsupported
+  control trials, at most one clean regression, and at most one detected-to-missed regression;
+- abstention contract: every resolved capability case is assessed once, while every unavailable or
+  conflicting case has zero calls and findings;
+- regression/privacy: all protected predecessor hashes match, the candidate remains nonpublic and
+  non-CLI, and no fixture speaker label, transcript, memory, hypothesis, or grounded premise appears
+  in result serialization.
+
+The 24/30 clean floor requires 80% clean entailment; the 27/30 safety floor requires 90%
+unsupported detection. The paired-regression allowances prevent aggregate improvement from hiding
+more than two adverse sensitive transitions, while the control bounds permit only small prefix
+instability. If the baseline failure reproduces but any gate fails, the interpretation is
+`DOES_NOT_SUPPORT_CANDIDATE`. These are the only three interpretation labels.
+
+The result schema is immutable, rejects extra fields and nonfinite JSON, canonicalizes execution
+rows, and recomputes all metrics, gates, and interpretation from row-level outcomes. It serializes
+case IDs, relations, scores, judge identity, usage, hashes, source coordinates, counts, and identity
+status—but no source text, memory content, premise, or speaker label. Safe environment provenance
+is stored separately. At preregistration freeze time no semantic model has been instantiated and no
+held-out relation has been observed. H3 confidence/selectivity research and H4 retrieval research
+remain outside this phase.

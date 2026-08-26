@@ -1,0 +1,784 @@
+{
+  "schema_version": "0.1",
+  "evaluation_id": "unsupported-identity-grounded-heldout-v0.1",
+  "split": "held_out",
+  "model": {
+    "model_id": "cross-encoder/nli-MiniLM2-L6-H768",
+    "revision": "b95119ce93d3e065de6214e38cd4a97b0f2f2c6d",
+    "device": "cpu"
+  },
+  "conditions": [
+    {
+      "condition": "baseline_plain",
+      "checker_id": "unsupported_claim",
+      "checker_version": "1.0",
+      "composition_style": "plain",
+      "identity_grounding": "none"
+    },
+    {
+      "condition": "identity_grounded",
+      "checker_id": "unsupported_claim_identity_grounded",
+      "checker_version": "0.1",
+      "composition_style": "plain",
+      "identity_grounding": "explicit_turn_binding_v0.1"
+    }
+  ],
+  "gates": {
+    "baseline_failure_min_false_alerts": 8,
+    "clean_min_candidate_entailments": 24,
+    "clean_min_rescues": 8,
+    "clean_max_regressions": 2,
+    "unsupported_min_candidate_detections": 27,
+    "unsupported_max_detected_to_missed": 2,
+    "unsupported_max_detection_drop": 2,
+    "control_max_relation_changes": 2,
+    "control_max_clean_regressions": 1,
+    "control_max_unsupported_regressions": 1
+  },
+  "semantic_cases": [
+    {
+      "case_id": "H6GC-C01",
+      "case_kind": "identity_free_control",
+      "person_name": "Asha Belmonte",
+      "domain": "tool_or_software",
+      "transformation_kind": "already_named_subject",
+      "source_text": "Asha Belmonte keeps design mockups in Penpot.",
+      "clean_hypothesis": "Asha Belmonte keeps design mockups in Penpot.",
+      "unsupported_hypothesis": "Asha Belmonte keeps design mockups in Figma.",
+      "changed_field": "software",
+      "source_value": "Penpot",
+      "replacement_value": "Figma"
+    },
+    {
+      "case_id": "H6GC-C02",
+      "case_kind": "identity_free_control",
+      "person_name": "Bram Kessler",
+      "domain": "device_or_hardware",
+      "transformation_kind": "already_named_subject",
+      "source_text": "Bram Kessler owns a Kobo Libra Colour e-reader.",
+      "clean_hypothesis": "Bram Kessler owns a Kobo Libra Colour e-reader.",
+      "unsupported_hypothesis": "Bram Kessler owns a Kindle Paperwhite e-reader.",
+      "changed_field": "device_model",
+      "source_value": "Kobo Libra Colour",
+      "replacement_value": "Kindle Paperwhite"
+    },
+    {
+      "case_id": "H6GC-C03",
+      "case_kind": "identity_free_control",
+      "person_name": "Cyra Nwosu",
+      "domain": "workplace_or_project",
+      "transformation_kind": "already_named_subject",
+      "source_text": "Cyra Nwosu contributes to the Northstar invoice project.",
+      "clean_hypothesis": "Cyra Nwosu contributes to the Northstar invoice project.",
+      "unsupported_hypothesis": "Cyra Nwosu contributes to the Redbridge invoice project.",
+      "changed_field": "project_name",
+      "source_value": "Northstar",
+      "replacement_value": "Redbridge"
+    },
+    {
+      "case_id": "H6GC-C04",
+      "case_kind": "identity_free_control",
+      "person_name": "Dalen Mori",
+      "domain": "location",
+      "transformation_kind": "already_named_subject",
+      "source_text": "Dalen Mori currently resides in Ghent.",
+      "clean_hypothesis": "Dalen Mori currently resides in Ghent.",
+      "unsupported_hypothesis": "Dalen Mori currently resides in Porto.",
+      "changed_field": "city",
+      "source_value": "Ghent",
+      "replacement_value": "Porto"
+    },
+    {
+      "case_id": "H6GC-C05",
+      "case_kind": "identity_free_control",
+      "person_name": "Esme Calder",
+      "domain": "schedule",
+      "transformation_kind": "already_named_subject",
+      "source_text": "Esme Calder schedules pottery class for Tuesday evenings.",
+      "clean_hypothesis": "Esme Calder schedules pottery class for Tuesday evenings.",
+      "unsupported_hypothesis": "Esme Calder schedules pottery class for Thursday evenings.",
+      "changed_field": "class_time",
+      "source_value": "Tuesday evenings",
+      "replacement_value": "Thursday evenings"
+    },
+    {
+      "case_id": "H6GC-C06",
+      "case_kind": "identity_free_control",
+      "person_name": "Farid Lorne",
+      "domain": "subscription_or_preference",
+      "transformation_kind": "already_named_subject",
+      "source_text": "Farid Lorne prefers the jazz newsletter's weekly edition.",
+      "clean_hypothesis": "Farid Lorne prefers the jazz newsletter's weekly edition.",
+      "unsupported_hypothesis": "Farid Lorne prefers the jazz newsletter's monthly edition.",
+      "changed_field": "edition_frequency",
+      "source_value": "weekly",
+      "replacement_value": "monthly"
+    },
+    {
+      "case_id": "H6GC-C07",
+      "case_kind": "identity_free_control",
+      "person_name": "Gaia Petrov",
+      "domain": "education_or_course",
+      "transformation_kind": "already_named_subject",
+      "source_text": "Gaia Petrov is enrolled in the Introductory Icelandic course.",
+      "clean_hypothesis": "Gaia Petrov is enrolled in the Introductory Icelandic course.",
+      "unsupported_hypothesis": "Gaia Petrov is enrolled in the Advanced Swahili course.",
+      "changed_field": "course",
+      "source_value": "Introductory Icelandic",
+      "replacement_value": "Advanced Swahili"
+    },
+    {
+      "case_id": "H6GC-C08",
+      "case_kind": "identity_free_control",
+      "person_name": "Hugo Sato",
+      "domain": "travel",
+      "transformation_kind": "already_named_subject",
+      "source_text": "Hugo Sato's next rail trip ends in Ljubljana.",
+      "clean_hypothesis": "Hugo Sato's next rail trip ends in Ljubljana.",
+      "unsupported_hypothesis": "Hugo Sato's next rail trip ends in Salzburg.",
+      "changed_field": "destination",
+      "source_value": "Ljubljana",
+      "replacement_value": "Salzburg"
+    },
+    {
+      "case_id": "H6GC-C09",
+      "case_kind": "identity_free_control",
+      "person_name": "Ines Valen",
+      "domain": "ordinary_possession",
+      "transformation_kind": "already_named_subject",
+      "source_text": "Ines Valen keeps a brass telescope at home.",
+      "clean_hypothesis": "Ines Valen keeps a brass telescope at home.",
+      "unsupported_hypothesis": "Ines Valen keeps a ceramic typewriter at home.",
+      "changed_field": "possession",
+      "source_value": "brass telescope",
+      "replacement_value": "ceramic typewriter"
+    },
+    {
+      "case_id": "H6GC-C10",
+      "case_kind": "identity_free_control",
+      "person_name": "Jamil Corin",
+      "domain": "biography",
+      "transformation_kind": "already_named_subject",
+      "source_text": "Jamil Corin was born in 1991.",
+      "clean_hypothesis": "Jamil Corin was born in 1991.",
+      "unsupported_hypothesis": "Jamil Corin was born in 1987.",
+      "changed_field": "birth_year",
+      "source_value": "1991",
+      "replacement_value": "1987"
+    },
+    {
+      "case_id": "H6GC-S01",
+      "case_kind": "identity_sensitive",
+      "person_name": "Kaia Dunne",
+      "domain": "tool_or_software",
+      "transformation_kind": "first_person_subject",
+      "source_text": "For source-code reviews, I work in Gerrit.",
+      "clean_hypothesis": "Kaia Dunne works in Gerrit for source-code reviews.",
+      "unsupported_hypothesis": "Kaia Dunne works in Phabricator for source-code reviews.",
+      "changed_field": "software",
+      "source_value": "Gerrit",
+      "replacement_value": "Phabricator"
+    },
+    {
+      "case_id": "H6GC-S02",
+      "case_kind": "identity_sensitive",
+      "person_name": "Lucan Reyes",
+      "domain": "tool_or_software",
+      "transformation_kind": "first_person_subject",
+      "source_text": "The password manager I use is KeePassXC.",
+      "clean_hypothesis": "Lucan Reyes uses KeePassXC as a password manager.",
+      "unsupported_hypothesis": "Lucan Reyes uses Bitwarden as a password manager.",
+      "changed_field": "software",
+      "source_value": "KeePassXC",
+      "replacement_value": "Bitwarden"
+    },
+    {
+      "case_id": "H6GC-S03",
+      "case_kind": "identity_sensitive",
+      "person_name": "Maelle Okoro",
+      "domain": "tool_or_software",
+      "transformation_kind": "first_person_subject",
+      "source_text": "When sketching interface flows, I reach for Pencil.",
+      "clean_hypothesis": "Maelle Okoro reaches for Pencil when sketching interface flows.",
+      "unsupported_hypothesis": "Maelle Okoro reaches for Balsamiq when sketching interface flows.",
+      "changed_field": "software",
+      "source_value": "Pencil",
+      "replacement_value": "Balsamiq"
+    },
+    {
+      "case_id": "H6GC-S04",
+      "case_kind": "identity_sensitive",
+      "person_name": "Niko Varga",
+      "domain": "device_or_hardware",
+      "transformation_kind": "first_person_possessive",
+      "source_text": "The tablet beside my drawing desk is a reMarkable 2.",
+      "clean_hypothesis": "Niko Varga's drawing-desk tablet is a reMarkable 2.",
+      "unsupported_hypothesis": "Niko Varga's drawing-desk tablet is an iPad Air.",
+      "changed_field": "device_model",
+      "source_value": "a reMarkable 2",
+      "replacement_value": "an iPad Air"
+    },
+    {
+      "case_id": "H6GC-S05",
+      "case_kind": "identity_sensitive",
+      "person_name": "Orla Chen",
+      "domain": "device_or_hardware",
+      "transformation_kind": "first_person_subject",
+      "source_text": "I carry a Fairphone 5 as my daily phone.",
+      "clean_hypothesis": "Orla Chen carries a Fairphone 5 as a daily phone.",
+      "unsupported_hypothesis": "Orla Chen carries a Pixel 8a as a daily phone.",
+      "changed_field": "device_model",
+      "source_value": "Fairphone 5",
+      "replacement_value": "Pixel 8a"
+    },
+    {
+      "case_id": "H6GC-S06",
+      "case_kind": "identity_sensitive",
+      "person_name": "Pavel Idrissi",
+      "domain": "device_or_hardware",
+      "transformation_kind": "first_person_possessive",
+      "source_text": "At home, my scanner is an Epson ES-580W.",
+      "clean_hypothesis": "Pavel Idrissi's home scanner is an Epson ES-580W.",
+      "unsupported_hypothesis": "Pavel Idrissi's home scanner is a Canon imageFORMULA R40.",
+      "changed_field": "device_model",
+      "source_value": "an Epson ES-580W",
+      "replacement_value": "a Canon imageFORMULA R40"
+    },
+    {
+      "case_id": "H6GC-S07",
+      "case_kind": "identity_sensitive",
+      "person_name": "Quinn Adebayo",
+      "domain": "workplace_or_project",
+      "transformation_kind": "first_person_subject",
+      "source_text": "I am assigned to the Copperleaf accessibility refresh.",
+      "clean_hypothesis": "Quinn Adebayo is assigned to the Copperleaf accessibility refresh.",
+      "unsupported_hypothesis": "Quinn Adebayo is assigned to the Stonegate accessibility refresh.",
+      "changed_field": "project_name",
+      "source_value": "Copperleaf",
+      "replacement_value": "Stonegate"
+    },
+    {
+      "case_id": "H6GC-S08",
+      "case_kind": "identity_sensitive",
+      "person_name": "Rina Solberg",
+      "domain": "workplace_or_project",
+      "transformation_kind": "first_person_possessive",
+      "source_text": "My employer is the fictional Alder Finch Cooperative.",
+      "clean_hypothesis": "Rina Solberg's employer is the fictional Alder Finch Cooperative.",
+      "unsupported_hypothesis": "Rina Solberg's employer is the fictional Juniper Lake Cooperative.",
+      "changed_field": "employer",
+      "source_value": "Alder Finch Cooperative",
+      "replacement_value": "Juniper Lake Cooperative"
+    },
+    {
+      "case_id": "H6GC-S09",
+      "case_kind": "identity_sensitive",
+      "person_name": "Soren Malik",
+      "domain": "workplace_or_project",
+      "transformation_kind": "first_person_subject",
+      "source_text": "Within the team, I maintain the Zephyr import service.",
+      "clean_hypothesis": "Soren Malik maintains the Zephyr import service within the team.",
+      "unsupported_hypothesis": "Soren Malik maintains the Nimbus import service within the team.",
+      "changed_field": "service_name",
+      "source_value": "Zephyr",
+      "replacement_value": "Nimbus"
+    },
+    {
+      "case_id": "H6GC-S10",
+      "case_kind": "identity_sensitive",
+      "person_name": "Talia Novak",
+      "domain": "location",
+      "transformation_kind": "first_person_subject",
+      "source_text": "The city I currently call home is Bergen.",
+      "clean_hypothesis": "Talia Novak currently calls Bergen home.",
+      "unsupported_hypothesis": "Talia Novak currently calls Basel home.",
+      "changed_field": "city",
+      "source_value": "Bergen",
+      "replacement_value": "Basel"
+    },
+    {
+      "case_id": "H6GC-S11",
+      "case_kind": "identity_sensitive",
+      "person_name": "Uma Ferreira",
+      "domain": "location",
+      "transformation_kind": "first_person_possessive",
+      "source_text": "My residence is in Córdoba.",
+      "clean_hypothesis": "Uma Ferreira's residence is in Córdoba.",
+      "unsupported_hypothesis": "Uma Ferreira's residence is in Tallinn.",
+      "changed_field": "city",
+      "source_value": "Córdoba",
+      "replacement_value": "Tallinn"
+    },
+    {
+      "case_id": "H6GC-S12",
+      "case_kind": "identity_sensitive",
+      "person_name": "Viggo Tan",
+      "domain": "location",
+      "transformation_kind": "first_person_subject",
+      "source_text": "These days, I am based in Sendai.",
+      "clean_hypothesis": "Viggo Tan is currently based in Sendai.",
+      "unsupported_hypothesis": "Viggo Tan is currently based in Busan.",
+      "changed_field": "city",
+      "source_value": "Sendai",
+      "replacement_value": "Busan"
+    },
+    {
+      "case_id": "H6GC-S13",
+      "case_kind": "identity_sensitive",
+      "person_name": "Willa Mensah",
+      "domain": "schedule",
+      "transformation_kind": "first_person_subject",
+      "source_text": "Every Monday morning, I attend a ceramics workshop.",
+      "clean_hypothesis": "Willa Mensah attends a ceramics workshop every Monday morning.",
+      "unsupported_hypothesis": "Willa Mensah attends a ceramics workshop every Thursday morning.",
+      "changed_field": "workshop_time",
+      "source_value": "Monday morning",
+      "replacement_value": "Thursday morning"
+    },
+    {
+      "case_id": "H6GC-S14",
+      "case_kind": "identity_sensitive",
+      "person_name": "Xavi Laurent",
+      "domain": "schedule",
+      "transformation_kind": "first_person_possessive",
+      "source_text": "My language exchange meets on the second Saturday of each month.",
+      "clean_hypothesis": "Xavi Laurent's language exchange meets on the second Saturday of each month.",
+      "unsupported_hypothesis": "Xavi Laurent's language exchange meets on the fourth Sunday of each month.",
+      "changed_field": "meeting_time",
+      "source_value": "second Saturday",
+      "replacement_value": "fourth Sunday"
+    },
+    {
+      "case_id": "H6GC-S15",
+      "case_kind": "identity_sensitive",
+      "person_name": "Yara Blom",
+      "domain": "schedule",
+      "transformation_kind": "first_person_subject",
+      "source_text": "I reserve Friday afternoons for choir rehearsal.",
+      "clean_hypothesis": "Yara Blom reserves Friday afternoons for choir rehearsal.",
+      "unsupported_hypothesis": "Yara Blom reserves Wednesday evenings for choir rehearsal.",
+      "changed_field": "rehearsal_time",
+      "source_value": "Friday afternoons",
+      "replacement_value": "Wednesday evenings"
+    },
+    {
+      "case_id": "H6GC-S16",
+      "case_kind": "identity_sensitive",
+      "person_name": "Zeno Carver",
+      "domain": "subscription_or_preference",
+      "transformation_kind": "first_person_subject",
+      "source_text": "For streaming music, I subscribe to Qobuz.",
+      "clean_hypothesis": "Zeno Carver subscribes to Qobuz for streaming music.",
+      "unsupported_hypothesis": "Zeno Carver subscribes to Tidal for streaming music.",
+      "changed_field": "service",
+      "source_value": "Qobuz",
+      "replacement_value": "Tidal"
+    },
+    {
+      "case_id": "H6GC-S17",
+      "case_kind": "identity_sensitive",
+      "person_name": "Alina Bako",
+      "domain": "subscription_or_preference",
+      "transformation_kind": "first_person_possessive",
+      "source_text": "My coffee delivery arrives every three weeks.",
+      "clean_hypothesis": "Alina Bako's coffee delivery arrives every three weeks.",
+      "unsupported_hypothesis": "Alina Bako's coffee delivery arrives every six weeks.",
+      "changed_field": "delivery_interval",
+      "source_value": "every three weeks",
+      "replacement_value": "every six weeks"
+    },
+    {
+      "case_id": "H6GC-S18",
+      "case_kind": "identity_sensitive",
+      "person_name": "Bastian Ilyev",
+      "domain": "subscription_or_preference",
+      "transformation_kind": "first_person_subject",
+      "source_text": "I prefer decaffeinated espresso after dinner.",
+      "clean_hypothesis": "Bastian Ilyev prefers decaffeinated espresso after dinner.",
+      "unsupported_hypothesis": "Bastian Ilyev prefers mint tea after dinner.",
+      "changed_field": "drink_preference",
+      "source_value": "decaffeinated espresso",
+      "replacement_value": "mint tea"
+    },
+    {
+      "case_id": "H6GC-S19",
+      "case_kind": "identity_sensitive",
+      "person_name": "Cora Mwangi",
+      "domain": "education_or_course",
+      "transformation_kind": "first_person_subject",
+      "source_text": "This term, I am taking Marine Cartography 201.",
+      "clean_hypothesis": "Cora Mwangi is taking Marine Cartography 201 this term.",
+      "unsupported_hypothesis": "Cora Mwangi is taking Alpine Geology 110 this term.",
+      "changed_field": "course",
+      "source_value": "Marine Cartography 201",
+      "replacement_value": "Alpine Geology 110"
+    },
+    {
+      "case_id": "H6GC-S20",
+      "case_kind": "identity_sensitive",
+      "person_name": "Dario Sen",
+      "domain": "education_or_course",
+      "transformation_kind": "first_person_possessive",
+      "source_text": "My evening course covers conversational Finnish.",
+      "clean_hypothesis": "Dario Sen's evening course covers conversational Finnish.",
+      "unsupported_hypothesis": "Dario Sen's evening course covers conversational Korean.",
+      "changed_field": "course_language",
+      "source_value": "conversational Finnish",
+      "replacement_value": "conversational Korean"
+    },
+    {
+      "case_id": "H6GC-S21",
+      "case_kind": "identity_sensitive",
+      "person_name": "Elara Kovac",
+      "domain": "education_or_course",
+      "transformation_kind": "first_person_subject",
+      "source_text": "I earned my diploma from the fictional Westmere Design Institute.",
+      "clean_hypothesis": "Elara Kovac earned a diploma from the fictional Westmere Design Institute.",
+      "unsupported_hypothesis": "Elara Kovac earned a diploma from the fictional Eastbridge Music Academy.",
+      "changed_field": "institution",
+      "source_value": "Westmere Design Institute",
+      "replacement_value": "Eastbridge Music Academy"
+    },
+    {
+      "case_id": "H6GC-S22",
+      "case_kind": "identity_sensitive",
+      "person_name": "Femi Arendt",
+      "domain": "travel",
+      "transformation_kind": "first_person_subject",
+      "source_text": "For my autumn holiday, I booked a ferry to Visby.",
+      "clean_hypothesis": "Femi Arendt booked a ferry to Visby for an autumn holiday.",
+      "unsupported_hypothesis": "Femi Arendt booked a ferry to Helsinki for an autumn holiday.",
+      "changed_field": "destination",
+      "source_value": "Visby",
+      "replacement_value": "Helsinki"
+    },
+    {
+      "case_id": "H6GC-S23",
+      "case_kind": "identity_sensitive",
+      "person_name": "Greta Ishikawa",
+      "domain": "travel",
+      "transformation_kind": "first_person_subject",
+      "source_text": "I will stay at the fictional Cedar Quay Hotel in July.",
+      "clean_hypothesis": "Greta Ishikawa will stay at the fictional Cedar Quay Hotel in July.",
+      "unsupported_hypothesis": "Greta Ishikawa will stay at the fictional Willow Court Hostel in July.",
+      "changed_field": "lodging",
+      "source_value": "Cedar Quay Hotel",
+      "replacement_value": "Willow Court Hostel"
+    },
+    {
+      "case_id": "H6GC-S24",
+      "case_kind": "identity_sensitive",
+      "person_name": "Hamid Verne",
+      "domain": "travel",
+      "transformation_kind": "first_person_possessive",
+      "source_text": "My return flight departs from Kraków.",
+      "clean_hypothesis": "Hamid Verne's return flight departs from Kraków.",
+      "unsupported_hypothesis": "Hamid Verne's return flight departs from Prague.",
+      "changed_field": "departure_city",
+      "source_value": "Kraków",
+      "replacement_value": "Prague"
+    },
+    {
+      "case_id": "H6GC-S25",
+      "case_kind": "identity_sensitive",
+      "person_name": "Isolde Park",
+      "domain": "ordinary_possession",
+      "transformation_kind": "first_person_subject",
+      "source_text": "On the shelf, I keep a signed atlas.",
+      "clean_hypothesis": "Isolde Park keeps a signed atlas on the shelf.",
+      "unsupported_hypothesis": "Isolde Park keeps a signed cookbook on the shelf.",
+      "changed_field": "possession",
+      "source_value": "signed atlas",
+      "replacement_value": "signed cookbook"
+    },
+    {
+      "case_id": "H6GC-S26",
+      "case_kind": "identity_sensitive",
+      "person_name": "Jonas Diallo",
+      "domain": "ordinary_possession",
+      "transformation_kind": "first_person_possessive",
+      "source_text": "The bicycle in my garage is a blue touring bike.",
+      "clean_hypothesis": "Jonas Diallo keeps a blue touring bike in the garage.",
+      "unsupported_hypothesis": "Jonas Diallo keeps a red folding bike in the garage.",
+      "changed_field": "bicycle",
+      "source_value": "blue touring bike",
+      "replacement_value": "red folding bike"
+    },
+    {
+      "case_id": "H6GC-S27",
+      "case_kind": "identity_sensitive",
+      "person_name": "Kemi Rousseau",
+      "domain": "ordinary_possession",
+      "transformation_kind": "first_person_subject",
+      "source_text": "I own a walnut chess set.",
+      "clean_hypothesis": "Kemi Rousseau owns a walnut chess set.",
+      "unsupported_hypothesis": "Kemi Rousseau owns a maple backgammon set.",
+      "changed_field": "possession",
+      "source_value": "walnut chess set",
+      "replacement_value": "maple backgammon set"
+    },
+    {
+      "case_id": "H6GC-S28",
+      "case_kind": "identity_sensitive",
+      "person_name": "Leif Banerjee",
+      "domain": "biography",
+      "transformation_kind": "first_person_subject",
+      "source_text": "I was born in 1988.",
+      "clean_hypothesis": "Leif Banerjee was born in 1988.",
+      "unsupported_hypothesis": "Leif Banerjee was born in 1994.",
+      "changed_field": "birth_year",
+      "source_value": "1988",
+      "replacement_value": "1994"
+    },
+    {
+      "case_id": "H6GC-S29",
+      "case_kind": "identity_sensitive",
+      "person_name": "Mina Duarte",
+      "domain": "biography",
+      "transformation_kind": "first_person_possessive",
+      "source_text": "My first language is Portuguese.",
+      "clean_hypothesis": "Mina Duarte's first language is Portuguese.",
+      "unsupported_hypothesis": "Mina Duarte's first language is Dutch.",
+      "changed_field": "first_language",
+      "source_value": "Portuguese",
+      "replacement_value": "Dutch"
+    },
+    {
+      "case_id": "H6GC-S30",
+      "case_kind": "identity_sensitive",
+      "person_name": "Navid Keller",
+      "domain": "biography",
+      "transformation_kind": "first_person_subject",
+      "source_text": "I have worked as an archivist since 2016.",
+      "clean_hypothesis": "Navid Keller has worked as an archivist since 2016.",
+      "unsupported_hypothesis": "Navid Keller has worked as a cartographer since 2016.",
+      "changed_field": "profession",
+      "source_value": "an archivist",
+      "replacement_value": "a cartographer"
+    }
+  ],
+  "coverage_cases": [
+    {
+      "case_id": "H6GC-R01",
+      "coverage_kind": "single_turn_resolved",
+      "memory_content": "Oona Mercer keeps emergency contacts in a paper notebook.",
+      "transcripts": [
+        {
+          "transcript_id": "coverage-single-resolved",
+          "turns": [
+            {
+              "turn_idx": 0,
+              "role": "user",
+              "content": "I keep emergency contacts in a paper notebook."
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "transcript_id": "coverage-single-resolved",
+          "turn_idx": 0
+        }
+      ],
+      "bindings": [
+        {
+          "transcript_id": "coverage-single-resolved",
+          "turn_idx": 0,
+          "speaker_label": "Oona Mercer"
+        }
+      ],
+      "expected_identity_status": "resolved"
+    },
+    {
+      "case_id": "H6GC-R02",
+      "coverage_kind": "multi_turn_same_speaker_resolved",
+      "memory_content": "Priam Cho maintains the observatory schedule and orders replacement lenses.",
+      "transcripts": [
+        {
+          "transcript_id": "coverage-multi-resolved",
+          "turns": [
+            {
+              "turn_idx": 0,
+              "role": "user",
+              "content": "I maintain the observatory schedule."
+            },
+            {
+              "turn_idx": 2,
+              "role": "user",
+              "content": "I also order replacement lenses."
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "transcript_id": "coverage-multi-resolved",
+          "turn_idx": 2
+        },
+        {
+          "transcript_id": "coverage-multi-resolved",
+          "turn_idx": 0
+        }
+      ],
+      "bindings": [
+        {
+          "transcript_id": "coverage-multi-resolved",
+          "turn_idx": 0,
+          "speaker_label": "Priam Cho"
+        },
+        {
+          "transcript_id": "coverage-multi-resolved",
+          "turn_idx": 2,
+          "speaker_label": "Priam Cho"
+        }
+      ],
+      "expected_identity_status": "resolved"
+    },
+    {
+      "case_id": "H6GC-U01",
+      "coverage_kind": "missing_binding_unavailable",
+      "memory_content": "Rhea Baptiste uses the north entrance.",
+      "transcripts": [
+        {
+          "transcript_id": "coverage-missing-binding",
+          "turns": [
+            {
+              "turn_idx": 0,
+              "role": "user",
+              "content": "I use the north entrance."
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "transcript_id": "coverage-missing-binding",
+          "turn_idx": 0
+        }
+      ],
+      "bindings": [],
+      "expected_identity_status": "unavailable"
+    },
+    {
+      "case_id": "H6GC-U02",
+      "coverage_kind": "transcript_level_unavailable",
+      "memory_content": "Sami Koivu practices on a viola.",
+      "transcripts": [
+        {
+          "transcript_id": "coverage-transcript-level",
+          "turns": [
+            {
+              "turn_idx": 0,
+              "role": "user",
+              "content": "I practice on a viola."
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "transcript_id": "coverage-transcript-level",
+          "turn_idx": null
+        }
+      ],
+      "bindings": [
+        {
+          "transcript_id": "coverage-transcript-level",
+          "turn_idx": 0,
+          "speaker_label": "Sami Koivu"
+        }
+      ],
+      "expected_identity_status": "unavailable"
+    },
+    {
+      "case_id": "H6GC-U03",
+      "coverage_kind": "incomplete_multi_turn_unavailable",
+      "memory_content": "Thalia Moreau collects field notes and stores them in the blue cabinet.",
+      "transcripts": [
+        {
+          "transcript_id": "coverage-incomplete-multi",
+          "turns": [
+            {
+              "turn_idx": 0,
+              "role": "user",
+              "content": "I collect field notes."
+            },
+            {
+              "turn_idx": 1,
+              "role": "user",
+              "content": "I store them in the blue cabinet."
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "transcript_id": "coverage-incomplete-multi",
+          "turn_idx": 0
+        },
+        {
+          "transcript_id": "coverage-incomplete-multi",
+          "turn_idx": 1
+        }
+      ],
+      "bindings": [
+        {
+          "transcript_id": "coverage-incomplete-multi",
+          "turn_idx": 0,
+          "speaker_label": "Thalia Moreau"
+        }
+      ],
+      "expected_identity_status": "unavailable"
+    },
+    {
+      "case_id": "H6GC-X01",
+      "coverage_kind": "mixed_speakers_conflict",
+      "memory_content": "Ugo Marin manages the morning desk and Vera Kwon manages the evening desk.",
+      "transcripts": [
+        {
+          "transcript_id": "coverage-conflict-morning",
+          "turns": [
+            {
+              "turn_idx": 0,
+              "role": "user",
+              "content": "I manage the morning desk."
+            }
+          ]
+        },
+        {
+          "transcript_id": "coverage-conflict-evening",
+          "turns": [
+            {
+              "turn_idx": 0,
+              "role": "user",
+              "content": "I manage the evening desk."
+            }
+          ]
+        }
+      ],
+      "source_refs": [
+        {
+          "transcript_id": "coverage-conflict-morning",
+          "turn_idx": 0
+        },
+        {
+          "transcript_id": "coverage-conflict-evening",
+          "turn_idx": 0
+        }
+      ],
+      "bindings": [
+        {
+          "transcript_id": "coverage-conflict-morning",
+          "turn_idx": 0,
+          "speaker_label": "Ugo Marin"
+        },
+        {
+          "transcript_id": "coverage-conflict-evening",
+          "turn_idx": 0,
+          "speaker_label": "Vera Kwon"
+        }
+      ],
+      "expected_identity_status": "conflict"
+    }
+  ]
+}
