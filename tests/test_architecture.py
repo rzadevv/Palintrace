@@ -96,6 +96,7 @@ def test_checker_package_has_only_implemented_modules() -> None:
         "retrieval_shadowing.py",
         "stale_active.py",
         "unsupported_claim.py",
+        "unsupported_claim_identity_grounded.py",
     }
 
 
