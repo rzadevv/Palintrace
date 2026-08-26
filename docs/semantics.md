@@ -5,6 +5,67 @@ contains no checker module; the dependency-injected unsupported-claim checker co
 contracts from the separate checker package. One optional implementation can run a pinned
 three-class NLI model locally on CPU; there is no API-hosted or generative-model provider.
 
+## Speaker identity grounding
+
+The Part 6F-B development experiment showed that an explicit speaker label can materially change
+semantic entailment for first-person transcript evidence and named-person memory claims. Production
+MemLint cannot safely invent that label. Speaker-grounded evidence may therefore be constructed only
+after a trusted integration or configuration layer supplies an explicit binding:
+
+```text
+(transcript_id, turn_idx) -> speaker_label
+```
+
+The versioned `SpeakerIdentityBindings` schema is `0.1`. Transcript IDs must be nonblank, turn
+indices must be nonnegative integers, and labels must be nonblank single lines of at most 128
+Unicode characters with no leading or trailing whitespace. Binding keys must be unique. The
+collection sorts bindings by transcript ID and turn index and serializes deterministic UTF-8 JSON
+with non-finite numbers forbidden. It contains no timestamps, UUIDs, confidence values, or backend
+raw data.
+
+The current normalized schema does not provide an equivalent portable mapping. `SourceRef` locates
+transcript evidence but carries no participant identity. `TranscriptTurn.role` is an opaque role
+string, while turn and transcript metadata are untyped JSON rather than a declared identity
+contract. `Transcript` and `TranscriptSet` identify and group ordered turns but add no participant
+label. `MemoryScope.user_id`, `agent_id`, and `session_id` are portable identifiers, not
+human-readable entity labels and not turn-level bindings. `NormalizedMemory.content` is the claim
+being audited, and `NormalizedMemory.raw` is backend-specific diagnostic material. The file, Mem0,
+Graphiti, and Letta adapters preserve some of those IDs, raw values, and explicit provenance
+coordinates, but none establishes a backend-independent turn-to-entity-label mapping.
+
+`SpeakerIdentityBinding` is consequently explicit audit input. It asserts that one exact transcript
+turn was spoken by the supplied label. MemLint does not independently prove the assertion, and the
+binding must not be described as verified identity. A false binding can make semantic auditing
+incorrect. In particular, MemLint must never derive a binding from memory content, transcript text,
+capitalization, pronouns, roles, metadata, scope IDs, email addresses, backend raw fields, an LLM,
+NLI, embeddings, named-entity recognition, or heuristic matching. Using the memory claim to derive
+the identity needed to support that same claim would be circular validation.
+
+Identity is bound to `(transcript_id, turn_idx)`, not a whole transcript, user ID, agent ID, or role,
+because a transcript may contain user, assistant, tool, or multiple-participant turns. Resolution
+uses only a memory's normalized `SourceRef` coordinates. Duplicate references to one turn are
+canonicalized, and character spans do not change identity. The three resolution statuses are:
+
+- `RESOLVED`: every relevant source reference names a turn, every turn has an explicit binding, and
+  all bindings contain exactly the same speaker label;
+- `UNAVAILABLE`: a source reference lacks `turn_idx`, one or more referenced turns lack a binding,
+  or there are no turn coordinates to resolve;
+- `CONFLICT`: every relevant turn is bound, but more than one distinct speaker label is present.
+
+`UNAVAILABLE` and `CONFLICT` never guess a label. Aliases, fuzzy matching, coreference, entity
+linking, and multi-speaker composition are outside this contract. When and only when resolution is
+`RESOLVED`, the grounded-premise helper reproduces the exact Part 6F representation:
+
+```text
+The speaker is {speaker_label}.
+{evidence_text}
+```
+
+The helper raises a speaker-identity capability/input error for `UNAVAILABLE` or `CONFLICT`; it does
+not silently fall back to PLAIN composition. A future checker integration phase must decide whether
+to skip, abstain, use PLAIN evidence, or expose a capability diagnostic. This contract makes no such
+production policy decision and is not integrated into `UnsupportedClaimChecker`.
+
 ## Evidence resolution
 
 `resolve_declared_evidence(memory, transcripts)` resolves the portable `SourceRef` values on a

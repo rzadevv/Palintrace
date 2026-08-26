@@ -274,16 +274,16 @@ H3 confidence/selectivity policies or H4 retrieval challenge design.
 The fixture `tests/fixtures/unsupported_identity_probe_v0.1.json` contains 24 fresh scenarios that
 do not reuse the v0.1 held-out people or sentences: 18 identity-sensitive cases and six
 identity-free controls. Every scenario has a clean hypothesis and a one-value unsupported
-hypothesis. Future execution evaluates both hypotheses under both frozen premise conditions, for
-exactly 96 judgments:
+hypothesis. Part 6F-B evaluated both hypotheses under both frozen premise conditions, for exactly
+96 judgments:
 
 - `plain` uses `source_text` unchanged;
 - `speaker_grounded_v0.1` uses exactly
   `The speaker is {person_name}.\n{source_text}`.
 
 The identity-free controls already name the person in `source_text` but still receive the same
-prefix. They test whether the prefix itself perturbs ordinary explicit-name relations. The future
-execution model is frozen as `cross-encoder/nli-MiniLM2-L6-H768` at revision
+prefix. They test whether the prefix itself perturbs ordinary explicit-name relations. The
+execution model was frozen as `cross-encoder/nli-MiniLM2-L6-H768` at revision
 `b95119ce93d3e065de6214e38cd4a97b0f2f2c6d`, on CPU, with no threshold, truncation, replacement
 model, or role-labeled composition.
 
@@ -304,6 +304,25 @@ must establish whether identity grounding is available and valid in a deployable
 contract.
 
 This probe is not a second held-out benchmark or independent validation of an improved method. If
-it informs v0.2, that method requires a new future held-out set. Part 6F-A did not instantiate or run
-MiniLM, did not observe semantic outputs, and did not test H3 or H4. The real frozen probe may be
-executed once only in Part 6F-B after fixture/hash/schema/model preflight succeeds.
+it informs v0.2, that method requires a new future held-out set. At the Part 6F-A freeze, MiniLM had
+not been instantiated or run, no semantic outputs had been observed, and H3 and H4 had not been
+tested. The real frozen probe was reserved for one Part 6F-B execution after
+fixture/hash/schema/model preflight succeeded.
+
+### Frozen Part 6F-B development result
+
+Part 6F-B executed the preregistered `unsupported-identity-counterfactual-v0.1` development probe.
+The canonical external `identity-probe-result.json` has SHA-256
+`a205fd355291d42aab0dc267241d5b5ea03613f1d324e64ca6cf4ec8a9320219` and is not committed to this
+repository. Its frozen interpretation is `SUPPORTS_H1`.
+
+For the 18 identity-sensitive cases, PLAIN produced 4/18 clean entailments and detected 18/18
+unsupported hypotheses. Speaker-grounded composition produced 18/18 clean entailments and detected
+18/18 unsupported hypotheses. For the six identity-free controls, both conditions produced 6/6
+clean entailments and 6/6 unsupported detections, with no relation changes. The frozen
+failure-pattern, clean-rescue, unsupported-safety, and prefix-stability gates all passed.
+
+This is a DEVELOPMENT experiment, not independent held-out validation of a v0.2 checker. It does
+not make identity grounding production-ready, show real-world generalization, or prove that speaker
+identity is the sole semantic failure mechanism. No production method was changed after observing
+the result. H3 confidence/selectivity policy and H4 retrieval challenge design remain untested.
