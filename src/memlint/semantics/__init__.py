@@ -9,6 +9,15 @@ from memlint.semantics.composition import (
     compose_evidence,
 )
 from memlint.semantics.evidence import resolve_declared_evidence
+from memlint.semantics.identity import (
+    SpeakerIdentityBinding,
+    SpeakerIdentityBindings,
+    SpeakerIdentityError,
+    SpeakerIdentityResolution,
+    SpeakerIdentityResolutionStatus,
+    build_speaker_grounded_premise,
+    resolve_speaker_identity,
+)
 from memlint.semantics.local_nli import (
     LocalNLISemanticJudge,
     SemanticDependencyError,
@@ -46,7 +55,14 @@ __all__ = [
     "SemanticModelConfigError",
     "SemanticRelation",
     "SemanticUsage",
+    "SpeakerIdentityBinding",
+    "SpeakerIdentityBindings",
+    "SpeakerIdentityError",
+    "SpeakerIdentityResolution",
+    "SpeakerIdentityResolutionStatus",
+    "build_speaker_grounded_premise",
     "compose_evidence",
     "resolve_declared_evidence",
+    "resolve_speaker_identity",
     "semantic_judge_identity",
 ]
