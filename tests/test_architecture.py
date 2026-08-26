@@ -144,12 +144,13 @@ def test_semantics_does_not_read_raw_attributes() -> None:
     assert violations == []
 
 
-def test_semantics_contains_only_frozen_modules_plus_composition() -> None:
+def test_semantics_contains_only_frozen_modules_plus_composition_and_identity() -> None:
     assert {path.name for path in SEMANTICS_ROOT.glob("*.py")} == {
         "__init__.py",
         "base.py",
         "composition.py",
         "evidence.py",
+        "identity.py",
         "local_nli.py",
         "models.py",
     }
