@@ -425,3 +425,37 @@ status—but no source text, memory content, premise, or speaker label. Safe env
 is stored separately. At preregistration freeze time no semantic model has been instantiated and no
 held-out relation has been observed. H3 confidence/selectivity research and H4 retrieval research
 remain outside this phase.
+
+### Frozen Part 6G-C held-out result
+
+After the complete preregistration was committed, the pinned CPU MiniLM evaluation was executed
+exactly once in forced-offline mode. The canonical external `heldout-result.json` has SHA-256
+`3fea4d3d27a6082e259794210ae20f8aa444895810b3e13f040f12bbfcfa8380`; its separate external
+`execution-provenance.json` has SHA-256
+`51ce4c9afbca10de511c6ba96730d286624a7b4dc6f66ec90782ba8d46b800a5`. Neither artifact is
+committed to this repository.
+
+On the 30 resolved identity-sensitive clean cases, the baseline produced 0/30 entailments and
+30/30 false alerts. The candidate produced 30/30 entailments and 0/30 false alerts: 30 paired clean
+rescues and no clean regressions. Both methods detected all 30/30 identity-sensitive unsupported
+hypotheses, with no detected-to-missed transition. On the ten identity-free controls, both methods
+produced 10/10 clean entailments and 10/10 unsupported detections; exact relation changes, clean
+regressions, and unsupported regressions were all zero.
+
+Across all 86 candidate memories, 82 were identity-resolved and assessed, three were unavailable,
+and one was conflicting. The four unavailable/conflicting cases abstained with zero semantic calls
+and findings. Assessment coverage was 82/86 (`0.9534883720930233`), the unavailable rate was 3/86,
+and the conflict rate was 1/86. Conditional and effective semantic rates were both 30/30 for
+sensitive clean entailment and 30/30 for sensitive unsupported detection because every semantic
+comparison case had an explicit resolved binding; the lower 82/86 deployment-contract coverage is
+reported separately and must not be hidden behind those perfect conditional results.
+
+The baseline failure reproduced, and the clean-selectivity, unsupported-safety,
+identity-free-stability, abstention-contract, and regression/privacy gates all passed. The frozen
+interpretation is `SUPPORTS_CANDIDATE`.
+
+This supports the exact frozen representation on this independently constructed synthetic held-out
+set. It is not real-world deployment validation or proof that production integrations can supply
+trustworthy speaker bindings. The experiment supplied every semantic-case binding explicitly.
+Candidate promotion, CLI/default integration, and production binding availability require later
+decisions and evidence. Benchmark v0.1 remains frozen; H3 and H4 remain untested.

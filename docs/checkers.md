@@ -132,7 +132,9 @@ established. Zero findings does not imply full assessment: inspect the skip coun
 `IdentityGroundedUnsupportedClaimChecker` version `0.1` is a DEVELOPMENT candidate that is separate
 from the frozen `UnsupportedClaimChecker` version `1.0`. It is not a replacement, is not exported
 from the public checker package, and is not available through the CLI, benchmark v0.1 dispatch, or
-default checker lists. It has not received fresh held-out validation.
+default checker lists. Part 6G-C supports its frozen representation on an independently constructed
+synthetic held-out set, but this is not real-world deployment validation and does not establish that
+production integrations can supply trustworthy speaker bindings.
 
 The constructor requires explicit version `0.1` `SpeakerIdentityBindings` in addition to an injected
 `SemanticJudge`. For each declared memory, the candidate first resolves transcript evidence and
