@@ -24,6 +24,7 @@ from memlint.retrieval import (
     RetrievalChallengeOutcome,
     RetrievalObservation,
     RetrievalSufficiencyPolicy,
+    assess_paired_retrieval_challenge,
 )
 
 RETRIEVAL_STRONG_PROBE_SCHEMA_VERSION = "0.1"
@@ -464,6 +465,14 @@ class RetrievalStrongProbeObservation(_DeterministicModel):
             or self.mutated_observation.usage.candidate_count != 12
         ):
             raise ValueError("paired observation usage must match four and twelve candidates")
+        recomputed_assessment = assess_paired_retrieval_challenge(
+            self.baseline_observation,
+            self.mutated_observation,
+            policy=FROZEN_POLICY,
+            case_id=self.case_id,
+        )
+        if self.paired_assessment != recomputed_assessment:
+            raise ValueError("paired assessment must be recomputed from raw observations")
         return self
 
 

@@ -9,9 +9,12 @@ from collections import Counter
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 import memlint.evaluation.retrieval_strong_probe as probe
 from memlint.retrieval import (
+    PairedRetrievalChallengeAssessment,
+    RetrievalChallengeOutcome,
     RetrievalHit,
     RetrievalObservation,
     RetrievalUsage,
@@ -103,6 +106,23 @@ def _fake_matrix(
         )
         for case in spec.cases
     )
+
+
+def _forge_paired_assessment(
+    observation: probe.RetrievalStrongProbeObservation,
+    *,
+    outcome: RetrievalChallengeOutcome,
+    mutated_sufficient: bool,
+) -> PairedRetrievalChallengeAssessment:
+    expected_ids = observation.mutated_observation.expected_memory_ids
+    payload = observation.paired_assessment.model_dump(mode="python")
+    payload.update(
+        outcome=outcome,
+        mutated_sufficient=mutated_sufficient,
+        mutated_retrieved_expected_memory_ids=(expected_ids if mutated_sufficient else ()),
+        mutated_missing_expected_memory_ids=(() if mutated_sufficient else expected_ids),
+    )
+    return PairedRetrievalChallengeAssessment.model_validate(payload)
 
 
 def _simple_tokens(text: str) -> frozenset[str]:
@@ -291,6 +311,75 @@ def test_existing_paired_assessment_produces_only_three_frozen_outcomes(
             mutated_sufficient=mutated,
         )
         assert observation.paired_assessment.outcome.value == expected
+
+
+def test_observation_accepts_exact_recomputed_paired_assessment(
+    spec: probe.RetrievalStrongProbeSpec,
+) -> None:
+    observation = _fake_observation(
+        spec.cases[0],
+        baseline_sufficient=True,
+        mutated_sufficient=True,
+    )
+
+    assert (
+        probe.RetrievalStrongProbeObservation.model_validate(
+            observation.model_dump(mode="python")
+        )
+        == observation
+    )
+
+
+def test_observation_rejects_forged_induced_assessment(
+    spec: probe.RetrievalStrongProbeSpec,
+) -> None:
+    observation = _fake_observation(
+        spec.cases[0],
+        baseline_sufficient=True,
+        mutated_sufficient=True,
+    )
+    forged = _forge_paired_assessment(
+        observation,
+        outcome=RetrievalChallengeOutcome.INDUCED_SHADOWING,
+        mutated_sufficient=False,
+    )
+
+    with pytest.raises(ValidationError, match="recomputed from raw observations"):
+        probe.RetrievalStrongProbeObservation(
+            case_id=observation.case_id,
+            case_kind=observation.case_kind,
+            challenge_family=observation.challenge_family,
+            domain=observation.domain,
+            baseline_observation=observation.baseline_observation,
+            mutated_observation=observation.mutated_observation,
+            paired_assessment=forged,
+        )
+
+
+def test_observation_rejects_forged_resilient_assessment(
+    spec: probe.RetrievalStrongProbeSpec,
+) -> None:
+    observation = _fake_observation(
+        spec.cases[0],
+        baseline_sufficient=True,
+        mutated_sufficient=False,
+    )
+    forged = _forge_paired_assessment(
+        observation,
+        outcome=RetrievalChallengeOutcome.RESILIENT,
+        mutated_sufficient=True,
+    )
+
+    with pytest.raises(ValidationError, match="recomputed from raw observations"):
+        probe.RetrievalStrongProbeObservation(
+            case_id=observation.case_id,
+            case_kind=observation.case_kind,
+            challenge_family=observation.challenge_family,
+            domain=observation.domain,
+            baseline_observation=observation.baseline_observation,
+            mutated_observation=observation.mutated_observation,
+            paired_assessment=forged,
+        )
 
 
 def test_all_four_gates_pass_at_preregistered_boundaries(
