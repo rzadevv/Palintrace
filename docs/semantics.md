@@ -41,6 +41,17 @@ capitalization, pronouns, roles, metadata, scope IDs, email addresses, backend r
 NLI, embeddings, named-entity recognition, or heuristic matching. Using the memory claim to derive
 the identity needed to support that same claim would be circular validation.
 
+Part 6G-D adds a separate caller/integration admission envelope without changing this frozen
+binding contract. `SpeakerIdentitySourceAssertion` keeps `principal_id` distinct from
+`speaker_label` and records `source_system`, `source_reference`, and one of exactly
+`TRUSTED_EXPLICIT`, `TRUSTED_CONFIGURED`, `UNAVAILABLE`, or `AMBIGUOUS`. Only trusted assertions
+with exact turn coordinates and labels can compile to `SpeakerIdentityBindings`;
+`TRUSTED_EXPLICIT` additionally requires a stable principal ID. Unavailable, ambiguous, or
+conflicting assertions fail closed. The envelope contains no claim/transcript text, role, memory
+scope, arbitrary metadata, or raw backend data, and no adapter constructs it automatically. The
+complete per-integration evidence matrix and promotion rule are documented in
+[`speaker_identity_integrations.md`](speaker_identity_integrations.md).
+
 Identity is bound to `(transcript_id, turn_idx)`, not a whole transcript, user ID, agent ID, or role,
 because a transcript may contain user, assistant, tool, or multiple-participant turns. Resolution
 uses only a memory's normalized `SourceRef` coordinates. Duplicate references to one turn are
@@ -62,9 +73,9 @@ The speaker is {speaker_label}.
 ```
 
 The helper raises a speaker-identity capability/input error for `UNAVAILABLE` or `CONFLICT`; it does
-not silently fall back to PLAIN composition. A future checker integration phase must decide whether
-to skip, abstain, use PLAIN evidence, or expose a capability diagnostic. This contract makes no such
-production policy decision and is not integrated into `UnsupportedClaimChecker`.
+not silently fall back to PLAIN composition. The separate development candidate abstains on both
+states and is still nondefault/non-CLI. This contract remains unintegrated into the frozen
+`UnsupportedClaimChecker`.
 
 ## Evidence resolution
 

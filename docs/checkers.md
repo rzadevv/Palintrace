@@ -161,10 +161,17 @@ SHA-256 digests. It does not serialize the speaker label, premise, hypothesis, t
 memory text, or raw bindings.
 
 Speaker-grounded checking trades semantic selectivity for an explicit capability requirement.
-Memories without trustworthy bindings for every relevant source turn are not assessed. A future
-evaluation must report both semantic outcomes on assessed memories and identity-grounding coverage
-and abstention counts. Abstentions must not be hidden or interpreted as clean memories. H3
+Memories without trustworthy bindings for every relevant source turn are not assessed. Evaluations
+must report both semantic outcomes on assessed memories and identity-grounding coverage and
+abstention counts. Abstentions must not be hidden or interpreted as clean memories. H3
 confidence/selectivity policy and H4 retrieval design remain untested.
+
+Part 6G-D finds no current adapter that automatically supplies both exact turn attribution and a
+human-readable label. Optional use therefore still requires explicit caller/operator assertions
+admitted through the trust contract described in
+[`speaker_identity_integrations.md`](speaker_identity_integrations.md). Mem0 scope IDs, Letta
+agent/user context, Graphiti groups/episodes, file metadata, and transcript roles do not become
+speaker labels automatically.
 
 ## Redundancy / bloat
 

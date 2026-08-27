@@ -18,6 +18,12 @@ from memlint.semantics.identity import (
     build_speaker_grounded_premise,
     resolve_speaker_identity,
 )
+from memlint.semantics.identity_source import (
+    SpeakerIdentityAdmissionError,
+    SpeakerIdentitySourceAssertion,
+    SpeakerIdentitySourceAssertions,
+    SpeakerIdentityTrust,
+)
 from memlint.semantics.local_nli import (
     LocalNLISemanticJudge,
     SemanticDependencyError,
@@ -57,9 +63,13 @@ __all__ = [
     "SemanticUsage",
     "SpeakerIdentityBinding",
     "SpeakerIdentityBindings",
+    "SpeakerIdentityAdmissionError",
     "SpeakerIdentityError",
     "SpeakerIdentityResolution",
     "SpeakerIdentityResolutionStatus",
+    "SpeakerIdentitySourceAssertion",
+    "SpeakerIdentitySourceAssertions",
+    "SpeakerIdentityTrust",
     "build_speaker_grounded_premise",
     "compose_evidence",
     "resolve_declared_evidence",

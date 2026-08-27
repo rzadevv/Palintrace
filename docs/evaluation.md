@@ -459,3 +459,20 @@ set. It is not real-world deployment validation or proof that production integra
 trustworthy speaker bindings. The experiment supplied every semantic-case binding explicitly.
 Candidate promotion, CLI/default integration, and production binding availability require later
 decisions and evidence. Benchmark v0.1 remains frozen; H3 and H4 remain untested.
+
+### Part 6G-D speaker-binding feasibility
+
+Part 6G-D separately audited whether the current File, Mem0, Letta, and Graphiti paths can supply
+the exact turn-level human labels assumed by 6G-C. No semantic model or additional semantic example
+was used. None of the current adapters automatically supplies both trustworthy turn attribution
+and a human-readable label. File input can be configured explicitly; a future Letta message/Identity
+join is supported in principle when documented sender and label fields are complete and unique;
+Mem0 and Graphiti require their surrounding integrations to preserve explicit assertions at
+ingestion time. Scope IDs, roles, metadata, episode prose, groups, and raw fields are insufficient.
+
+A separate source-admission envelope records trust class, source provenance, optional principal ID,
+and speaker label before compiling to the unchanged `SpeakerIdentityBindings`. It rejects
+unavailable, ambiguous, or conflicting input. Under the preregistered promotion ladder, controlled
+contract and regression tests establish `OPTIONAL_EXPLICIT_API_READY`, not `DEFAULT_READY`. The
+candidate remains nonpublic, non-CLI, and nondefault; real production binding prevalence remains
+unknown.

@@ -152,6 +152,7 @@ def test_semantics_contains_only_frozen_modules_plus_composition_and_identity() 
         "composition.py",
         "evidence.py",
         "identity.py",
+        "identity_source.py",
         "local_nli.py",
         "models.py",
     }
