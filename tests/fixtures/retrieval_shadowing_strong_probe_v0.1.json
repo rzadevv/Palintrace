@@ -1,0 +1,839 @@
+{
+  "schema_version": "0.1",
+  "probe_id": "retrieval-shadowing-strong-probe-v0.1",
+  "split": "development",
+  "retriever": {
+    "kind": "experimental_lexical",
+    "version": "0.1",
+    "top_k": 3,
+    "policy": "all_expected"
+  },
+  "cases": [
+    {
+      "case_id": "RS-Q01",
+      "case_kind": "strong_challenge",
+      "challenge_family": "query_term_crowding",
+      "domain": "software_tool",
+      "scope_user_id": "probe-user-rs-q01",
+      "query": "Which terminal program does the user prefer for remote server work?",
+      "target_memory": {"id": "rs-q01-target", "content": "The user prefers Alacritty for remote server work."},
+      "baseline_other_memories": [
+        {"id": "rs-q01-base-01", "content": "The user rides a folding bicycle on quiet weekends."},
+        {"id": "rs-q01-base-02", "content": "The user keeps an emergency contact card in a blue wallet."},
+        {"id": "rs-q01-base-03", "content": "The user cooks lentil soup after the Thursday market."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-q01-dist-01", "content": "The user compares terminal program latency before beginning remote server work."},
+        {"id": "rs-q01-dist-02", "content": "Remote server work requires the user to review terminal program access rules."},
+        {"id": "rs-q01-dist-03", "content": "The user documents terminal program shortcuts used during remote server work."},
+        {"id": "rs-q01-dist-04", "content": "Terminal program color settings are part of the user's remote server work checklist."},
+        {"id": "rs-q01-dist-05", "content": "The user discusses whether terminal program tabs help with remote server work."},
+        {"id": "rs-q01-dist-06", "content": "A terminal program training note describes the user's remote server work routine."},
+        {"id": "rs-q01-dist-07", "content": "The user audits terminal program fonts before long remote server work sessions."},
+        {"id": "rs-q01-dist-08", "content": "Remote server work notes remind the user to close each terminal program session."}
+      ],
+      "expected_memory_ids": ["rs-q01-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-Q02",
+      "case_kind": "strong_challenge",
+      "challenge_family": "query_term_crowding",
+      "domain": "software_tool",
+      "scope_user_id": "probe-user-rs-q02",
+      "query": "What diagram tool does the user use for architecture sketches?",
+      "target_memory": {"id": "rs-q02-target", "content": "The user uses Excalidraw for architecture sketches."},
+      "baseline_other_memories": [
+        {"id": "rs-q02-base-01", "content": "The user stores spare batteries in the hallway cabinet."},
+        {"id": "rs-q02-base-02", "content": "The user attends a neighborhood choir rehearsal in spring."},
+        {"id": "rs-q02-base-03", "content": "The user orders plain oat biscuits for afternoon breaks."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-q02-dist-01", "content": "The user reviews diagram tool conventions before sharing architecture sketches."},
+        {"id": "rs-q02-dist-02", "content": "Architecture sketches need a diagram tool legend that the user can explain."},
+        {"id": "rs-q02-dist-03", "content": "The user's diagram tool checklist covers labels for architecture sketches."},
+        {"id": "rs-q02-dist-04", "content": "The user archives diagram tool exports alongside architecture sketches."},
+        {"id": "rs-q02-dist-05", "content": "A diagram tool workshop helped the user simplify architecture sketches."},
+        {"id": "rs-q02-dist-06", "content": "The user compares diagram tool canvas sizes for architecture sketches."},
+        {"id": "rs-q02-dist-07", "content": "Architecture sketches follow the user's diagram tool naming guide."},
+        {"id": "rs-q02-dist-08", "content": "The user adds review dates to every diagram tool file containing architecture sketches."}
+      ],
+      "expected_memory_ids": ["rs-q02-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-Q03",
+      "case_kind": "strong_challenge",
+      "challenge_family": "query_term_crowding",
+      "domain": "location",
+      "scope_user_id": "probe-user-rs-q03",
+      "query": "Where does the user hold the monthly language exchange?",
+      "target_memory": {"id": "rs-q03-target", "content": "The user holds the monthly language exchange at Linden Community Hall."},
+      "baseline_other_memories": [
+        {"id": "rs-q03-base-01", "content": "The user grows rosemary beside the kitchen window."},
+        {"id": "rs-q03-base-02", "content": "The user repairs wool gloves with green thread."},
+        {"id": "rs-q03-base-03", "content": "The user listens to astronomy lectures while baking bread."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-q03-dist-01", "content": "The user prepares monthly language exchange name cards before each gathering."},
+        {"id": "rs-q03-dist-02", "content": "Monthly language exchange planning includes a user-maintained attendance sheet."},
+        {"id": "rs-q03-dist-03", "content": "The user sends monthly language exchange reminders to new participants."},
+        {"id": "rs-q03-dist-04", "content": "A monthly language exchange checklist reminds the user to bring spare pens."},
+        {"id": "rs-q03-dist-05", "content": "The user rotates monthly language exchange discussion themes."},
+        {"id": "rs-q03-dist-06", "content": "Monthly language exchange feedback is summarized by the user."},
+        {"id": "rs-q03-dist-07", "content": "The user prints monthly language exchange vocabulary cards in advance."},
+        {"id": "rs-q03-dist-08", "content": "Monthly language exchange volunteers receive a short note from the user."}
+      ],
+      "expected_memory_ids": ["rs-q03-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-Q04",
+      "case_kind": "strong_challenge",
+      "challenge_family": "query_term_crowding",
+      "domain": "schedule",
+      "scope_user_id": "probe-user-rs-q04",
+      "query": "When does the user review the household budget each week?",
+      "target_memory": {"id": "rs-q04-target", "content": "The user reviews the household budget on Sunday evening each week."},
+      "baseline_other_memories": [
+        {"id": "rs-q04-base-01", "content": "The user owns a striped picnic blanket."},
+        {"id": "rs-q04-base-02", "content": "The user exchanges mystery novels with a cousin."},
+        {"id": "rs-q04-base-03", "content": "The user buys pears from a farm stall."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-q04-dist-01", "content": "The user keeps a household budget review checklist for each week."},
+        {"id": "rs-q04-dist-02", "content": "Each week the household budget review includes utility receipts for the user."},
+        {"id": "rs-q04-dist-03", "content": "The user labels every weekly household budget review folder by month."},
+        {"id": "rs-q04-dist-04", "content": "A household budget review template helps the user compare each week."},
+        {"id": "rs-q04-dist-05", "content": "The user adds grocery totals to the household budget before the weekly review."},
+        {"id": "rs-q04-dist-06", "content": "Each household budget review prompts the user to check weekly subscriptions."},
+        {"id": "rs-q04-dist-07", "content": "The user's weekly household budget review uses color-coded categories."},
+        {"id": "rs-q04-dist-08", "content": "Weekly household budget notes tell the user which receipts need review."}
+      ],
+      "expected_memory_ids": ["rs-q04-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-Q05",
+      "case_kind": "strong_challenge",
+      "challenge_family": "query_term_crowding",
+      "domain": "device",
+      "scope_user_id": "probe-user-rs-q05",
+      "query": "Which tablet does the user use for field annotations?",
+      "target_memory": {"id": "rs-q05-target", "content": "The user uses a reMarkable 2 tablet for field annotations."},
+      "baseline_other_memories": [
+        {"id": "rs-q05-base-01", "content": "The user prefers cinnamon in morning porridge."},
+        {"id": "rs-q05-base-02", "content": "The user keeps a rain jacket near the back door."},
+        {"id": "rs-q05-base-03", "content": "The user visits a sculpture garden every midsummer."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-q05-dist-01", "content": "The user organizes tablet templates before starting field annotations."},
+        {"id": "rs-q05-dist-02", "content": "Field annotations require the user to charge the tablet before departure."},
+        {"id": "rs-q05-dist-03", "content": "The user's tablet folder structure separates field annotations by site."},
+        {"id": "rs-q05-dist-04", "content": "A tablet stylus checklist supports the user's field annotations."},
+        {"id": "rs-q05-dist-05", "content": "The user exports tablet pages after completing field annotations."},
+        {"id": "rs-q05-dist-06", "content": "Field annotations are backed up from the user's tablet after each survey."},
+        {"id": "rs-q05-dist-07", "content": "The user reviews tablet battery settings before field annotations."},
+        {"id": "rs-q05-dist-08", "content": "Tablet handwriting practice helps the user keep field annotations legible."}
+      ],
+      "expected_memory_ids": ["rs-q05-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-Q06",
+      "case_kind": "strong_challenge",
+      "challenge_family": "query_term_crowding",
+      "domain": "device",
+      "scope_user_id": "probe-user-rs-q06",
+      "query": "What microphone does the user use for remote interviews?",
+      "target_memory": {"id": "rs-q06-target", "content": "The user uses a Rode NT-USB Mini microphone for remote interviews."},
+      "baseline_other_memories": [
+        {"id": "rs-q06-base-01", "content": "The user collects postcards showing coastal lighthouses."},
+        {"id": "rs-q06-base-02", "content": "The user waters a small lemon tree twice a week."},
+        {"id": "rs-q06-base-03", "content": "The user stores winter scarves in a cedar box."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-q06-dist-01", "content": "The user checks microphone levels before every remote interview."},
+        {"id": "rs-q06-dist-02", "content": "Remote interview notes remind the user to mute the microphone between questions."},
+        {"id": "rs-q06-dist-03", "content": "The user's microphone placement guide covers remote interview acoustics."},
+        {"id": "rs-q06-dist-04", "content": "A microphone test recording is part of the user's remote interview routine."},
+        {"id": "rs-q06-dist-05", "content": "The user keeps remote interview prompts beside the microphone stand."},
+        {"id": "rs-q06-dist-06", "content": "Remote interview preparation includes a microphone cable check by the user."},
+        {"id": "rs-q06-dist-07", "content": "The user documents microphone gain settings after remote interviews."},
+        {"id": "rs-q06-dist-08", "content": "Microphone monitoring helps the user notice noise during remote interviews."}
+      ],
+      "expected_memory_ids": ["rs-q06-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-Q07",
+      "case_kind": "strong_challenge",
+      "challenge_family": "query_term_crowding",
+      "domain": "project_or_work",
+      "scope_user_id": "probe-user-rs-q07",
+      "query": "Which project is the user leading for the autumn release?",
+      "target_memory": {"id": "rs-q07-target", "content": "The user is leading Project Lantern for the autumn release."},
+      "baseline_other_memories": [
+        {"id": "rs-q07-base-01", "content": "The user drinks mint tea from a stoneware mug."},
+        {"id": "rs-q07-base-02", "content": "The user reserves a tennis court every second month."},
+        {"id": "rs-q07-base-03", "content": "The user keeps travel receipts in yellow envelopes."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-q07-dist-01", "content": "The user reviews project risks before the autumn release planning meeting."},
+        {"id": "rs-q07-dist-02", "content": "Autumn release notes require the user to summarize project dependencies."},
+        {"id": "rs-q07-dist-03", "content": "The user's project checklist includes an autumn release accessibility review."},
+        {"id": "rs-q07-dist-04", "content": "A project dashboard helps the user track autumn release milestones."},
+        {"id": "rs-q07-dist-05", "content": "The user schedules project demos before the autumn release."},
+        {"id": "rs-q07-dist-06", "content": "Autumn release coordination requires the user to update the project calendar."},
+        {"id": "rs-q07-dist-07", "content": "The user asks project reviewers to confirm autumn release requirements."},
+        {"id": "rs-q07-dist-08", "content": "Project status summaries keep the user informed about autumn release blockers."}
+      ],
+      "expected_memory_ids": ["rs-q07-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-Q08",
+      "case_kind": "strong_challenge",
+      "challenge_family": "query_term_crowding",
+      "domain": "preference_or_subscription",
+      "scope_user_id": "probe-user-rs-q08",
+      "query": "Which newsletter subscription does the user keep for climate policy updates?",
+      "target_memory": {"id": "rs-q08-target", "content": "The user keeps the Carbon Brief Daily newsletter subscription for climate policy updates."},
+      "baseline_other_memories": [
+        {"id": "rs-q08-base-01", "content": "The user carries a red umbrella during spring storms."},
+        {"id": "rs-q08-base-02", "content": "The user sketches old railway stations on holidays."},
+        {"id": "rs-q08-base-03", "content": "The user freezes portions of vegetable stew."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-q08-dist-01", "content": "The user sorts newsletter subscription messages about climate policy updates."},
+        {"id": "rs-q08-dist-02", "content": "Climate policy update folders help the user manage newsletter subscription mail."},
+        {"id": "rs-q08-dist-03", "content": "The user's newsletter subscription checklist filters climate policy updates by region."},
+        {"id": "rs-q08-dist-04", "content": "A newsletter subscription archive lets the user revisit climate policy updates."},
+        {"id": "rs-q08-dist-05", "content": "The user tags climate policy updates before filing newsletter subscription messages."},
+        {"id": "rs-q08-dist-06", "content": "Newsletter subscription housekeeping keeps the user's climate policy updates organized."},
+        {"id": "rs-q08-dist-07", "content": "The user reviews climate policy update sources in a newsletter subscription checklist."},
+        {"id": "rs-q08-dist-08", "content": "Climate policy updates prompt the user to clean the newsletter subscription inbox."}
+      ],
+      "expected_memory_ids": ["rs-q08-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-N01",
+      "case_kind": "strong_challenge",
+      "challenge_family": "negated_value_decoys",
+      "domain": "software_tool",
+      "scope_user_id": "probe-user-rs-n01",
+      "query": "Which database engine does the user prefer for embedded prototypes?",
+      "target_memory": {"id": "rs-n01-target", "content": "The user prefers Firebird as the database engine for embedded prototypes."},
+      "baseline_other_memories": [
+        {"id": "rs-n01-base-01", "content": "The user folds clean towels on Saturday mornings."},
+        {"id": "rs-n01-base-02", "content": "The user visits a botanical greenhouse in winter."},
+        {"id": "rs-n01-base-03", "content": "The user stores loose buttons in a glass jar."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-n01-dist-01", "content": "The user does not prefer PostgreSQL as the database engine for embedded prototypes."},
+        {"id": "rs-n01-dist-02", "content": "The user rejected SQLite as the preferred database engine for embedded prototypes."},
+        {"id": "rs-n01-dist-03", "content": "MySQL is not the database engine the user prefers for embedded prototypes."},
+        {"id": "rs-n01-dist-04", "content": "The user explicitly ruled out MariaDB as the preferred database engine for embedded prototypes."},
+        {"id": "rs-n01-dist-05", "content": "CockroachDB is not the user's preferred database engine for embedded prototypes."},
+        {"id": "rs-n01-dist-06", "content": "The user does not choose MongoDB as the database engine for embedded prototypes."},
+        {"id": "rs-n01-dist-07", "content": "The user said Cassandra is not the preferred database engine for embedded prototypes."},
+        {"id": "rs-n01-dist-08", "content": "Redis is explicitly not the database engine the user prefers for embedded prototypes."}
+      ],
+      "expected_memory_ids": ["rs-n01-target"],
+      "top_k": 3,
+      "policy": "all_expected",
+      "target_value": "Firebird",
+      "distractor_values": ["PostgreSQL", "SQLite", "MySQL", "MariaDB", "CockroachDB", "MongoDB", "Cassandra", "Redis"]
+    },
+    {
+      "case_id": "RS-N02",
+      "case_kind": "strong_challenge",
+      "challenge_family": "negated_value_decoys",
+      "domain": "location",
+      "scope_user_id": "probe-user-rs-n02",
+      "query": "Which library branch does the user use for weekend study?",
+      "target_memory": {"id": "rs-n02-target", "content": "The user uses Maple Street Branch for weekend study."},
+      "baseline_other_memories": [
+        {"id": "rs-n02-base-01", "content": "The user bakes rye rolls for family lunches."},
+        {"id": "rs-n02-base-02", "content": "The user owns a brass reading lamp."},
+        {"id": "rs-n02-base-03", "content": "The user follows a beginner rowing course."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-n02-dist-01", "content": "The user does not use Northgate Branch for weekend study."},
+        {"id": "rs-n02-dist-02", "content": "Riverbend Branch is not the library branch the user uses for weekend study."},
+        {"id": "rs-n02-dist-03", "content": "The user rejected Orchard Branch as a weekend study library branch."},
+        {"id": "rs-n02-dist-04", "content": "The user explicitly does not choose Central Arcade Branch for weekend study."},
+        {"id": "rs-n02-dist-05", "content": "Pine Hill Branch is not used by the user for weekend study."},
+        {"id": "rs-n02-dist-06", "content": "The user said East Wharf Branch is not the weekend study location."},
+        {"id": "rs-n02-dist-07", "content": "Crescent Branch is explicitly not the library branch for the user's weekend study."},
+        {"id": "rs-n02-dist-08", "content": "The user does not attend Meadow Lane Branch for weekend study."}
+      ],
+      "expected_memory_ids": ["rs-n02-target"],
+      "top_k": 3,
+      "policy": "all_expected",
+      "target_value": "Maple Street Branch",
+      "distractor_values": ["Northgate Branch", "Riverbend Branch", "Orchard Branch", "Central Arcade Branch", "Pine Hill Branch", "East Wharf Branch", "Crescent Branch", "Meadow Lane Branch"]
+    },
+    {
+      "case_id": "RS-N03",
+      "case_kind": "strong_challenge",
+      "challenge_family": "negated_value_decoys",
+      "domain": "location",
+      "scope_user_id": "probe-user-rs-n03",
+      "query": "Where does the user collect pottery supplies?",
+      "target_memory": {"id": "rs-n03-target", "content": "The user collects pottery supplies at Harbor Market."},
+      "baseline_other_memories": [
+        {"id": "rs-n03-base-01", "content": "The user keeps a spare blanket in the car."},
+        {"id": "rs-n03-base-02", "content": "The user reads biographies of polar explorers."},
+        {"id": "rs-n03-base-03", "content": "The user makes plum jam in late summer."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-n03-dist-01", "content": "The user does not collect pottery supplies at Clay Depot."},
+        {"id": "rs-n03-dist-02", "content": "Riverside Arcade is not where the user collects pottery supplies."},
+        {"id": "rs-n03-dist-03", "content": "The user rejected Kiln Corner as a place to collect pottery supplies."},
+        {"id": "rs-n03-dist-04", "content": "The user explicitly does not collect pottery supplies at Juniper Bazaar."},
+        {"id": "rs-n03-dist-05", "content": "Stoneware Square is not the user's pottery supplies collection point."},
+        {"id": "rs-n03-dist-06", "content": "The user said Market Annex is not where pottery supplies are collected."},
+        {"id": "rs-n03-dist-07", "content": "The user does not use Studio Row to collect pottery supplies."},
+        {"id": "rs-n03-dist-08", "content": "Canal Warehouse is explicitly not the pottery supplies location for the user."}
+      ],
+      "expected_memory_ids": ["rs-n03-target"],
+      "top_k": 3,
+      "policy": "all_expected",
+      "target_value": "Harbor Market",
+      "distractor_values": ["Clay Depot", "Riverside Arcade", "Kiln Corner", "Juniper Bazaar", "Stoneware Square", "Market Annex", "Studio Row", "Canal Warehouse"]
+    },
+    {
+      "case_id": "RS-N04",
+      "case_kind": "strong_challenge",
+      "challenge_family": "negated_value_decoys",
+      "domain": "schedule",
+      "scope_user_id": "probe-user-rs-n04",
+      "query": "When does the user schedule the weekly supplier call?",
+      "target_memory": {"id": "rs-n04-target", "content": "The user schedules the weekly supplier call for Thursday afternoons."},
+      "baseline_other_memories": [
+        {"id": "rs-n04-base-01", "content": "The user grows dwarf tomatoes in two pots."},
+        {"id": "rs-n04-base-02", "content": "The user donates old magazines to a clinic."},
+        {"id": "rs-n04-base-03", "content": "The user keeps a wooden puzzle on the coffee table."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-n04-dist-01", "content": "The user does not schedule the weekly supplier call for Monday mornings."},
+        {"id": "rs-n04-dist-02", "content": "Tuesday evenings are not when the user schedules the weekly supplier call."},
+        {"id": "rs-n04-dist-03", "content": "The user rejected Wednesday mornings for the weekly supplier call."},
+        {"id": "rs-n04-dist-04", "content": "The user explicitly does not schedule the weekly supplier call on Friday afternoons."},
+        {"id": "rs-n04-dist-05", "content": "Saturday mornings are not the user's weekly supplier call time."},
+        {"id": "rs-n04-dist-06", "content": "The user said Sunday evenings are not used for the weekly supplier call."},
+        {"id": "rs-n04-dist-07", "content": "The user does not hold the weekly supplier call on Thursday mornings."},
+        {"id": "rs-n04-dist-08", "content": "Friday evenings are explicitly not when the user schedules the weekly supplier call."}
+      ],
+      "expected_memory_ids": ["rs-n04-target"],
+      "top_k": 3,
+      "policy": "all_expected",
+      "target_value": "Thursday afternoons",
+      "distractor_values": ["Monday mornings", "Tuesday evenings", "Wednesday mornings", "Friday afternoons", "Saturday mornings", "Sunday evenings", "Thursday mornings", "Friday evenings"]
+    },
+    {
+      "case_id": "RS-N05",
+      "case_kind": "strong_challenge",
+      "challenge_family": "negated_value_decoys",
+      "domain": "device",
+      "scope_user_id": "probe-user-rs-n05",
+      "query": "Which phone does the user prefer for travel photography?",
+      "target_memory": {"id": "rs-n05-target", "content": "The user prefers the Pixel 9 phone for travel photography."},
+      "baseline_other_memories": [
+        {"id": "rs-n05-base-01", "content": "The user wears canvas shoes for garden work."},
+        {"id": "rs-n05-base-02", "content": "The user keeps dried apricots in a desk drawer."},
+        {"id": "rs-n05-base-03", "content": "The user borrows history audiobooks from a friend."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-n05-dist-01", "content": "The user does not prefer the iPhone 15 phone for travel photography."},
+        {"id": "rs-n05-dist-02", "content": "The Galaxy S24 is not the phone the user prefers for travel photography."},
+        {"id": "rs-n05-dist-03", "content": "The user rejected the Xperia 5 V as a travel photography phone."},
+        {"id": "rs-n05-dist-04", "content": "The user explicitly does not choose the OnePlus 12 phone for travel photography."},
+        {"id": "rs-n05-dist-05", "content": "The Fairphone 5 is not the user's preferred phone for travel photography."},
+        {"id": "rs-n05-dist-06", "content": "The user said the Nothing Phone 2 is not preferred for travel photography."},
+        {"id": "rs-n05-dist-07", "content": "The user does not use the Moto Edge 50 as the preferred travel photography phone."},
+        {"id": "rs-n05-dist-08", "content": "The Zenfone 10 is explicitly not the phone the user prefers for travel photography."}
+      ],
+      "expected_memory_ids": ["rs-n05-target"],
+      "top_k": 3,
+      "policy": "all_expected",
+      "target_value": "Pixel 9",
+      "distractor_values": ["iPhone 15", "Galaxy S24", "Xperia 5 V", "OnePlus 12", "Fairphone 5", "Nothing Phone 2", "Moto Edge 50", "Zenfone 10"]
+    },
+    {
+      "case_id": "RS-N06",
+      "case_kind": "strong_challenge",
+      "challenge_family": "negated_value_decoys",
+      "domain": "project_or_work",
+      "scope_user_id": "probe-user-rs-n06",
+      "query": "Which client account does the user lead for the accessibility review?",
+      "target_memory": {"id": "rs-n06-target", "content": "The user leads the Alder Clinic client account for the accessibility review."},
+      "baseline_other_memories": [
+        {"id": "rs-n06-base-01", "content": "The user stores camping pegs in a canvas pouch."},
+        {"id": "rs-n06-base-02", "content": "The user orders jasmine rice in bulk."},
+        {"id": "rs-n06-base-03", "content": "The user watches silent films during winter."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-n06-dist-01", "content": "The user does not lead the Birch Museum client account for the accessibility review."},
+        {"id": "rs-n06-dist-02", "content": "Cobalt School is not the client account the user leads for the accessibility review."},
+        {"id": "rs-n06-dist-03", "content": "The user rejected Delta Pharmacy as the accessibility review client account they lead."},
+        {"id": "rs-n06-dist-04", "content": "The user explicitly does not lead the Elm Theater client account for the accessibility review."},
+        {"id": "rs-n06-dist-05", "content": "Foxglove Bank is not the user's client account for the accessibility review."},
+        {"id": "rs-n06-dist-06", "content": "The user said Granite College is not the client account they lead for accessibility review."},
+        {"id": "rs-n06-dist-07", "content": "The user does not lead the Harbor Archive client account for the accessibility review."},
+        {"id": "rs-n06-dist-08", "content": "Iris Dental is explicitly not the accessibility review client account led by the user."}
+      ],
+      "expected_memory_ids": ["rs-n06-target"],
+      "top_k": 3,
+      "policy": "all_expected",
+      "target_value": "Alder Clinic",
+      "distractor_values": ["Birch Museum", "Cobalt School", "Delta Pharmacy", "Elm Theater", "Foxglove Bank", "Granite College", "Harbor Archive", "Iris Dental"]
+    },
+    {
+      "case_id": "RS-N07",
+      "case_kind": "strong_challenge",
+      "challenge_family": "negated_value_decoys",
+      "domain": "project_or_work",
+      "scope_user_id": "probe-user-rs-n07",
+      "query": "Which repository does the user maintain for quarterly invoices?",
+      "target_memory": {"id": "rs-n07-target", "content": "The user maintains the Quartz Ledger repository for quarterly invoices."},
+      "baseline_other_memories": [
+        {"id": "rs-n07-base-01", "content": "The user walks a neighbor's terrier on holidays."},
+        {"id": "rs-n07-base-02", "content": "The user owns a green enamel saucepan."},
+        {"id": "rs-n07-base-03", "content": "The user learns folk melodies on a recorder."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-n07-dist-01", "content": "The user does not maintain the Amber Books repository for quarterly invoices."},
+        {"id": "rs-n07-dist-02", "content": "Birch Billing is not the repository the user maintains for quarterly invoices."},
+        {"id": "rs-n07-dist-03", "content": "The user rejected Copper Receipts as the quarterly invoices repository they maintain."},
+        {"id": "rs-n07-dist-04", "content": "The user explicitly does not maintain the Drift Accounts repository for quarterly invoices."},
+        {"id": "rs-n07-dist-05", "content": "Ember Finance is not the user's maintained repository for quarterly invoices."},
+        {"id": "rs-n07-dist-06", "content": "The user said Finch Records is not the repository for quarterly invoices."},
+        {"id": "rs-n07-dist-07", "content": "The user does not maintain Granite Totals for quarterly invoices."},
+        {"id": "rs-n07-dist-08", "content": "Harbor Billing is explicitly not the quarterly invoices repository maintained by the user."}
+      ],
+      "expected_memory_ids": ["rs-n07-target"],
+      "top_k": 3,
+      "policy": "all_expected",
+      "target_value": "Quartz Ledger",
+      "distractor_values": ["Amber Books", "Birch Billing", "Copper Receipts", "Drift Accounts", "Ember Finance", "Finch Records", "Granite Totals", "Harbor Billing"]
+    },
+    {
+      "case_id": "RS-N08",
+      "case_kind": "strong_challenge",
+      "challenge_family": "negated_value_decoys",
+      "domain": "preference_or_subscription",
+      "scope_user_id": "probe-user-rs-n08",
+      "query": "Which tea subscription does the user prefer for seasonal green tea?",
+      "target_memory": {"id": "rs-n08-target", "content": "The user prefers the Verdant Parcel subscription for seasonal green tea."},
+      "baseline_other_memories": [
+        {"id": "rs-n08-base-01", "content": "The user keeps spare shoelaces in a travel tin."},
+        {"id": "rs-n08-base-02", "content": "The user visits an outdoor cinema each August."},
+        {"id": "rs-n08-base-03", "content": "The user paints small wooden birdhouses."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-n08-dist-01", "content": "The user does not prefer the Jade Crate subscription for seasonal green tea."},
+        {"id": "rs-n08-dist-02", "content": "Moss Leaf Club is not the tea subscription the user prefers for seasonal green tea."},
+        {"id": "rs-n08-dist-03", "content": "The user rejected Pine Cup Post as a seasonal green tea subscription."},
+        {"id": "rs-n08-dist-04", "content": "The user explicitly does not choose the River Tea Box subscription for seasonal green tea."},
+        {"id": "rs-n08-dist-05", "content": "Spring Kettle is not the user's preferred subscription for seasonal green tea."},
+        {"id": "rs-n08-dist-06", "content": "The user said Tea Grove Mail is not preferred for seasonal green tea."},
+        {"id": "rs-n08-dist-07", "content": "The user does not use the Willow Tin subscription for seasonal green tea."},
+        {"id": "rs-n08-dist-08", "content": "Zen Garden Tea is explicitly not the subscription the user prefers for seasonal green tea."}
+      ],
+      "expected_memory_ids": ["rs-n08-target"],
+      "top_k": 3,
+      "policy": "all_expected",
+      "target_value": "Verdant Parcel",
+      "distractor_values": ["Jade Crate", "Moss Leaf Club", "Pine Cup Post", "River Tea Box", "Spring Kettle", "Tea Grove Mail", "Willow Tin", "Zen Garden Tea"]
+    },
+    {
+      "case_id": "RS-C01",
+      "case_kind": "strong_challenge",
+      "challenge_family": "contextual_mention_decoys",
+      "domain": "software_tool",
+      "scope_user_id": "probe-user-rs-c01",
+      "query": "Which calendar app does the user use to coordinate volunteer shifts?",
+      "target_memory": {"id": "rs-c01-target", "content": "The user uses Morgen as the calendar app for coordinating volunteer shifts."},
+      "baseline_other_memories": [
+        {"id": "rs-c01-base-01", "content": "The user mends cotton shirts with white thread."},
+        {"id": "rs-c01-base-02", "content": "The user keeps dried bay leaves in a ceramic pot."},
+        {"id": "rs-c01-base-03", "content": "The user visits a lake trail after heavy rain."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-c01-dist-01", "content": "The user imported volunteer shift dates from an old Fantastical calendar app export."},
+        {"id": "rs-c01-dist-02", "content": "A Calendly calendar app link appears in the volunteer shift coordinator's archived email."},
+        {"id": "rs-c01-dist-03", "content": "The user compared BusyCal screenshots while documenting calendar app needs for volunteer shifts."},
+        {"id": "rs-c01-dist-04", "content": "A teammate demonstrated Proton Calendar during a meeting about volunteer shift coordination."},
+        {"id": "rs-c01-dist-05", "content": "The volunteer handbook mentions Google Calendar as an example rather than the user's calendar app."},
+        {"id": "rs-c01-dist-06", "content": "The user archived an Outlook Calendar trial note beside volunteer shift records."},
+        {"id": "rs-c01-dist-07", "content": "A Nextcloud Calendar migration proposal was declined during volunteer shift planning."},
+        {"id": "rs-c01-dist-08", "content": "The user recorded Apple Calendar limitations while defining volunteer shift calendar app requirements."}
+      ],
+      "expected_memory_ids": ["rs-c01-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-C02",
+      "case_kind": "strong_challenge",
+      "challenge_family": "contextual_mention_decoys",
+      "domain": "location",
+      "scope_user_id": "probe-user-rs-c02",
+      "query": "Where does the user meet the bicycle repair group?",
+      "target_memory": {"id": "rs-c02-target", "content": "The user meets the bicycle repair group at Beacon Yard."},
+      "baseline_other_memories": [
+        {"id": "rs-c02-base-01", "content": "The user buys sunflower seeds for a window feeder."},
+        {"id": "rs-c02-base-02", "content": "The user labels freezer containers with blue tape."},
+        {"id": "rs-c02-base-03", "content": "The user enjoys radio plays on long evenings."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-c02-dist-01", "content": "The bicycle repair group rejected Old Mill Courtyard because the user reported poor lighting."},
+        {"id": "rs-c02-dist-02", "content": "The user's route to the bicycle repair group passes the Copper Bridge plaza."},
+        {"id": "rs-c02-dist-03", "content": "A bicycle repair group flyer was collected by the user at North Market."},
+        {"id": "rs-c02-dist-04", "content": "The user discussed Harbor Steps as a former bicycle repair group venue."},
+        {"id": "rs-c02-dist-05", "content": "Rain plans for the bicycle repair group once considered Cedar Arcade."},
+        {"id": "rs-c02-dist-06", "content": "The user stores bicycle repair group tools near the South Station lockers."},
+        {"id": "rs-c02-dist-07", "content": "A map to Willow Square appears in an expired bicycle repair group notice."},
+        {"id": "rs-c02-dist-08", "content": "The user compared Quarry Hall rental fees during bicycle repair group planning."}
+      ],
+      "expected_memory_ids": ["rs-c02-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-C03",
+      "case_kind": "strong_challenge",
+      "challenge_family": "contextual_mention_decoys",
+      "domain": "schedule",
+      "scope_user_id": "probe-user-rs-c03",
+      "query": "When does the user attend the weekly ceramics class?",
+      "target_memory": {"id": "rs-c03-target", "content": "The user attends the weekly ceramics class on Tuesday at 18:30."},
+      "baseline_other_memories": [
+        {"id": "rs-c03-base-01", "content": "The user carries a compact sewing kit on trips."},
+        {"id": "rs-c03-base-02", "content": "The user grows parsley in a recycled tin."},
+        {"id": "rs-c03-base-03", "content": "The user reads local history beside the fireplace."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-c03-dist-01", "content": "The ceramics studio opens on Monday at 17:00 before another weekly class."},
+        {"id": "rs-c03-dist-02", "content": "The user considered a Wednesday 19:00 ceramics class before enrollment closed."},
+        {"id": "rs-c03-dist-03", "content": "A Thursday 18:30 workshop appears on the ceramics class noticeboard."},
+        {"id": "rs-c03-dist-04", "content": "The user collects weekly ceramics class materials after Friday noon deliveries."},
+        {"id": "rs-c03-dist-05", "content": "A Saturday 10:00 ceramics class is reserved for beginners, not the user."},
+        {"id": "rs-c03-dist-06", "content": "The weekly ceramics class calendar lists a Sunday 14:00 open studio."},
+        {"id": "rs-c03-dist-07", "content": "The user once attended a one-off ceramics lecture on Monday at 18:30."},
+        {"id": "rs-c03-dist-08", "content": "A canceled Wednesday 18:30 session remains in the old ceramics class calendar."}
+      ],
+      "expected_memory_ids": ["rs-c03-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-C04",
+      "case_kind": "strong_challenge",
+      "challenge_family": "contextual_mention_decoys",
+      "domain": "schedule",
+      "scope_user_id": "probe-user-rs-c04",
+      "query": "When does the user send the weekly inventory report?",
+      "target_memory": {"id": "rs-c04-target", "content": "The user sends the weekly inventory report on Friday at 16:00."},
+      "baseline_other_memories": [
+        {"id": "rs-c04-base-01", "content": "The user stores umbrellas in a brass stand."},
+        {"id": "rs-c04-base-02", "content": "The user makes apple compote without added sugar."},
+        {"id": "rs-c04-base-03", "content": "The user owns a field guide to coastal birds."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-c04-dist-01", "content": "The weekly inventory report template unlocks on Monday at 09:00."},
+        {"id": "rs-c04-dist-02", "content": "The user receives inventory report source data on Tuesday at 15:00."},
+        {"id": "rs-c04-dist-03", "content": "A Wednesday 12:00 reminder asks the user to review weekly inventory changes."},
+        {"id": "rs-c04-dist-04", "content": "The inventory report reviewer leaves comments on Thursday at 10:00."},
+        {"id": "rs-c04-dist-05", "content": "The user archives the prior weekly inventory report on Saturday at 11:00."},
+        {"id": "rs-c04-dist-06", "content": "A Sunday 17:00 dashboard refresh supplies inventory figures for the next report."},
+        {"id": "rs-c04-dist-07", "content": "The user canceled an obsolete Thursday 16:00 inventory report reminder."},
+        {"id": "rs-c04-dist-08", "content": "An old weekly report guide mentions Friday at 09:00 as a review checkpoint."}
+      ],
+      "expected_memory_ids": ["rs-c04-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-C05",
+      "case_kind": "strong_challenge",
+      "challenge_family": "contextual_mention_decoys",
+      "domain": "device",
+      "scope_user_id": "probe-user-rs-c05",
+      "query": "Which camera does the user carry for bird surveys?",
+      "target_memory": {"id": "rs-c05-target", "content": "The user carries an Olympus OM-D E-M10 IV camera for bird surveys."},
+      "baseline_other_memories": [
+        {"id": "rs-c05-base-01", "content": "The user buys wholegrain flour from a mill."},
+        {"id": "rs-c05-base-02", "content": "The user keeps a chess set in the guest room."},
+        {"id": "rs-c05-base-03", "content": "The user takes evening walks beside the canal."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-c05-dist-01", "content": "The user borrowed a Canon EOS R50 camera for one bird survey workshop."},
+        {"id": "rs-c05-dist-02", "content": "A Nikon Z fc camera appears in the bird survey equipment comparison."},
+        {"id": "rs-c05-dist-03", "content": "The user returned a Fujifilm X-S20 camera after a bird survey trial."},
+        {"id": "rs-c05-dist-04", "content": "A teammate carries a Sony Alpha 6400 camera during joint bird surveys."},
+        {"id": "rs-c05-dist-05", "content": "The user documented Panasonic G100 camera limitations for bird surveys."},
+        {"id": "rs-c05-dist-06", "content": "A Pentax K-70 camera was displayed at the bird survey training day."},
+        {"id": "rs-c05-dist-07", "content": "The user compared a Leica D-Lux 8 camera brochure before bird surveys."},
+        {"id": "rs-c05-dist-08", "content": "A borrowed Ricoh GR III camera lacked the lens reach needed for bird surveys."}
+      ],
+      "expected_memory_ids": ["rs-c05-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-C06",
+      "case_kind": "strong_challenge",
+      "challenge_family": "contextual_mention_decoys",
+      "domain": "project_or_work",
+      "scope_user_id": "probe-user-rs-c06",
+      "query": "Which initiative does the user manage for the municipal data catalog?",
+      "target_memory": {"id": "rs-c06-target", "content": "The user manages the Open Atlas initiative for the municipal data catalog."},
+      "baseline_other_memories": [
+        {"id": "rs-c06-base-01", "content": "The user stores dried beans in labeled jars."},
+        {"id": "rs-c06-base-02", "content": "The user keeps a bicycle pump under the stairs."},
+        {"id": "rs-c06-base-03", "content": "The user collects recordings of string quartets."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-c06-dist-01", "content": "The municipal data catalog inherited metadata from the retired Civic Index initiative."},
+        {"id": "rs-c06-dist-02", "content": "The user reviewed the Harbor Tables initiative as a municipal data catalog dependency."},
+        {"id": "rs-c06-dist-03", "content": "A vendor manages the City Lens initiative adjacent to the municipal data catalog."},
+        {"id": "rs-c06-dist-04", "content": "The municipal data catalog roadmap rejected the Metro Ledger initiative proposal."},
+        {"id": "rs-c06-dist-05", "content": "The user archived notes from the completed Public Grid initiative."},
+        {"id": "rs-c06-dist-06", "content": "The Northstar Records initiative supplies a reference format for the municipal data catalog."},
+        {"id": "rs-c06-dist-07", "content": "The user attended a demo of the Common Map initiative during catalog planning."},
+        {"id": "rs-c06-dist-08", "content": "A partner team owns the Clear Registry initiative mentioned in municipal data catalog minutes."}
+      ],
+      "expected_memory_ids": ["rs-c06-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-C07",
+      "case_kind": "strong_challenge",
+      "challenge_family": "contextual_mention_decoys",
+      "domain": "preference_or_subscription",
+      "scope_user_id": "probe-user-rs-c07",
+      "query": "Which meal-kit plan does the user subscribe to for weekday dinners?",
+      "target_memory": {"id": "rs-c07-target", "content": "The user subscribes to the Green Spoon Flex meal-kit plan for weekday dinners."},
+      "baseline_other_memories": [
+        {"id": "rs-c07-base-01", "content": "The user keeps a wool blanket on the reading chair."},
+        {"id": "rs-c07-base-02", "content": "The user buys tulip bulbs in early autumn."},
+        {"id": "rs-c07-base-03", "content": "The user practices calligraphy with brown ink."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-c07-dist-01", "content": "The user canceled a Fresh Fork Basic meal-kit plan before planning weekday dinners."},
+        {"id": "rs-c07-dist-02", "content": "A Harvest Tray trial supplied two weekday dinners and then expired."},
+        {"id": "rs-c07-dist-03", "content": "The user compared the Pantry Path plan while researching meal-kit portions."},
+        {"id": "rs-c07-dist-04", "content": "A friend recommended the Quick Ladle meal-kit plan for weekday dinners."},
+        {"id": "rs-c07-dist-05", "content": "The user rejected the Copper Apron plan because its weekday dinner menu was limited."},
+        {"id": "rs-c07-dist-06", "content": "An expired Blue Basket coupon remains in the user's meal-kit folder."},
+        {"id": "rs-c07-dist-07", "content": "The user read a review of the Garden Plate plan during weekday dinner planning."},
+        {"id": "rs-c07-dist-08", "content": "A sample Sunlit Supper box was a one-time gift, not the user's meal-kit subscription."}
+      ],
+      "expected_memory_ids": ["rs-c07-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-C08",
+      "case_kind": "strong_challenge",
+      "challenge_family": "contextual_mention_decoys",
+      "domain": "preference_or_subscription",
+      "scope_user_id": "probe-user-rs-c08",
+      "query": "Which podcast membership does the user keep for economics interviews?",
+      "target_memory": {"id": "rs-c08-target", "content": "The user keeps a Ledger Voices Plus podcast membership for economics interviews."},
+      "baseline_other_memories": [
+        {"id": "rs-c08-base-01", "content": "The user carries ginger sweets on ferry rides."},
+        {"id": "rs-c08-base-02", "content": "The user repairs picture frames with wood glue."},
+        {"id": "rs-c08-base-03", "content": "The user visits a small observatory in October."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-c08-dist-01", "content": "The user's Market Signals podcast membership trial expired after one economics interview."},
+        {"id": "rs-c08-dist-02", "content": "A friend shared a Civic Balance podcast episode containing economics interviews."},
+        {"id": "rs-c08-dist-03", "content": "The user canceled the Capital Notes membership before its economics interview season."},
+        {"id": "rs-c08-dist-04", "content": "An Open Margins podcast membership was a temporary conference benefit."},
+        {"id": "rs-c08-dist-05", "content": "The user compared Policy Room episodes while cataloging economics interviews."},
+        {"id": "rs-c08-dist-06", "content": "A gifted Trade Stories membership belongs to the user's colleague."},
+        {"id": "rs-c08-dist-07", "content": "The user rejected the Fiscal Forum podcast membership after a sample interview."},
+        {"id": "rs-c08-dist-08", "content": "An expired Macro Exchange login remains in the economics interview notes."}
+      ],
+      "expected_memory_ids": ["rs-c08-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-R01",
+      "case_kind": "resilience_control",
+      "challenge_family": "low_overlap_control",
+      "domain": "software_tool",
+      "scope_user_id": "probe-user-rs-r01",
+      "query": "Which password manager does the user use for personal logins?",
+      "target_memory": {"id": "rs-r01-target", "content": "The user uses KeePassXC as the password manager for personal logins."},
+      "baseline_other_memories": [
+        {"id": "rs-r01-base-01", "content": "The user buys sourdough bread on market days."},
+        {"id": "rs-r01-base-02", "content": "The user keeps spare candles in a kitchen drawer."},
+        {"id": "rs-r01-base-03", "content": "The user follows migratory geese near the reservoir."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-r01-dist-01", "content": "A navy raincoat hangs beside the entrance."},
+        {"id": "rs-r01-dist-02", "content": "Two basil plants grow on the balcony."},
+        {"id": "rs-r01-dist-03", "content": "The bicycle basket has a loose leather strap."},
+        {"id": "rs-r01-dist-04", "content": "A pottery class begins after the summer break."},
+        {"id": "rs-r01-dist-05", "content": "Dried figs are stored in the pantry."},
+        {"id": "rs-r01-dist-06", "content": "The hallway rug needs a nonslip backing."},
+        {"id": "rs-r01-dist-07", "content": "A cousin collects postcards from mountain towns."},
+        {"id": "rs-r01-dist-08", "content": "The garden shed contains a folding stool."}
+      ],
+      "expected_memory_ids": ["rs-r01-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-R02",
+      "case_kind": "resilience_control",
+      "challenge_family": "low_overlap_control",
+      "domain": "location",
+      "scope_user_id": "probe-user-rs-r02",
+      "query": "Where does the user practice indoor climbing?",
+      "target_memory": {"id": "rs-r02-target", "content": "The user practices indoor climbing at Granite Dock Gym."},
+      "baseline_other_memories": [
+        {"id": "rs-r02-base-01", "content": "The user brews chamomile tea before bedtime."},
+        {"id": "rs-r02-base-02", "content": "The user owns a small collection of sea charts."},
+        {"id": "rs-r02-base-03", "content": "The user repairs loose coat buttons on Sundays."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-r02-dist-01", "content": "A jar of red lentils sits on the middle shelf."},
+        {"id": "rs-r02-dist-02", "content": "The winter blanket has a geometric pattern."},
+        {"id": "rs-r02-dist-03", "content": "A radio documentary covers early aviation."},
+        {"id": "rs-r02-dist-04", "content": "The tomato seedlings need larger pots."},
+        {"id": "rs-r02-dist-05", "content": "An old camera bag is stored under the desk."},
+        {"id": "rs-r02-dist-06", "content": "Fresh pears arrive with the Thursday groceries."},
+        {"id": "rs-r02-dist-07", "content": "The linen cupboard has three empty baskets."},
+        {"id": "rs-r02-dist-08", "content": "A brass bookmark marks the current novel."}
+      ],
+      "expected_memory_ids": ["rs-r02-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-R03",
+      "case_kind": "resilience_control",
+      "challenge_family": "low_overlap_control",
+      "domain": "schedule",
+      "scope_user_id": "probe-user-rs-r03",
+      "query": "When does the user water the balcony herbs?",
+      "target_memory": {"id": "rs-r03-target", "content": "The user waters the balcony herbs on Wednesday before breakfast."},
+      "baseline_other_memories": [
+        {"id": "rs-r03-base-01", "content": "The user borrows detective stories from an aunt."},
+        {"id": "rs-r03-base-02", "content": "The user keeps a tool roll in the cellar."},
+        {"id": "rs-r03-base-03", "content": "The user prefers lemon zest in shortbread."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-r03-dist-01", "content": "A gray scarf is packed for the train journey."},
+        {"id": "rs-r03-dist-02", "content": "The pantry contains a sealed bag of barley."},
+        {"id": "rs-r03-dist-03", "content": "A wooden frame holds the landscape print."},
+        {"id": "rs-r03-dist-04", "content": "The spare room has a narrow writing desk."},
+        {"id": "rs-r03-dist-05", "content": "A museum ticket is tucked inside the guidebook."},
+        {"id": "rs-r03-dist-06", "content": "The blue bicycle needs a new rear reflector."},
+        {"id": "rs-r03-dist-07", "content": "Cinnamon sticks are kept beside the flour."},
+        {"id": "rs-r03-dist-08", "content": "The record shelf is arranged by composer."}
+      ],
+      "expected_memory_ids": ["rs-r03-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-R04",
+      "case_kind": "resilience_control",
+      "challenge_family": "low_overlap_control",
+      "domain": "device",
+      "scope_user_id": "probe-user-rs-r04",
+      "query": "Which e-reader does the user take on train trips?",
+      "target_memory": {"id": "rs-r04-target", "content": "The user takes a Kobo Clara Colour e-reader on train trips."},
+      "baseline_other_memories": [
+        {"id": "rs-r04-base-01", "content": "The user grows mint in a window box."},
+        {"id": "rs-r04-base-02", "content": "The user orders vegetable dumplings on Fridays."},
+        {"id": "rs-r04-base-03", "content": "The user stores sketchbooks in a flat drawer."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-r04-dist-01", "content": "A cast-iron pan rests on the lower rack."},
+        {"id": "rs-r04-dist-02", "content": "The allotment gate needs a fresh coat of paint."},
+        {"id": "rs-r04-dist-03", "content": "A wool cap is drying beside the radiator."},
+        {"id": "rs-r04-dist-04", "content": "The recipe folder contains a page about apricots."},
+        {"id": "rs-r04-dist-05", "content": "A concert poster is framed in the hallway."},
+        {"id": "rs-r04-dist-06", "content": "The picnic basket includes two enamel cups."},
+        {"id": "rs-r04-dist-07", "content": "An astronomy map covers the northern sky."},
+        {"id": "rs-r04-dist-08", "content": "The shoe cupboard holds a spare umbrella."}
+      ],
+      "expected_memory_ids": ["rs-r04-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-R05",
+      "case_kind": "resilience_control",
+      "challenge_family": "low_overlap_control",
+      "domain": "project_or_work",
+      "scope_user_id": "probe-user-rs-r05",
+      "query": "Which research project does the user coordinate this quarter?",
+      "target_memory": {"id": "rs-r05-target", "content": "The user coordinates Project Saffron research this quarter."},
+      "baseline_other_memories": [
+        {"id": "rs-r05-base-01", "content": "The user freezes blueberries in small containers."},
+        {"id": "rs-r05-base-02", "content": "The user owns a paperback atlas of rivers."},
+        {"id": "rs-r05-base-03", "content": "The user wears rubber boots in the garden."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-r05-dist-01", "content": "A ceramic bowl sits beside the fruit basket."},
+        {"id": "rs-r05-dist-02", "content": "The stairwell window faces a chestnut tree."},
+        {"id": "rs-r05-dist-03", "content": "A linen apron hangs behind the pantry door."},
+        {"id": "rs-r05-dist-04", "content": "The local cinema screens classic comedies."},
+        {"id": "rs-r05-dist-05", "content": "Three seed packets remain in the garden box."},
+        {"id": "rs-r05-dist-06", "content": "A cork mat protects the dining table."},
+        {"id": "rs-r05-dist-07", "content": "The hiking flask has a dent near its base."},
+        {"id": "rs-r05-dist-08", "content": "A library receipt marks the return date."}
+      ],
+      "expected_memory_ids": ["rs-r05-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    },
+    {
+      "case_id": "RS-R06",
+      "case_kind": "resilience_control",
+      "challenge_family": "low_overlap_control",
+      "domain": "preference_or_subscription",
+      "scope_user_id": "probe-user-rs-r06",
+      "query": "Which coffee subscription does the user renew?",
+      "target_memory": {"id": "rs-r06-target", "content": "The user renews the North Star Roasters monthly coffee subscription."},
+      "baseline_other_memories": [
+        {"id": "rs-r06-base-01", "content": "The user stores watercolor paper in a portfolio."},
+        {"id": "rs-r06-base-02", "content": "The user walks beside the river at dawn."},
+        {"id": "rs-r06-base-03", "content": "The user buys hazelnuts for holiday baking."}
+      ],
+      "distractor_memories": [
+        {"id": "rs-r06-dist-01", "content": "A green watering can stands near the shed."},
+        {"id": "rs-r06-dist-02", "content": "The wool cushions need new inner covers."},
+        {"id": "rs-r06-dist-03", "content": "A ferry timetable is pinned to the noticeboard."},
+        {"id": "rs-r06-dist-04", "content": "The pantry shelf holds two jars of chickpeas."},
+        {"id": "rs-r06-dist-05", "content": "A carved wooden bird rests on the bookcase."},
+        {"id": "rs-r06-dist-06", "content": "The spare key has a yellow fabric tag."},
+        {"id": "rs-r06-dist-07", "content": "A gardening magazine lies beside the armchair."},
+        {"id": "rs-r06-dist-08", "content": "The travel pouch contains a compact comb."}
+      ],
+      "expected_memory_ids": ["rs-r06-target"],
+      "top_k": 3,
+      "policy": "all_expected"
+    }
+  ]
+}
