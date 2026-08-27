@@ -476,3 +476,35 @@ unavailable, ambiguous, or conflicting input. Under the preregistered promotion 
 contract and regression tests establish `OPTIONAL_EXPLICIT_API_READY`, not `DEFAULT_READY`. The
 candidate remains nonpublic, non-CLI, and nondefault; real production binding prevalence remains
 unknown.
+
+## Strong retrieval-shadowing development probe
+
+The controlled benchmark v0.1 retrieval challenge was too weak to test H4 meaningfully. All 12
+paired cases were baseline-eligible, but none produced induced shadowing: every target remained at
+rank one before and after the three fixed editor distractors were added. That negative challenge
+result does not show that retrieval shadowing is absent; it shows that the frozen v0.1 mutation did
+not stress the experimental lexical retriever.
+
+Part 6H-A therefore preregisters a separate development probe with 30 entirely new synthetic cases:
+24 strong challenges and six low-overlap resilience controls. The strong cases are divided equally
+among query-term crowding, explicitly negated competing-value decoys, and non-answer contextual
+mentions. Every case has one target plus three baseline non-target memories, then exactly eight
+frozen distractors. The six domains are balanced with four strong cases and one control each.
+
+The retriever remains the byte-frozen evaluation-only `experimental_lexical` version `0.1`, using
+its existing tokenizer, BM25 formula, score handling, and tie order. Every case fixes `top_k=3`, one
+expected target, and `ALL_EXPECTED`; no retrieval or BM25 setting is exposed for tuning. The fixture
+is frozen by byte SHA before any retrieval observation. Part 6H-A uses only structural validation,
+manual semantic review, independent regex-token overlap descriptions, and fake hit observations for
+gate arithmetic. It observes no BM25 scores, target ranks, or real retrieval outputs.
+
+Part 6H-B may execute the frozen runner once. The preregistered strong baseline-eligibility gate is
+at least 20/24. Among eligible strong cases, the shadowing gate requires at least eight induced
+cases and at least a 40% induced rate; induced cases must span at least two of the three strong
+families. Controls require at least 5/6 eligible and at most one induced case. The only final labels
+are `SUPPORTS_H4`, `DOES_NOT_SUPPORT_H4`, and `INCONCLUSIVE_BASELINE_CONSTRUCTION`.
+
+This probe is development-only, not a held-out final benchmark or a production prevalence study.
+Even `SUPPORTS_H4` would establish only susceptibility of this frozen lexical retriever under the
+preregistered synthetic challenge. It would not establish that BM25 is generally poor, that other
+memory retrievers share the behavior, or that the induced rate estimates real-world prevalence.

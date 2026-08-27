@@ -193,6 +193,26 @@ base and corresponding mutated store snapshots. Part 5A observations are not yet
 bound to complete store contents; an outer controlled-evaluation harness may check mutation and store
 digests later without changing this frozen paired contract.
 
+## Strong synthetic development challenge
+
+Part 6H-A adds an evaluation-only preregistration that reuses this paired contract without changing
+it. The frozen development fixture has 24 strong cases split equally across query-term crowding,
+negated competing-value decoys, and contextual non-answer mentions, plus six low-overlap controls.
+Every baseline contains one declared target and three non-target memories; the mutated store adds
+exactly eight same-scope distractors. One target in the top three under `ALL_EXPECTED` is sufficient.
+
+The future runner is fixed to the existing `experimental_lexical` version `0.1`. It offers no
+retriever choice, top-k override, policy override, tokenizer option, BM25 parameter, stop-word list,
+stemming, query rewriting, or boost. It must verify the fixture bytes, identity, counts, family and
+domain balance, and condition before constructing the retriever. Runtime observations are then
+converted by `assess_paired_retrieval_challenge`, preserving only `induced_shadowing`, `resilient`,
+and `baseline_insufficient`.
+
+Part 6H-A does not execute that runner or inspect real retrieval output. Simple overlap descriptions
+use a separately implemented lowercase `[A-Za-z0-9]+` tokenizer and are not BM25 calculations. The
+probe is synthetic development evidence only; its future induced-shadowing rate is not a production
+prevalence estimate.
+
 ## Part 2 isolation
 
 Part 2 retrieval challenges are evaluation artifacts. Their mutation `RetrievalProbe` declares a
