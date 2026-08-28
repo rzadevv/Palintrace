@@ -1,0 +1,2516 @@
+{
+  "schema_version": "0.1",
+  "probe_id": "retrieval-negation-confirmatory-v0.1",
+  "hypothesis_id": "H4-N",
+  "split": "fresh_confirmatory_development",
+  "retriever": {
+    "kind": "experimental_lexical",
+    "version": "0.1",
+    "top_k": 3,
+    "policy": "all_expected"
+  },
+  "scenarios": [
+    {
+      "scenario_id": "H4N-01",
+      "domain": "software_tool",
+      "scope_user_id": "confirmatory-user-h4n-01",
+      "query": "Which issue tracker does the user rely on for volunteer release work?",
+      "target_value": "CedarTrack",
+      "target_memory": {
+        "id": "h4n-01-target",
+        "content": "The user relies on CedarTrack as the issue tracker for volunteer release work."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-01-base-01",
+          "content": "The user keeps a brass bookmark near the orchard gate."
+        },
+        {
+          "id": "h4n-01-base-02",
+          "content": "The user sketches cloud patterns beside the orchard gate."
+        },
+        {
+          "id": "h4n-01-base-03",
+          "content": "The user packs dried apricots for walks past the orchard gate."
+        }
+      ],
+      "competing_values": [
+        "BirchBoard",
+        "Cobalt Queue",
+        "Drift Tickets",
+        "Ember Desk",
+        "Fable Issues",
+        "Granite Flow",
+        "Harbor Tasks",
+        "Indigo Queue"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-01-neg-01",
+            "content": "For volunteer release work, the user's record says BirchBoard is not the selected issue tracker."
+          },
+          {
+            "id": "h4n-01-neg-02",
+            "content": "For volunteer release work, the user's record says Cobalt Queue is not the selected issue tracker."
+          },
+          {
+            "id": "h4n-01-neg-03",
+            "content": "For volunteer release work, the user's record says Drift Tickets is not the selected issue tracker."
+          },
+          {
+            "id": "h4n-01-neg-04",
+            "content": "For volunteer release work, the user's record says Ember Desk is not the selected issue tracker."
+          },
+          {
+            "id": "h4n-01-neg-05",
+            "content": "For volunteer release work, the user's record says Fable Issues is not the selected issue tracker."
+          },
+          {
+            "id": "h4n-01-neg-06",
+            "content": "For volunteer release work, the user's record says Granite Flow is not the selected issue tracker."
+          },
+          {
+            "id": "h4n-01-neg-07",
+            "content": "For volunteer release work, the user's record says Harbor Tasks is not the selected issue tracker."
+          },
+          {
+            "id": "h4n-01-neg-08",
+            "content": "For volunteer release work, the user's record says Indigo Queue is not the selected issue tracker."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-01-ctx-01",
+            "content": "For volunteer release work, the user's record compares BirchBoard as a possible issue tracker."
+          },
+          {
+            "id": "h4n-01-ctx-02",
+            "content": "For volunteer release work, the user's record compares Cobalt Queue as a possible issue tracker."
+          },
+          {
+            "id": "h4n-01-ctx-03",
+            "content": "For volunteer release work, the user's record compares Drift Tickets as a possible issue tracker."
+          },
+          {
+            "id": "h4n-01-ctx-04",
+            "content": "For volunteer release work, the user's record compares Ember Desk as a possible issue tracker."
+          },
+          {
+            "id": "h4n-01-ctx-05",
+            "content": "For volunteer release work, the user's record compares Fable Issues as a possible issue tracker."
+          },
+          {
+            "id": "h4n-01-ctx-06",
+            "content": "For volunteer release work, the user's record compares Granite Flow as a possible issue tracker."
+          },
+          {
+            "id": "h4n-01-ctx-07",
+            "content": "For volunteer release work, the user's record compares Harbor Tasks as a possible issue tracker."
+          },
+          {
+            "id": "h4n-01-ctx-08",
+            "content": "For volunteer release work, the user's record compares Indigo Queue as a possible issue tracker."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-01-low-01",
+            "content": "A linen apron rests beside the orchard gate."
+          },
+          {
+            "id": "h4n-01-low-02",
+            "content": "A ceramic pitcher rests beside the orchard gate."
+          },
+          {
+            "id": "h4n-01-low-03",
+            "content": "A brass compass rests beside the orchard gate."
+          },
+          {
+            "id": "h4n-01-low-04",
+            "content": "A paper lantern rests beside the orchard gate."
+          },
+          {
+            "id": "h4n-01-low-05",
+            "content": "A wool blanket rests beside the orchard gate."
+          },
+          {
+            "id": "h4n-01-low-06",
+            "content": "A silver thimble rests beside the orchard gate."
+          },
+          {
+            "id": "h4n-01-low-07",
+            "content": "A wooden mallet rests beside the orchard gate."
+          },
+          {
+            "id": "h4n-01-low-08",
+            "content": "A glass marble rests beside the orchard gate."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-02",
+      "domain": "software_tool",
+      "scope_user_id": "confirmatory-user-h4n-02",
+      "query": "Which diagram editor does the user use for network planning?",
+      "target_value": "VectorNest",
+      "target_memory": {
+        "id": "h4n-02-target",
+        "content": "The user uses VectorNest as the diagram editor for network planning."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-02-base-01",
+          "content": "The user keeps a brass bookmark near the pantry window."
+        },
+        {
+          "id": "h4n-02-base-02",
+          "content": "The user sketches cloud patterns beside the pantry window."
+        },
+        {
+          "id": "h4n-02-base-03",
+          "content": "The user packs dried apricots for walks past the pantry window."
+        }
+      ],
+      "competing_values": [
+        "ArcSketch",
+        "Blueprint Fox",
+        "Circuit Canvas",
+        "Draft Harbor",
+        "Graph Loom",
+        "Ink Vector",
+        "Maple Diagram",
+        "Node Atelier"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-02-neg-01",
+            "content": "For network planning, the user's record says ArcSketch is not the selected diagram editor."
+          },
+          {
+            "id": "h4n-02-neg-02",
+            "content": "For network planning, the user's record says Blueprint Fox is not the selected diagram editor."
+          },
+          {
+            "id": "h4n-02-neg-03",
+            "content": "For network planning, the user's record says Circuit Canvas is not the selected diagram editor."
+          },
+          {
+            "id": "h4n-02-neg-04",
+            "content": "For network planning, the user's record says Draft Harbor is not the selected diagram editor."
+          },
+          {
+            "id": "h4n-02-neg-05",
+            "content": "For network planning, the user's record says Graph Loom is not the selected diagram editor."
+          },
+          {
+            "id": "h4n-02-neg-06",
+            "content": "For network planning, the user's record says Ink Vector is not the selected diagram editor."
+          },
+          {
+            "id": "h4n-02-neg-07",
+            "content": "For network planning, the user's record says Maple Diagram is not the selected diagram editor."
+          },
+          {
+            "id": "h4n-02-neg-08",
+            "content": "For network planning, the user's record says Node Atelier is not the selected diagram editor."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-02-ctx-01",
+            "content": "For network planning, the user's record compares ArcSketch as a possible diagram editor."
+          },
+          {
+            "id": "h4n-02-ctx-02",
+            "content": "For network planning, the user's record compares Blueprint Fox as a possible diagram editor."
+          },
+          {
+            "id": "h4n-02-ctx-03",
+            "content": "For network planning, the user's record compares Circuit Canvas as a possible diagram editor."
+          },
+          {
+            "id": "h4n-02-ctx-04",
+            "content": "For network planning, the user's record compares Draft Harbor as a possible diagram editor."
+          },
+          {
+            "id": "h4n-02-ctx-05",
+            "content": "For network planning, the user's record compares Graph Loom as a possible diagram editor."
+          },
+          {
+            "id": "h4n-02-ctx-06",
+            "content": "For network planning, the user's record compares Ink Vector as a possible diagram editor."
+          },
+          {
+            "id": "h4n-02-ctx-07",
+            "content": "For network planning, the user's record compares Maple Diagram as a possible diagram editor."
+          },
+          {
+            "id": "h4n-02-ctx-08",
+            "content": "For network planning, the user's record compares Node Atelier as a possible diagram editor."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-02-low-01",
+            "content": "A linen apron rests beside the pantry window."
+          },
+          {
+            "id": "h4n-02-low-02",
+            "content": "A ceramic pitcher rests beside the pantry window."
+          },
+          {
+            "id": "h4n-02-low-03",
+            "content": "A brass compass rests beside the pantry window."
+          },
+          {
+            "id": "h4n-02-low-04",
+            "content": "A paper lantern rests beside the pantry window."
+          },
+          {
+            "id": "h4n-02-low-05",
+            "content": "A wool blanket rests beside the pantry window."
+          },
+          {
+            "id": "h4n-02-low-06",
+            "content": "A silver thimble rests beside the pantry window."
+          },
+          {
+            "id": "h4n-02-low-07",
+            "content": "A wooden mallet rests beside the pantry window."
+          },
+          {
+            "id": "h4n-02-low-08",
+            "content": "A glass marble rests beside the pantry window."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-03",
+      "domain": "software_tool",
+      "scope_user_id": "confirmatory-user-h4n-03",
+      "query": "Which package registry does the user use for internal libraries?",
+      "target_value": "ParcelShelf",
+      "target_memory": {
+        "id": "h4n-03-target",
+        "content": "The user uses ParcelShelf as the package registry for internal libraries."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-03-base-01",
+          "content": "The user keeps a brass bookmark near the garden wall."
+        },
+        {
+          "id": "h4n-03-base-02",
+          "content": "The user sketches cloud patterns beside the garden wall."
+        },
+        {
+          "id": "h4n-03-base-03",
+          "content": "The user packs dried apricots for walks past the garden wall."
+        }
+      ],
+      "competing_values": [
+        "Artifact Bay",
+        "Bundle Grove",
+        "Crate Harbor",
+        "Depot Nest",
+        "Library Dock",
+        "Module Pantry",
+        "Package Orchard",
+        "Registry Vale"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-03-neg-01",
+            "content": "For internal libraries, the user's record says Artifact Bay is not the selected package registry."
+          },
+          {
+            "id": "h4n-03-neg-02",
+            "content": "For internal libraries, the user's record says Bundle Grove is not the selected package registry."
+          },
+          {
+            "id": "h4n-03-neg-03",
+            "content": "For internal libraries, the user's record says Crate Harbor is not the selected package registry."
+          },
+          {
+            "id": "h4n-03-neg-04",
+            "content": "For internal libraries, the user's record says Depot Nest is not the selected package registry."
+          },
+          {
+            "id": "h4n-03-neg-05",
+            "content": "For internal libraries, the user's record says Library Dock is not the selected package registry."
+          },
+          {
+            "id": "h4n-03-neg-06",
+            "content": "For internal libraries, the user's record says Module Pantry is not the selected package registry."
+          },
+          {
+            "id": "h4n-03-neg-07",
+            "content": "For internal libraries, the user's record says Package Orchard is not the selected package registry."
+          },
+          {
+            "id": "h4n-03-neg-08",
+            "content": "For internal libraries, the user's record says Registry Vale is not the selected package registry."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-03-ctx-01",
+            "content": "For internal libraries, the user's record compares Artifact Bay as a possible package registry."
+          },
+          {
+            "id": "h4n-03-ctx-02",
+            "content": "For internal libraries, the user's record compares Bundle Grove as a possible package registry."
+          },
+          {
+            "id": "h4n-03-ctx-03",
+            "content": "For internal libraries, the user's record compares Crate Harbor as a possible package registry."
+          },
+          {
+            "id": "h4n-03-ctx-04",
+            "content": "For internal libraries, the user's record compares Depot Nest as a possible package registry."
+          },
+          {
+            "id": "h4n-03-ctx-05",
+            "content": "For internal libraries, the user's record compares Library Dock as a possible package registry."
+          },
+          {
+            "id": "h4n-03-ctx-06",
+            "content": "For internal libraries, the user's record compares Module Pantry as a possible package registry."
+          },
+          {
+            "id": "h4n-03-ctx-07",
+            "content": "For internal libraries, the user's record compares Package Orchard as a possible package registry."
+          },
+          {
+            "id": "h4n-03-ctx-08",
+            "content": "For internal libraries, the user's record compares Registry Vale as a possible package registry."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-03-low-01",
+            "content": "A linen apron rests beside the garden wall."
+          },
+          {
+            "id": "h4n-03-low-02",
+            "content": "A ceramic pitcher rests beside the garden wall."
+          },
+          {
+            "id": "h4n-03-low-03",
+            "content": "A brass compass rests beside the garden wall."
+          },
+          {
+            "id": "h4n-03-low-04",
+            "content": "A paper lantern rests beside the garden wall."
+          },
+          {
+            "id": "h4n-03-low-05",
+            "content": "A wool blanket rests beside the garden wall."
+          },
+          {
+            "id": "h4n-03-low-06",
+            "content": "A silver thimble rests beside the garden wall."
+          },
+          {
+            "id": "h4n-03-low-07",
+            "content": "A wooden mallet rests beside the garden wall."
+          },
+          {
+            "id": "h4n-03-low-08",
+            "content": "A glass marble rests beside the garden wall."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-04",
+      "domain": "location",
+      "scope_user_id": "confirmatory-user-h4n-04",
+      "query": "Which studio does the user visit for Saturday printmaking?",
+      "target_value": "Lantern Yard Studio",
+      "target_memory": {
+        "id": "h4n-04-target",
+        "content": "The user visits Lantern Yard Studio for Saturday printmaking."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-04-base-01",
+          "content": "The user keeps a brass bookmark near the meadow fence."
+        },
+        {
+          "id": "h4n-04-base-02",
+          "content": "The user sketches cloud patterns beside the meadow fence."
+        },
+        {
+          "id": "h4n-04-base-03",
+          "content": "The user packs dried apricots for walks past the meadow fence."
+        }
+      ],
+      "competing_values": [
+        "Amber Loft Studio",
+        "Bramble Press Room",
+        "Copper Finch Studio",
+        "Dahlia Works",
+        "Elm Print Loft",
+        "Foundry Lane Studio",
+        "Garnet Press Hall",
+        "Juniper Ink Room"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-04-neg-01",
+            "content": "For Saturday printmaking, the user's record says Amber Loft Studio is not the selected printmaking studio."
+          },
+          {
+            "id": "h4n-04-neg-02",
+            "content": "For Saturday printmaking, the user's record says Bramble Press Room is not the selected printmaking studio."
+          },
+          {
+            "id": "h4n-04-neg-03",
+            "content": "For Saturday printmaking, the user's record says Copper Finch Studio is not the selected printmaking studio."
+          },
+          {
+            "id": "h4n-04-neg-04",
+            "content": "For Saturday printmaking, the user's record says Dahlia Works is not the selected printmaking studio."
+          },
+          {
+            "id": "h4n-04-neg-05",
+            "content": "For Saturday printmaking, the user's record says Elm Print Loft is not the selected printmaking studio."
+          },
+          {
+            "id": "h4n-04-neg-06",
+            "content": "For Saturday printmaking, the user's record says Foundry Lane Studio is not the selected printmaking studio."
+          },
+          {
+            "id": "h4n-04-neg-07",
+            "content": "For Saturday printmaking, the user's record says Garnet Press Hall is not the selected printmaking studio."
+          },
+          {
+            "id": "h4n-04-neg-08",
+            "content": "For Saturday printmaking, the user's record says Juniper Ink Room is not the selected printmaking studio."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-04-ctx-01",
+            "content": "For Saturday printmaking, the user's record compares Amber Loft Studio as a possible printmaking studio."
+          },
+          {
+            "id": "h4n-04-ctx-02",
+            "content": "For Saturday printmaking, the user's record compares Bramble Press Room as a possible printmaking studio."
+          },
+          {
+            "id": "h4n-04-ctx-03",
+            "content": "For Saturday printmaking, the user's record compares Copper Finch Studio as a possible printmaking studio."
+          },
+          {
+            "id": "h4n-04-ctx-04",
+            "content": "For Saturday printmaking, the user's record compares Dahlia Works as a possible printmaking studio."
+          },
+          {
+            "id": "h4n-04-ctx-05",
+            "content": "For Saturday printmaking, the user's record compares Elm Print Loft as a possible printmaking studio."
+          },
+          {
+            "id": "h4n-04-ctx-06",
+            "content": "For Saturday printmaking, the user's record compares Foundry Lane Studio as a possible printmaking studio."
+          },
+          {
+            "id": "h4n-04-ctx-07",
+            "content": "For Saturday printmaking, the user's record compares Garnet Press Hall as a possible printmaking studio."
+          },
+          {
+            "id": "h4n-04-ctx-08",
+            "content": "For Saturday printmaking, the user's record compares Juniper Ink Room as a possible printmaking studio."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-04-low-01",
+            "content": "A linen apron rests beside the meadow fence."
+          },
+          {
+            "id": "h4n-04-low-02",
+            "content": "A ceramic pitcher rests beside the meadow fence."
+          },
+          {
+            "id": "h4n-04-low-03",
+            "content": "A brass compass rests beside the meadow fence."
+          },
+          {
+            "id": "h4n-04-low-04",
+            "content": "A paper lantern rests beside the meadow fence."
+          },
+          {
+            "id": "h4n-04-low-05",
+            "content": "A wool blanket rests beside the meadow fence."
+          },
+          {
+            "id": "h4n-04-low-06",
+            "content": "A silver thimble rests beside the meadow fence."
+          },
+          {
+            "id": "h4n-04-low-07",
+            "content": "A wooden mallet rests beside the meadow fence."
+          },
+          {
+            "id": "h4n-04-low-08",
+            "content": "A glass marble rests beside the meadow fence."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-05",
+      "domain": "location",
+      "scope_user_id": "confirmatory-user-h4n-05",
+      "query": "Which pier does the user use for the morning ferry?",
+      "target_value": "Willow Quay",
+      "target_memory": {
+        "id": "h4n-05-target",
+        "content": "The user uses Willow Quay as the pier for the morning ferry."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-05-base-01",
+          "content": "The user keeps a brass bookmark near the attic trunk."
+        },
+        {
+          "id": "h4n-05-base-02",
+          "content": "The user sketches cloud patterns beside the attic trunk."
+        },
+        {
+          "id": "h4n-05-base-03",
+          "content": "The user packs dried apricots for walks past the attic trunk."
+        }
+      ],
+      "competing_values": [
+        "Beacon Pier",
+        "Clover Jetty",
+        "Dawn Quay",
+        "Estuary Landing",
+        "Flint Wharf",
+        "Gull Point Pier",
+        "Heron Dock",
+        "Ivory Landing"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-05-neg-01",
+            "content": "For morning ferry, the user's record says Beacon Pier is not the selected ferry pier."
+          },
+          {
+            "id": "h4n-05-neg-02",
+            "content": "For morning ferry, the user's record says Clover Jetty is not the selected ferry pier."
+          },
+          {
+            "id": "h4n-05-neg-03",
+            "content": "For morning ferry, the user's record says Dawn Quay is not the selected ferry pier."
+          },
+          {
+            "id": "h4n-05-neg-04",
+            "content": "For morning ferry, the user's record says Estuary Landing is not the selected ferry pier."
+          },
+          {
+            "id": "h4n-05-neg-05",
+            "content": "For morning ferry, the user's record says Flint Wharf is not the selected ferry pier."
+          },
+          {
+            "id": "h4n-05-neg-06",
+            "content": "For morning ferry, the user's record says Gull Point Pier is not the selected ferry pier."
+          },
+          {
+            "id": "h4n-05-neg-07",
+            "content": "For morning ferry, the user's record says Heron Dock is not the selected ferry pier."
+          },
+          {
+            "id": "h4n-05-neg-08",
+            "content": "For morning ferry, the user's record says Ivory Landing is not the selected ferry pier."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-05-ctx-01",
+            "content": "For morning ferry, the user's record compares Beacon Pier as a possible ferry pier."
+          },
+          {
+            "id": "h4n-05-ctx-02",
+            "content": "For morning ferry, the user's record compares Clover Jetty as a possible ferry pier."
+          },
+          {
+            "id": "h4n-05-ctx-03",
+            "content": "For morning ferry, the user's record compares Dawn Quay as a possible ferry pier."
+          },
+          {
+            "id": "h4n-05-ctx-04",
+            "content": "For morning ferry, the user's record compares Estuary Landing as a possible ferry pier."
+          },
+          {
+            "id": "h4n-05-ctx-05",
+            "content": "For morning ferry, the user's record compares Flint Wharf as a possible ferry pier."
+          },
+          {
+            "id": "h4n-05-ctx-06",
+            "content": "For morning ferry, the user's record compares Gull Point Pier as a possible ferry pier."
+          },
+          {
+            "id": "h4n-05-ctx-07",
+            "content": "For morning ferry, the user's record compares Heron Dock as a possible ferry pier."
+          },
+          {
+            "id": "h4n-05-ctx-08",
+            "content": "For morning ferry, the user's record compares Ivory Landing as a possible ferry pier."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-05-low-01",
+            "content": "A linen apron rests beside the attic trunk."
+          },
+          {
+            "id": "h4n-05-low-02",
+            "content": "A ceramic pitcher rests beside the attic trunk."
+          },
+          {
+            "id": "h4n-05-low-03",
+            "content": "A brass compass rests beside the attic trunk."
+          },
+          {
+            "id": "h4n-05-low-04",
+            "content": "A paper lantern rests beside the attic trunk."
+          },
+          {
+            "id": "h4n-05-low-05",
+            "content": "A wool blanket rests beside the attic trunk."
+          },
+          {
+            "id": "h4n-05-low-06",
+            "content": "A silver thimble rests beside the attic trunk."
+          },
+          {
+            "id": "h4n-05-low-07",
+            "content": "A wooden mallet rests beside the attic trunk."
+          },
+          {
+            "id": "h4n-05-low-08",
+            "content": "A glass marble rests beside the attic trunk."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-06",
+      "domain": "location",
+      "scope_user_id": "confirmatory-user-h4n-06",
+      "query": "Which hall does the user attend for the monthly choir rehearsal?",
+      "target_value": "Mosaic Hall",
+      "target_memory": {
+        "id": "h4n-06-target",
+        "content": "The user attends Mosaic Hall for the monthly choir rehearsal."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-06-base-01",
+          "content": "The user keeps a brass bookmark near the riverside path."
+        },
+        {
+          "id": "h4n-06-base-02",
+          "content": "The user sketches cloud patterns beside the riverside path."
+        },
+        {
+          "id": "h4n-06-base-03",
+          "content": "The user packs dried apricots for walks past the riverside path."
+        }
+      ],
+      "competing_values": [
+        "Acorn Assembly Hall",
+        "Bellflower Room",
+        "Crescent Music Hall",
+        "Dovecote Chamber",
+        "Evergreen Salon",
+        "Foxglove Auditorium",
+        "Gallery North",
+        "Hearthstone Room"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-06-neg-01",
+            "content": "For monthly choir rehearsal, the user's record says Acorn Assembly Hall is not the selected rehearsal hall."
+          },
+          {
+            "id": "h4n-06-neg-02",
+            "content": "For monthly choir rehearsal, the user's record says Bellflower Room is not the selected rehearsal hall."
+          },
+          {
+            "id": "h4n-06-neg-03",
+            "content": "For monthly choir rehearsal, the user's record says Crescent Music Hall is not the selected rehearsal hall."
+          },
+          {
+            "id": "h4n-06-neg-04",
+            "content": "For monthly choir rehearsal, the user's record says Dovecote Chamber is not the selected rehearsal hall."
+          },
+          {
+            "id": "h4n-06-neg-05",
+            "content": "For monthly choir rehearsal, the user's record says Evergreen Salon is not the selected rehearsal hall."
+          },
+          {
+            "id": "h4n-06-neg-06",
+            "content": "For monthly choir rehearsal, the user's record says Foxglove Auditorium is not the selected rehearsal hall."
+          },
+          {
+            "id": "h4n-06-neg-07",
+            "content": "For monthly choir rehearsal, the user's record says Gallery North is not the selected rehearsal hall."
+          },
+          {
+            "id": "h4n-06-neg-08",
+            "content": "For monthly choir rehearsal, the user's record says Hearthstone Room is not the selected rehearsal hall."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-06-ctx-01",
+            "content": "For monthly choir rehearsal, the user's record compares Acorn Assembly Hall as a possible rehearsal hall."
+          },
+          {
+            "id": "h4n-06-ctx-02",
+            "content": "For monthly choir rehearsal, the user's record compares Bellflower Room as a possible rehearsal hall."
+          },
+          {
+            "id": "h4n-06-ctx-03",
+            "content": "For monthly choir rehearsal, the user's record compares Crescent Music Hall as a possible rehearsal hall."
+          },
+          {
+            "id": "h4n-06-ctx-04",
+            "content": "For monthly choir rehearsal, the user's record compares Dovecote Chamber as a possible rehearsal hall."
+          },
+          {
+            "id": "h4n-06-ctx-05",
+            "content": "For monthly choir rehearsal, the user's record compares Evergreen Salon as a possible rehearsal hall."
+          },
+          {
+            "id": "h4n-06-ctx-06",
+            "content": "For monthly choir rehearsal, the user's record compares Foxglove Auditorium as a possible rehearsal hall."
+          },
+          {
+            "id": "h4n-06-ctx-07",
+            "content": "For monthly choir rehearsal, the user's record compares Gallery North as a possible rehearsal hall."
+          },
+          {
+            "id": "h4n-06-ctx-08",
+            "content": "For monthly choir rehearsal, the user's record compares Hearthstone Room as a possible rehearsal hall."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-06-low-01",
+            "content": "A linen apron rests beside the riverside path."
+          },
+          {
+            "id": "h4n-06-low-02",
+            "content": "A ceramic pitcher rests beside the riverside path."
+          },
+          {
+            "id": "h4n-06-low-03",
+            "content": "A brass compass rests beside the riverside path."
+          },
+          {
+            "id": "h4n-06-low-04",
+            "content": "A paper lantern rests beside the riverside path."
+          },
+          {
+            "id": "h4n-06-low-05",
+            "content": "A wool blanket rests beside the riverside path."
+          },
+          {
+            "id": "h4n-06-low-06",
+            "content": "A silver thimble rests beside the riverside path."
+          },
+          {
+            "id": "h4n-06-low-07",
+            "content": "A wooden mallet rests beside the riverside path."
+          },
+          {
+            "id": "h4n-06-low-08",
+            "content": "A glass marble rests beside the riverside path."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-07",
+      "domain": "schedule",
+      "scope_user_id": "confirmatory-user-h4n-07",
+      "query": "Which time slot does the user reserve for language tutoring?",
+      "target_value": "Wednesday at 19:15",
+      "target_memory": {
+        "id": "h4n-07-target",
+        "content": "The user reserves Wednesday at 19:15 as the time slot for language tutoring."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-07-base-01",
+          "content": "The user keeps a brass bookmark near the kitchen shelf."
+        },
+        {
+          "id": "h4n-07-base-02",
+          "content": "The user sketches cloud patterns beside the kitchen shelf."
+        },
+        {
+          "id": "h4n-07-base-03",
+          "content": "The user packs dried apricots for walks past the kitchen shelf."
+        }
+      ],
+      "competing_values": [
+        "Monday at 08:40",
+        "Monday at 17:25",
+        "Tuesday at 12:10",
+        "Thursday at 09:35",
+        "Friday at 16:50",
+        "Saturday at 10:05",
+        "Saturday at 18:45",
+        "Sunday at 14:30"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-07-neg-01",
+            "content": "For language tutoring, the user's record says Monday at 08:40 is not the selected time slot."
+          },
+          {
+            "id": "h4n-07-neg-02",
+            "content": "For language tutoring, the user's record says Monday at 17:25 is not the selected time slot."
+          },
+          {
+            "id": "h4n-07-neg-03",
+            "content": "For language tutoring, the user's record says Tuesday at 12:10 is not the selected time slot."
+          },
+          {
+            "id": "h4n-07-neg-04",
+            "content": "For language tutoring, the user's record says Thursday at 09:35 is not the selected time slot."
+          },
+          {
+            "id": "h4n-07-neg-05",
+            "content": "For language tutoring, the user's record says Friday at 16:50 is not the selected time slot."
+          },
+          {
+            "id": "h4n-07-neg-06",
+            "content": "For language tutoring, the user's record says Saturday at 10:05 is not the selected time slot."
+          },
+          {
+            "id": "h4n-07-neg-07",
+            "content": "For language tutoring, the user's record says Saturday at 18:45 is not the selected time slot."
+          },
+          {
+            "id": "h4n-07-neg-08",
+            "content": "For language tutoring, the user's record says Sunday at 14:30 is not the selected time slot."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-07-ctx-01",
+            "content": "For language tutoring, the user's record compares Monday at 08:40 as a possible time slot."
+          },
+          {
+            "id": "h4n-07-ctx-02",
+            "content": "For language tutoring, the user's record compares Monday at 17:25 as a possible time slot."
+          },
+          {
+            "id": "h4n-07-ctx-03",
+            "content": "For language tutoring, the user's record compares Tuesday at 12:10 as a possible time slot."
+          },
+          {
+            "id": "h4n-07-ctx-04",
+            "content": "For language tutoring, the user's record compares Thursday at 09:35 as a possible time slot."
+          },
+          {
+            "id": "h4n-07-ctx-05",
+            "content": "For language tutoring, the user's record compares Friday at 16:50 as a possible time slot."
+          },
+          {
+            "id": "h4n-07-ctx-06",
+            "content": "For language tutoring, the user's record compares Saturday at 10:05 as a possible time slot."
+          },
+          {
+            "id": "h4n-07-ctx-07",
+            "content": "For language tutoring, the user's record compares Saturday at 18:45 as a possible time slot."
+          },
+          {
+            "id": "h4n-07-ctx-08",
+            "content": "For language tutoring, the user's record compares Sunday at 14:30 as a possible time slot."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-07-low-01",
+            "content": "A linen apron rests beside the kitchen shelf."
+          },
+          {
+            "id": "h4n-07-low-02",
+            "content": "A ceramic pitcher rests beside the kitchen shelf."
+          },
+          {
+            "id": "h4n-07-low-03",
+            "content": "A brass compass rests beside the kitchen shelf."
+          },
+          {
+            "id": "h4n-07-low-04",
+            "content": "A paper lantern rests beside the kitchen shelf."
+          },
+          {
+            "id": "h4n-07-low-05",
+            "content": "A wool blanket rests beside the kitchen shelf."
+          },
+          {
+            "id": "h4n-07-low-06",
+            "content": "A silver thimble rests beside the kitchen shelf."
+          },
+          {
+            "id": "h4n-07-low-07",
+            "content": "A wooden mallet rests beside the kitchen shelf."
+          },
+          {
+            "id": "h4n-07-low-08",
+            "content": "A glass marble rests beside the kitchen shelf."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-08",
+      "domain": "schedule",
+      "scope_user_id": "confirmatory-user-h4n-08",
+      "query": "Which day does the user schedule for grocery delivery?",
+      "target_value": "Sunday evening",
+      "target_memory": {
+        "id": "h4n-08-target",
+        "content": "The user schedules Sunday evening as the delivery day for groceries."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-08-base-01",
+          "content": "The user keeps a brass bookmark near the courtyard fountain."
+        },
+        {
+          "id": "h4n-08-base-02",
+          "content": "The user sketches cloud patterns beside the courtyard fountain."
+        },
+        {
+          "id": "h4n-08-base-03",
+          "content": "The user packs dried apricots for walks past the courtyard fountain."
+        }
+      ],
+      "competing_values": [
+        "Monday dawn",
+        "Tuesday noon",
+        "Wednesday night",
+        "Thursday morning",
+        "Friday midday",
+        "Friday evening",
+        "Saturday dawn",
+        "Saturday afternoon"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-08-neg-01",
+            "content": "For grocery delivery, the user's record says Monday dawn is not the selected delivery day."
+          },
+          {
+            "id": "h4n-08-neg-02",
+            "content": "For grocery delivery, the user's record says Tuesday noon is not the selected delivery day."
+          },
+          {
+            "id": "h4n-08-neg-03",
+            "content": "For grocery delivery, the user's record says Wednesday night is not the selected delivery day."
+          },
+          {
+            "id": "h4n-08-neg-04",
+            "content": "For grocery delivery, the user's record says Thursday morning is not the selected delivery day."
+          },
+          {
+            "id": "h4n-08-neg-05",
+            "content": "For grocery delivery, the user's record says Friday midday is not the selected delivery day."
+          },
+          {
+            "id": "h4n-08-neg-06",
+            "content": "For grocery delivery, the user's record says Friday evening is not the selected delivery day."
+          },
+          {
+            "id": "h4n-08-neg-07",
+            "content": "For grocery delivery, the user's record says Saturday dawn is not the selected delivery day."
+          },
+          {
+            "id": "h4n-08-neg-08",
+            "content": "For grocery delivery, the user's record says Saturday afternoon is not the selected delivery day."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-08-ctx-01",
+            "content": "For grocery delivery, the user's record compares Monday dawn as a possible delivery day."
+          },
+          {
+            "id": "h4n-08-ctx-02",
+            "content": "For grocery delivery, the user's record compares Tuesday noon as a possible delivery day."
+          },
+          {
+            "id": "h4n-08-ctx-03",
+            "content": "For grocery delivery, the user's record compares Wednesday night as a possible delivery day."
+          },
+          {
+            "id": "h4n-08-ctx-04",
+            "content": "For grocery delivery, the user's record compares Thursday morning as a possible delivery day."
+          },
+          {
+            "id": "h4n-08-ctx-05",
+            "content": "For grocery delivery, the user's record compares Friday midday as a possible delivery day."
+          },
+          {
+            "id": "h4n-08-ctx-06",
+            "content": "For grocery delivery, the user's record compares Friday evening as a possible delivery day."
+          },
+          {
+            "id": "h4n-08-ctx-07",
+            "content": "For grocery delivery, the user's record compares Saturday dawn as a possible delivery day."
+          },
+          {
+            "id": "h4n-08-ctx-08",
+            "content": "For grocery delivery, the user's record compares Saturday afternoon as a possible delivery day."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-08-low-01",
+            "content": "A linen apron rests beside the courtyard fountain."
+          },
+          {
+            "id": "h4n-08-low-02",
+            "content": "A ceramic pitcher rests beside the courtyard fountain."
+          },
+          {
+            "id": "h4n-08-low-03",
+            "content": "A brass compass rests beside the courtyard fountain."
+          },
+          {
+            "id": "h4n-08-low-04",
+            "content": "A paper lantern rests beside the courtyard fountain."
+          },
+          {
+            "id": "h4n-08-low-05",
+            "content": "A wool blanket rests beside the courtyard fountain."
+          },
+          {
+            "id": "h4n-08-low-06",
+            "content": "A silver thimble rests beside the courtyard fountain."
+          },
+          {
+            "id": "h4n-08-low-07",
+            "content": "A wooden mallet rests beside the courtyard fountain."
+          },
+          {
+            "id": "h4n-08-low-08",
+            "content": "A glass marble rests beside the courtyard fountain."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-09",
+      "domain": "schedule",
+      "scope_user_id": "confirmatory-user-h4n-09",
+      "query": "Which hour does the user choose for the design review?",
+      "target_value": "14:20",
+      "target_memory": {
+        "id": "h4n-09-target",
+        "content": "The user chooses 14:20 as the review hour for the design review."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-09-base-01",
+          "content": "The user keeps a brass bookmark near the greenhouse bench."
+        },
+        {
+          "id": "h4n-09-base-02",
+          "content": "The user sketches cloud patterns beside the greenhouse bench."
+        },
+        {
+          "id": "h4n-09-base-03",
+          "content": "The user packs dried apricots for walks past the greenhouse bench."
+        }
+      ],
+      "competing_values": [
+        "08:10",
+        "09:45",
+        "10:30",
+        "11:55",
+        "13:05",
+        "15:40",
+        "16:25",
+        "17:50"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-09-neg-01",
+            "content": "For design review, the user's record says 08:10 is not the selected review hour."
+          },
+          {
+            "id": "h4n-09-neg-02",
+            "content": "For design review, the user's record says 09:45 is not the selected review hour."
+          },
+          {
+            "id": "h4n-09-neg-03",
+            "content": "For design review, the user's record says 10:30 is not the selected review hour."
+          },
+          {
+            "id": "h4n-09-neg-04",
+            "content": "For design review, the user's record says 11:55 is not the selected review hour."
+          },
+          {
+            "id": "h4n-09-neg-05",
+            "content": "For design review, the user's record says 13:05 is not the selected review hour."
+          },
+          {
+            "id": "h4n-09-neg-06",
+            "content": "For design review, the user's record says 15:40 is not the selected review hour."
+          },
+          {
+            "id": "h4n-09-neg-07",
+            "content": "For design review, the user's record says 16:25 is not the selected review hour."
+          },
+          {
+            "id": "h4n-09-neg-08",
+            "content": "For design review, the user's record says 17:50 is not the selected review hour."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-09-ctx-01",
+            "content": "For design review, the user's record compares 08:10 as a possible review hour."
+          },
+          {
+            "id": "h4n-09-ctx-02",
+            "content": "For design review, the user's record compares 09:45 as a possible review hour."
+          },
+          {
+            "id": "h4n-09-ctx-03",
+            "content": "For design review, the user's record compares 10:30 as a possible review hour."
+          },
+          {
+            "id": "h4n-09-ctx-04",
+            "content": "For design review, the user's record compares 11:55 as a possible review hour."
+          },
+          {
+            "id": "h4n-09-ctx-05",
+            "content": "For design review, the user's record compares 13:05 as a possible review hour."
+          },
+          {
+            "id": "h4n-09-ctx-06",
+            "content": "For design review, the user's record compares 15:40 as a possible review hour."
+          },
+          {
+            "id": "h4n-09-ctx-07",
+            "content": "For design review, the user's record compares 16:25 as a possible review hour."
+          },
+          {
+            "id": "h4n-09-ctx-08",
+            "content": "For design review, the user's record compares 17:50 as a possible review hour."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-09-low-01",
+            "content": "A linen apron rests beside the greenhouse bench."
+          },
+          {
+            "id": "h4n-09-low-02",
+            "content": "A ceramic pitcher rests beside the greenhouse bench."
+          },
+          {
+            "id": "h4n-09-low-03",
+            "content": "A brass compass rests beside the greenhouse bench."
+          },
+          {
+            "id": "h4n-09-low-04",
+            "content": "A paper lantern rests beside the greenhouse bench."
+          },
+          {
+            "id": "h4n-09-low-05",
+            "content": "A wool blanket rests beside the greenhouse bench."
+          },
+          {
+            "id": "h4n-09-low-06",
+            "content": "A silver thimble rests beside the greenhouse bench."
+          },
+          {
+            "id": "h4n-09-low-07",
+            "content": "A wooden mallet rests beside the greenhouse bench."
+          },
+          {
+            "id": "h4n-09-low-08",
+            "content": "A glass marble rests beside the greenhouse bench."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-10",
+      "domain": "device",
+      "scope_user_id": "confirmatory-user-h4n-10",
+      "query": "Which headset does the user use for remote interviews?",
+      "target_value": "Aurora H7",
+      "target_memory": {
+        "id": "h4n-10-target",
+        "content": "The user uses the Aurora H7 headset for remote interviews."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-10-base-01",
+          "content": "The user keeps a brass bookmark near the library stair."
+        },
+        {
+          "id": "h4n-10-base-02",
+          "content": "The user sketches cloud patterns beside the library stair."
+        },
+        {
+          "id": "h4n-10-base-03",
+          "content": "The user packs dried apricots for walks past the library stair."
+        }
+      ],
+      "competing_values": [
+        "Boreal X2",
+        "Cloud Arc",
+        "DriftSound 4",
+        "Echo Crown",
+        "Fjord Mic Pro",
+        "Glacier Band",
+        "Halo Voice 3",
+        "Iris Audio One"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-10-neg-01",
+            "content": "For remote interviews, the user's record says Boreal X2 is not the selected interview headset."
+          },
+          {
+            "id": "h4n-10-neg-02",
+            "content": "For remote interviews, the user's record says Cloud Arc is not the selected interview headset."
+          },
+          {
+            "id": "h4n-10-neg-03",
+            "content": "For remote interviews, the user's record says DriftSound 4 is not the selected interview headset."
+          },
+          {
+            "id": "h4n-10-neg-04",
+            "content": "For remote interviews, the user's record says Echo Crown is not the selected interview headset."
+          },
+          {
+            "id": "h4n-10-neg-05",
+            "content": "For remote interviews, the user's record says Fjord Mic Pro is not the selected interview headset."
+          },
+          {
+            "id": "h4n-10-neg-06",
+            "content": "For remote interviews, the user's record says Glacier Band is not the selected interview headset."
+          },
+          {
+            "id": "h4n-10-neg-07",
+            "content": "For remote interviews, the user's record says Halo Voice 3 is not the selected interview headset."
+          },
+          {
+            "id": "h4n-10-neg-08",
+            "content": "For remote interviews, the user's record says Iris Audio One is not the selected interview headset."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-10-ctx-01",
+            "content": "For remote interviews, the user's record compares Boreal X2 as a possible interview headset."
+          },
+          {
+            "id": "h4n-10-ctx-02",
+            "content": "For remote interviews, the user's record compares Cloud Arc as a possible interview headset."
+          },
+          {
+            "id": "h4n-10-ctx-03",
+            "content": "For remote interviews, the user's record compares DriftSound 4 as a possible interview headset."
+          },
+          {
+            "id": "h4n-10-ctx-04",
+            "content": "For remote interviews, the user's record compares Echo Crown as a possible interview headset."
+          },
+          {
+            "id": "h4n-10-ctx-05",
+            "content": "For remote interviews, the user's record compares Fjord Mic Pro as a possible interview headset."
+          },
+          {
+            "id": "h4n-10-ctx-06",
+            "content": "For remote interviews, the user's record compares Glacier Band as a possible interview headset."
+          },
+          {
+            "id": "h4n-10-ctx-07",
+            "content": "For remote interviews, the user's record compares Halo Voice 3 as a possible interview headset."
+          },
+          {
+            "id": "h4n-10-ctx-08",
+            "content": "For remote interviews, the user's record compares Iris Audio One as a possible interview headset."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-10-low-01",
+            "content": "A linen apron rests beside the library stair."
+          },
+          {
+            "id": "h4n-10-low-02",
+            "content": "A ceramic pitcher rests beside the library stair."
+          },
+          {
+            "id": "h4n-10-low-03",
+            "content": "A brass compass rests beside the library stair."
+          },
+          {
+            "id": "h4n-10-low-04",
+            "content": "A paper lantern rests beside the library stair."
+          },
+          {
+            "id": "h4n-10-low-05",
+            "content": "A wool blanket rests beside the library stair."
+          },
+          {
+            "id": "h4n-10-low-06",
+            "content": "A silver thimble rests beside the library stair."
+          },
+          {
+            "id": "h4n-10-low-07",
+            "content": "A wooden mallet rests beside the library stair."
+          },
+          {
+            "id": "h4n-10-low-08",
+            "content": "A glass marble rests beside the library stair."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-11",
+      "domain": "device",
+      "scope_user_id": "confirmatory-user-h4n-11",
+      "query": "Which tablet does the user carry for field surveys?",
+      "target_value": "Terra Slate",
+      "target_memory": {
+        "id": "h4n-11-target",
+        "content": "The user carries the Terra Slate tablet for field surveys."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-11-base-01",
+          "content": "The user keeps a brass bookmark near the bakery awning."
+        },
+        {
+          "id": "h4n-11-base-02",
+          "content": "The user sketches cloud patterns beside the bakery awning."
+        },
+        {
+          "id": "h4n-11-base-03",
+          "content": "The user packs dried apricots for walks past the bakery awning."
+        }
+      ],
+      "competing_values": [
+        "Atlas Pad",
+        "Birch Tab 8",
+        "Compass Slate",
+        "Dune Panel",
+        "Evergreen Pad",
+        "Fieldglass Tab",
+        "Grove Screen",
+        "Horizon Slate Mini"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-11-neg-01",
+            "content": "For field surveys, the user's record says Atlas Pad is not the selected survey tablet."
+          },
+          {
+            "id": "h4n-11-neg-02",
+            "content": "For field surveys, the user's record says Birch Tab 8 is not the selected survey tablet."
+          },
+          {
+            "id": "h4n-11-neg-03",
+            "content": "For field surveys, the user's record says Compass Slate is not the selected survey tablet."
+          },
+          {
+            "id": "h4n-11-neg-04",
+            "content": "For field surveys, the user's record says Dune Panel is not the selected survey tablet."
+          },
+          {
+            "id": "h4n-11-neg-05",
+            "content": "For field surveys, the user's record says Evergreen Pad is not the selected survey tablet."
+          },
+          {
+            "id": "h4n-11-neg-06",
+            "content": "For field surveys, the user's record says Fieldglass Tab is not the selected survey tablet."
+          },
+          {
+            "id": "h4n-11-neg-07",
+            "content": "For field surveys, the user's record says Grove Screen is not the selected survey tablet."
+          },
+          {
+            "id": "h4n-11-neg-08",
+            "content": "For field surveys, the user's record says Horizon Slate Mini is not the selected survey tablet."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-11-ctx-01",
+            "content": "For field surveys, the user's record compares Atlas Pad as a possible survey tablet."
+          },
+          {
+            "id": "h4n-11-ctx-02",
+            "content": "For field surveys, the user's record compares Birch Tab 8 as a possible survey tablet."
+          },
+          {
+            "id": "h4n-11-ctx-03",
+            "content": "For field surveys, the user's record compares Compass Slate as a possible survey tablet."
+          },
+          {
+            "id": "h4n-11-ctx-04",
+            "content": "For field surveys, the user's record compares Dune Panel as a possible survey tablet."
+          },
+          {
+            "id": "h4n-11-ctx-05",
+            "content": "For field surveys, the user's record compares Evergreen Pad as a possible survey tablet."
+          },
+          {
+            "id": "h4n-11-ctx-06",
+            "content": "For field surveys, the user's record compares Fieldglass Tab as a possible survey tablet."
+          },
+          {
+            "id": "h4n-11-ctx-07",
+            "content": "For field surveys, the user's record compares Grove Screen as a possible survey tablet."
+          },
+          {
+            "id": "h4n-11-ctx-08",
+            "content": "For field surveys, the user's record compares Horizon Slate Mini as a possible survey tablet."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-11-low-01",
+            "content": "A linen apron rests beside the bakery awning."
+          },
+          {
+            "id": "h4n-11-low-02",
+            "content": "A ceramic pitcher rests beside the bakery awning."
+          },
+          {
+            "id": "h4n-11-low-03",
+            "content": "A brass compass rests beside the bakery awning."
+          },
+          {
+            "id": "h4n-11-low-04",
+            "content": "A paper lantern rests beside the bakery awning."
+          },
+          {
+            "id": "h4n-11-low-05",
+            "content": "A wool blanket rests beside the bakery awning."
+          },
+          {
+            "id": "h4n-11-low-06",
+            "content": "A silver thimble rests beside the bakery awning."
+          },
+          {
+            "id": "h4n-11-low-07",
+            "content": "A wooden mallet rests beside the bakery awning."
+          },
+          {
+            "id": "h4n-11-low-08",
+            "content": "A glass marble rests beside the bakery awning."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-12",
+      "domain": "device",
+      "scope_user_id": "confirmatory-user-h4n-12",
+      "query": "Which e-reader does the user prefer for train journeys?",
+      "target_value": "Page Harbor",
+      "target_memory": {
+        "id": "h4n-12-target",
+        "content": "The user prefers the Page Harbor e-reader for train journeys."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-12-base-01",
+          "content": "The user keeps a brass bookmark near the cabin porch."
+        },
+        {
+          "id": "h4n-12-base-02",
+          "content": "The user sketches cloud patterns beside the cabin porch."
+        },
+        {
+          "id": "h4n-12-base-03",
+          "content": "The user packs dried apricots for walks past the cabin porch."
+        }
+      ],
+      "competing_values": [
+        "Book Fern",
+        "Chapter Light",
+        "Folio Drift",
+        "Leaf Reader 6",
+        "Margin Glow",
+        "Novel Slate",
+        "Paper Route Mini",
+        "Quiet Page"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-12-neg-01",
+            "content": "For train journeys, the user's record says Book Fern is not the selected travel e-reader."
+          },
+          {
+            "id": "h4n-12-neg-02",
+            "content": "For train journeys, the user's record says Chapter Light is not the selected travel e-reader."
+          },
+          {
+            "id": "h4n-12-neg-03",
+            "content": "For train journeys, the user's record says Folio Drift is not the selected travel e-reader."
+          },
+          {
+            "id": "h4n-12-neg-04",
+            "content": "For train journeys, the user's record says Leaf Reader 6 is not the selected travel e-reader."
+          },
+          {
+            "id": "h4n-12-neg-05",
+            "content": "For train journeys, the user's record says Margin Glow is not the selected travel e-reader."
+          },
+          {
+            "id": "h4n-12-neg-06",
+            "content": "For train journeys, the user's record says Novel Slate is not the selected travel e-reader."
+          },
+          {
+            "id": "h4n-12-neg-07",
+            "content": "For train journeys, the user's record says Paper Route Mini is not the selected travel e-reader."
+          },
+          {
+            "id": "h4n-12-neg-08",
+            "content": "For train journeys, the user's record says Quiet Page is not the selected travel e-reader."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-12-ctx-01",
+            "content": "For train journeys, the user's record compares Book Fern as a possible travel e-reader."
+          },
+          {
+            "id": "h4n-12-ctx-02",
+            "content": "For train journeys, the user's record compares Chapter Light as a possible travel e-reader."
+          },
+          {
+            "id": "h4n-12-ctx-03",
+            "content": "For train journeys, the user's record compares Folio Drift as a possible travel e-reader."
+          },
+          {
+            "id": "h4n-12-ctx-04",
+            "content": "For train journeys, the user's record compares Leaf Reader 6 as a possible travel e-reader."
+          },
+          {
+            "id": "h4n-12-ctx-05",
+            "content": "For train journeys, the user's record compares Margin Glow as a possible travel e-reader."
+          },
+          {
+            "id": "h4n-12-ctx-06",
+            "content": "For train journeys, the user's record compares Novel Slate as a possible travel e-reader."
+          },
+          {
+            "id": "h4n-12-ctx-07",
+            "content": "For train journeys, the user's record compares Paper Route Mini as a possible travel e-reader."
+          },
+          {
+            "id": "h4n-12-ctx-08",
+            "content": "For train journeys, the user's record compares Quiet Page as a possible travel e-reader."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-12-low-01",
+            "content": "A linen apron rests beside the cabin porch."
+          },
+          {
+            "id": "h4n-12-low-02",
+            "content": "A ceramic pitcher rests beside the cabin porch."
+          },
+          {
+            "id": "h4n-12-low-03",
+            "content": "A brass compass rests beside the cabin porch."
+          },
+          {
+            "id": "h4n-12-low-04",
+            "content": "A paper lantern rests beside the cabin porch."
+          },
+          {
+            "id": "h4n-12-low-05",
+            "content": "A wool blanket rests beside the cabin porch."
+          },
+          {
+            "id": "h4n-12-low-06",
+            "content": "A silver thimble rests beside the cabin porch."
+          },
+          {
+            "id": "h4n-12-low-07",
+            "content": "A wooden mallet rests beside the cabin porch."
+          },
+          {
+            "id": "h4n-12-low-08",
+            "content": "A glass marble rests beside the cabin porch."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-13",
+      "domain": "project_or_work",
+      "scope_user_id": "confirmatory-user-h4n-13",
+      "query": "Which project does the user lead for archive digitization?",
+      "target_value": "Mosaic Index",
+      "target_memory": {
+        "id": "h4n-13-target",
+        "content": "The user leads Mosaic Index as the project for archive digitization."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-13-base-01",
+          "content": "The user keeps a brass bookmark near the museum cabinet."
+        },
+        {
+          "id": "h4n-13-base-02",
+          "content": "The user sketches cloud patterns beside the museum cabinet."
+        },
+        {
+          "id": "h4n-13-base-03",
+          "content": "The user packs dried apricots for walks past the museum cabinet."
+        }
+      ],
+      "competing_values": [
+        "Amber Folio",
+        "Beacon Archive",
+        "Cedar Scan",
+        "Document Grove",
+        "Echo Catalog",
+        "Fossil Pages",
+        "Gallery Ledger",
+        "Heritage Grid"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-13-neg-01",
+            "content": "For archive digitization, the user's record says Amber Folio is not the selected digitization project."
+          },
+          {
+            "id": "h4n-13-neg-02",
+            "content": "For archive digitization, the user's record says Beacon Archive is not the selected digitization project."
+          },
+          {
+            "id": "h4n-13-neg-03",
+            "content": "For archive digitization, the user's record says Cedar Scan is not the selected digitization project."
+          },
+          {
+            "id": "h4n-13-neg-04",
+            "content": "For archive digitization, the user's record says Document Grove is not the selected digitization project."
+          },
+          {
+            "id": "h4n-13-neg-05",
+            "content": "For archive digitization, the user's record says Echo Catalog is not the selected digitization project."
+          },
+          {
+            "id": "h4n-13-neg-06",
+            "content": "For archive digitization, the user's record says Fossil Pages is not the selected digitization project."
+          },
+          {
+            "id": "h4n-13-neg-07",
+            "content": "For archive digitization, the user's record says Gallery Ledger is not the selected digitization project."
+          },
+          {
+            "id": "h4n-13-neg-08",
+            "content": "For archive digitization, the user's record says Heritage Grid is not the selected digitization project."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-13-ctx-01",
+            "content": "For archive digitization, the user's record compares Amber Folio as a possible digitization project."
+          },
+          {
+            "id": "h4n-13-ctx-02",
+            "content": "For archive digitization, the user's record compares Beacon Archive as a possible digitization project."
+          },
+          {
+            "id": "h4n-13-ctx-03",
+            "content": "For archive digitization, the user's record compares Cedar Scan as a possible digitization project."
+          },
+          {
+            "id": "h4n-13-ctx-04",
+            "content": "For archive digitization, the user's record compares Document Grove as a possible digitization project."
+          },
+          {
+            "id": "h4n-13-ctx-05",
+            "content": "For archive digitization, the user's record compares Echo Catalog as a possible digitization project."
+          },
+          {
+            "id": "h4n-13-ctx-06",
+            "content": "For archive digitization, the user's record compares Fossil Pages as a possible digitization project."
+          },
+          {
+            "id": "h4n-13-ctx-07",
+            "content": "For archive digitization, the user's record compares Gallery Ledger as a possible digitization project."
+          },
+          {
+            "id": "h4n-13-ctx-08",
+            "content": "For archive digitization, the user's record compares Heritage Grid as a possible digitization project."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-13-low-01",
+            "content": "A linen apron rests beside the museum cabinet."
+          },
+          {
+            "id": "h4n-13-low-02",
+            "content": "A ceramic pitcher rests beside the museum cabinet."
+          },
+          {
+            "id": "h4n-13-low-03",
+            "content": "A brass compass rests beside the museum cabinet."
+          },
+          {
+            "id": "h4n-13-low-04",
+            "content": "A paper lantern rests beside the museum cabinet."
+          },
+          {
+            "id": "h4n-13-low-05",
+            "content": "A wool blanket rests beside the museum cabinet."
+          },
+          {
+            "id": "h4n-13-low-06",
+            "content": "A silver thimble rests beside the museum cabinet."
+          },
+          {
+            "id": "h4n-13-low-07",
+            "content": "A wooden mallet rests beside the museum cabinet."
+          },
+          {
+            "id": "h4n-13-low-08",
+            "content": "A glass marble rests beside the museum cabinet."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-14",
+      "domain": "project_or_work",
+      "scope_user_id": "confirmatory-user-h4n-14",
+      "query": "Which client account does the user manage for accessibility testing?",
+      "target_value": "Bluebird Account",
+      "target_memory": {
+        "id": "h4n-14-target",
+        "content": "The user manages Bluebird Account for accessibility testing."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-14-base-01",
+          "content": "The user keeps a brass bookmark near the harbor railing."
+        },
+        {
+          "id": "h4n-14-base-02",
+          "content": "The user sketches cloud patterns beside the harbor railing."
+        },
+        {
+          "id": "h4n-14-base-03",
+          "content": "The user packs dried apricots for walks past the harbor railing."
+        }
+      ],
+      "competing_values": [
+        "Alder Account",
+        "Brighton Client",
+        "Citrine Account",
+        "Dovetail Client",
+        "Everwell Account",
+        "Foxrun Client",
+        "Greenway Account",
+        "Hillcrest Client"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-14-neg-01",
+            "content": "For accessibility testing, the user's record says Alder Account is not the selected client account."
+          },
+          {
+            "id": "h4n-14-neg-02",
+            "content": "For accessibility testing, the user's record says Brighton Client is not the selected client account."
+          },
+          {
+            "id": "h4n-14-neg-03",
+            "content": "For accessibility testing, the user's record says Citrine Account is not the selected client account."
+          },
+          {
+            "id": "h4n-14-neg-04",
+            "content": "For accessibility testing, the user's record says Dovetail Client is not the selected client account."
+          },
+          {
+            "id": "h4n-14-neg-05",
+            "content": "For accessibility testing, the user's record says Everwell Account is not the selected client account."
+          },
+          {
+            "id": "h4n-14-neg-06",
+            "content": "For accessibility testing, the user's record says Foxrun Client is not the selected client account."
+          },
+          {
+            "id": "h4n-14-neg-07",
+            "content": "For accessibility testing, the user's record says Greenway Account is not the selected client account."
+          },
+          {
+            "id": "h4n-14-neg-08",
+            "content": "For accessibility testing, the user's record says Hillcrest Client is not the selected client account."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-14-ctx-01",
+            "content": "For accessibility testing, the user's record compares Alder Account as a possible client account."
+          },
+          {
+            "id": "h4n-14-ctx-02",
+            "content": "For accessibility testing, the user's record compares Brighton Client as a possible client account."
+          },
+          {
+            "id": "h4n-14-ctx-03",
+            "content": "For accessibility testing, the user's record compares Citrine Account as a possible client account."
+          },
+          {
+            "id": "h4n-14-ctx-04",
+            "content": "For accessibility testing, the user's record compares Dovetail Client as a possible client account."
+          },
+          {
+            "id": "h4n-14-ctx-05",
+            "content": "For accessibility testing, the user's record compares Everwell Account as a possible client account."
+          },
+          {
+            "id": "h4n-14-ctx-06",
+            "content": "For accessibility testing, the user's record compares Foxrun Client as a possible client account."
+          },
+          {
+            "id": "h4n-14-ctx-07",
+            "content": "For accessibility testing, the user's record compares Greenway Account as a possible client account."
+          },
+          {
+            "id": "h4n-14-ctx-08",
+            "content": "For accessibility testing, the user's record compares Hillcrest Client as a possible client account."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-14-low-01",
+            "content": "A linen apron rests beside the harbor railing."
+          },
+          {
+            "id": "h4n-14-low-02",
+            "content": "A ceramic pitcher rests beside the harbor railing."
+          },
+          {
+            "id": "h4n-14-low-03",
+            "content": "A brass compass rests beside the harbor railing."
+          },
+          {
+            "id": "h4n-14-low-04",
+            "content": "A paper lantern rests beside the harbor railing."
+          },
+          {
+            "id": "h4n-14-low-05",
+            "content": "A wool blanket rests beside the harbor railing."
+          },
+          {
+            "id": "h4n-14-low-06",
+            "content": "A silver thimble rests beside the harbor railing."
+          },
+          {
+            "id": "h4n-14-low-07",
+            "content": "A wooden mallet rests beside the harbor railing."
+          },
+          {
+            "id": "h4n-14-low-08",
+            "content": "A glass marble rests beside the harbor railing."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-15",
+      "domain": "project_or_work",
+      "scope_user_id": "confirmatory-user-h4n-15",
+      "query": "Which report series does the user prepare for quarterly planning?",
+      "target_value": "Northline Briefs",
+      "target_memory": {
+        "id": "h4n-15-target",
+        "content": "The user prepares Northline Briefs as the report series for quarterly planning."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-15-base-01",
+          "content": "The user keeps a brass bookmark near the village clock."
+        },
+        {
+          "id": "h4n-15-base-02",
+          "content": "The user sketches cloud patterns beside the village clock."
+        },
+        {
+          "id": "h4n-15-base-03",
+          "content": "The user packs dried apricots for walks past the village clock."
+        }
+      ],
+      "competing_values": [
+        "Autumn Ledger",
+        "Beacon Reports",
+        "Compass Briefs",
+        "Delta Outlook",
+        "Eastward Notes",
+        "Forecast Folio",
+        "Growth Papers",
+        "Harbor Review"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-15-neg-01",
+            "content": "For quarterly planning, the user's record says Autumn Ledger is not the selected planning report series."
+          },
+          {
+            "id": "h4n-15-neg-02",
+            "content": "For quarterly planning, the user's record says Beacon Reports is not the selected planning report series."
+          },
+          {
+            "id": "h4n-15-neg-03",
+            "content": "For quarterly planning, the user's record says Compass Briefs is not the selected planning report series."
+          },
+          {
+            "id": "h4n-15-neg-04",
+            "content": "For quarterly planning, the user's record says Delta Outlook is not the selected planning report series."
+          },
+          {
+            "id": "h4n-15-neg-05",
+            "content": "For quarterly planning, the user's record says Eastward Notes is not the selected planning report series."
+          },
+          {
+            "id": "h4n-15-neg-06",
+            "content": "For quarterly planning, the user's record says Forecast Folio is not the selected planning report series."
+          },
+          {
+            "id": "h4n-15-neg-07",
+            "content": "For quarterly planning, the user's record says Growth Papers is not the selected planning report series."
+          },
+          {
+            "id": "h4n-15-neg-08",
+            "content": "For quarterly planning, the user's record says Harbor Review is not the selected planning report series."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-15-ctx-01",
+            "content": "For quarterly planning, the user's record compares Autumn Ledger as a possible planning report series."
+          },
+          {
+            "id": "h4n-15-ctx-02",
+            "content": "For quarterly planning, the user's record compares Beacon Reports as a possible planning report series."
+          },
+          {
+            "id": "h4n-15-ctx-03",
+            "content": "For quarterly planning, the user's record compares Compass Briefs as a possible planning report series."
+          },
+          {
+            "id": "h4n-15-ctx-04",
+            "content": "For quarterly planning, the user's record compares Delta Outlook as a possible planning report series."
+          },
+          {
+            "id": "h4n-15-ctx-05",
+            "content": "For quarterly planning, the user's record compares Eastward Notes as a possible planning report series."
+          },
+          {
+            "id": "h4n-15-ctx-06",
+            "content": "For quarterly planning, the user's record compares Forecast Folio as a possible planning report series."
+          },
+          {
+            "id": "h4n-15-ctx-07",
+            "content": "For quarterly planning, the user's record compares Growth Papers as a possible planning report series."
+          },
+          {
+            "id": "h4n-15-ctx-08",
+            "content": "For quarterly planning, the user's record compares Harbor Review as a possible planning report series."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-15-low-01",
+            "content": "A linen apron rests beside the village clock."
+          },
+          {
+            "id": "h4n-15-low-02",
+            "content": "A ceramic pitcher rests beside the village clock."
+          },
+          {
+            "id": "h4n-15-low-03",
+            "content": "A brass compass rests beside the village clock."
+          },
+          {
+            "id": "h4n-15-low-04",
+            "content": "A paper lantern rests beside the village clock."
+          },
+          {
+            "id": "h4n-15-low-05",
+            "content": "A wool blanket rests beside the village clock."
+          },
+          {
+            "id": "h4n-15-low-06",
+            "content": "A silver thimble rests beside the village clock."
+          },
+          {
+            "id": "h4n-15-low-07",
+            "content": "A wooden mallet rests beside the village clock."
+          },
+          {
+            "id": "h4n-15-low-08",
+            "content": "A glass marble rests beside the village clock."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-16",
+      "domain": "preference_or_subscription",
+      "scope_user_id": "confirmatory-user-h4n-16",
+      "query": "Which tea subscription does the user keep for winter deliveries?",
+      "target_value": "Hearthleaf Club",
+      "target_memory": {
+        "id": "h4n-16-target",
+        "content": "The user keeps Hearthleaf Club as the tea subscription for winter deliveries."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-16-base-01",
+          "content": "The user keeps a brass bookmark near the workshop sink."
+        },
+        {
+          "id": "h4n-16-base-02",
+          "content": "The user sketches cloud patterns beside the workshop sink."
+        },
+        {
+          "id": "h4n-16-base-03",
+          "content": "The user packs dried apricots for walks past the workshop sink."
+        }
+      ],
+      "competing_values": [
+        "Amber Infusion Club",
+        "Bergamot Parcel",
+        "Cedar Cup Circle",
+        "Dawn Tea Post",
+        "Ember Kettle Club",
+        "Frostleaf Mailer",
+        "Golden Steep Box",
+        "Heather Brew Plan"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-16-neg-01",
+            "content": "For winter deliveries, the user's record says Amber Infusion Club is not the selected tea subscription."
+          },
+          {
+            "id": "h4n-16-neg-02",
+            "content": "For winter deliveries, the user's record says Bergamot Parcel is not the selected tea subscription."
+          },
+          {
+            "id": "h4n-16-neg-03",
+            "content": "For winter deliveries, the user's record says Cedar Cup Circle is not the selected tea subscription."
+          },
+          {
+            "id": "h4n-16-neg-04",
+            "content": "For winter deliveries, the user's record says Dawn Tea Post is not the selected tea subscription."
+          },
+          {
+            "id": "h4n-16-neg-05",
+            "content": "For winter deliveries, the user's record says Ember Kettle Club is not the selected tea subscription."
+          },
+          {
+            "id": "h4n-16-neg-06",
+            "content": "For winter deliveries, the user's record says Frostleaf Mailer is not the selected tea subscription."
+          },
+          {
+            "id": "h4n-16-neg-07",
+            "content": "For winter deliveries, the user's record says Golden Steep Box is not the selected tea subscription."
+          },
+          {
+            "id": "h4n-16-neg-08",
+            "content": "For winter deliveries, the user's record says Heather Brew Plan is not the selected tea subscription."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-16-ctx-01",
+            "content": "For winter deliveries, the user's record compares Amber Infusion Club as a possible tea subscription."
+          },
+          {
+            "id": "h4n-16-ctx-02",
+            "content": "For winter deliveries, the user's record compares Bergamot Parcel as a possible tea subscription."
+          },
+          {
+            "id": "h4n-16-ctx-03",
+            "content": "For winter deliveries, the user's record compares Cedar Cup Circle as a possible tea subscription."
+          },
+          {
+            "id": "h4n-16-ctx-04",
+            "content": "For winter deliveries, the user's record compares Dawn Tea Post as a possible tea subscription."
+          },
+          {
+            "id": "h4n-16-ctx-05",
+            "content": "For winter deliveries, the user's record compares Ember Kettle Club as a possible tea subscription."
+          },
+          {
+            "id": "h4n-16-ctx-06",
+            "content": "For winter deliveries, the user's record compares Frostleaf Mailer as a possible tea subscription."
+          },
+          {
+            "id": "h4n-16-ctx-07",
+            "content": "For winter deliveries, the user's record compares Golden Steep Box as a possible tea subscription."
+          },
+          {
+            "id": "h4n-16-ctx-08",
+            "content": "For winter deliveries, the user's record compares Heather Brew Plan as a possible tea subscription."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-16-low-01",
+            "content": "A linen apron rests beside the workshop sink."
+          },
+          {
+            "id": "h4n-16-low-02",
+            "content": "A ceramic pitcher rests beside the workshop sink."
+          },
+          {
+            "id": "h4n-16-low-03",
+            "content": "A brass compass rests beside the workshop sink."
+          },
+          {
+            "id": "h4n-16-low-04",
+            "content": "A paper lantern rests beside the workshop sink."
+          },
+          {
+            "id": "h4n-16-low-05",
+            "content": "A wool blanket rests beside the workshop sink."
+          },
+          {
+            "id": "h4n-16-low-06",
+            "content": "A silver thimble rests beside the workshop sink."
+          },
+          {
+            "id": "h4n-16-low-07",
+            "content": "A wooden mallet rests beside the workshop sink."
+          },
+          {
+            "id": "h4n-16-low-08",
+            "content": "A glass marble rests beside the workshop sink."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-17",
+      "domain": "preference_or_subscription",
+      "scope_user_id": "confirmatory-user-h4n-17",
+      "query": "Which music plan does the user subscribe to for offline listening?",
+      "target_value": "Echo Trail Plan",
+      "target_memory": {
+        "id": "h4n-17-target",
+        "content": "The user subscribes to Echo Trail Plan for offline music listening."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-17-base-01",
+          "content": "The user keeps a brass bookmark near the cellar door."
+        },
+        {
+          "id": "h4n-17-base-02",
+          "content": "The user sketches cloud patterns beside the cellar door."
+        },
+        {
+          "id": "h4n-17-base-03",
+          "content": "The user packs dried apricots for walks past the cellar door."
+        }
+      ],
+      "competing_values": [
+        "Acoustic Pocket",
+        "Beat Harbor Plan",
+        "Chorus Cache",
+        "Drift Melody Tier",
+        "Encore Offline Club",
+        "Folkstream Pocket",
+        "Groove Cabin Plan",
+        "Harmony Vault"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-17-neg-01",
+            "content": "For offline listening, the user's record says Acoustic Pocket is not the selected music plan."
+          },
+          {
+            "id": "h4n-17-neg-02",
+            "content": "For offline listening, the user's record says Beat Harbor Plan is not the selected music plan."
+          },
+          {
+            "id": "h4n-17-neg-03",
+            "content": "For offline listening, the user's record says Chorus Cache is not the selected music plan."
+          },
+          {
+            "id": "h4n-17-neg-04",
+            "content": "For offline listening, the user's record says Drift Melody Tier is not the selected music plan."
+          },
+          {
+            "id": "h4n-17-neg-05",
+            "content": "For offline listening, the user's record says Encore Offline Club is not the selected music plan."
+          },
+          {
+            "id": "h4n-17-neg-06",
+            "content": "For offline listening, the user's record says Folkstream Pocket is not the selected music plan."
+          },
+          {
+            "id": "h4n-17-neg-07",
+            "content": "For offline listening, the user's record says Groove Cabin Plan is not the selected music plan."
+          },
+          {
+            "id": "h4n-17-neg-08",
+            "content": "For offline listening, the user's record says Harmony Vault is not the selected music plan."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-17-ctx-01",
+            "content": "For offline listening, the user's record compares Acoustic Pocket as a possible music plan."
+          },
+          {
+            "id": "h4n-17-ctx-02",
+            "content": "For offline listening, the user's record compares Beat Harbor Plan as a possible music plan."
+          },
+          {
+            "id": "h4n-17-ctx-03",
+            "content": "For offline listening, the user's record compares Chorus Cache as a possible music plan."
+          },
+          {
+            "id": "h4n-17-ctx-04",
+            "content": "For offline listening, the user's record compares Drift Melody Tier as a possible music plan."
+          },
+          {
+            "id": "h4n-17-ctx-05",
+            "content": "For offline listening, the user's record compares Encore Offline Club as a possible music plan."
+          },
+          {
+            "id": "h4n-17-ctx-06",
+            "content": "For offline listening, the user's record compares Folkstream Pocket as a possible music plan."
+          },
+          {
+            "id": "h4n-17-ctx-07",
+            "content": "For offline listening, the user's record compares Groove Cabin Plan as a possible music plan."
+          },
+          {
+            "id": "h4n-17-ctx-08",
+            "content": "For offline listening, the user's record compares Harmony Vault as a possible music plan."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-17-low-01",
+            "content": "A linen apron rests beside the cellar door."
+          },
+          {
+            "id": "h4n-17-low-02",
+            "content": "A ceramic pitcher rests beside the cellar door."
+          },
+          {
+            "id": "h4n-17-low-03",
+            "content": "A brass compass rests beside the cellar door."
+          },
+          {
+            "id": "h4n-17-low-04",
+            "content": "A paper lantern rests beside the cellar door."
+          },
+          {
+            "id": "h4n-17-low-05",
+            "content": "A wool blanket rests beside the cellar door."
+          },
+          {
+            "id": "h4n-17-low-06",
+            "content": "A silver thimble rests beside the cellar door."
+          },
+          {
+            "id": "h4n-17-low-07",
+            "content": "A wooden mallet rests beside the cellar door."
+          },
+          {
+            "id": "h4n-17-low-08",
+            "content": "A glass marble rests beside the cellar door."
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "H4N-18",
+      "domain": "preference_or_subscription",
+      "scope_user_id": "confirmatory-user-h4n-18",
+      "query": "Which produce box does the user order for weekday cooking?",
+      "target_value": "Market Grove Box",
+      "target_memory": {
+        "id": "h4n-18-target",
+        "content": "The user orders Market Grove Box as the produce box for weekday cooking."
+      },
+      "baseline_other_memories": [
+        {
+          "id": "h4n-18-base-01",
+          "content": "The user keeps a brass bookmark near the woodland bridge."
+        },
+        {
+          "id": "h4n-18-base-02",
+          "content": "The user sketches cloud patterns beside the woodland bridge."
+        },
+        {
+          "id": "h4n-18-base-03",
+          "content": "The user packs dried apricots for walks past the woodland bridge."
+        }
+      ],
+      "competing_values": [
+        "Apple Lane Crate",
+        "Basil Basket",
+        "Carrot Corner Box",
+        "Dill Farm Parcel",
+        "Eggplant Grove Crate",
+        "Fennel Field Box",
+        "Garden Row Basket",
+        "Harvest Path Parcel"
+      ],
+      "conditions": {
+        "negated_competing_value": [
+          {
+            "id": "h4n-18-neg-01",
+            "content": "For weekday cooking, the user's record says Apple Lane Crate is not the selected produce box."
+          },
+          {
+            "id": "h4n-18-neg-02",
+            "content": "For weekday cooking, the user's record says Basil Basket is not the selected produce box."
+          },
+          {
+            "id": "h4n-18-neg-03",
+            "content": "For weekday cooking, the user's record says Carrot Corner Box is not the selected produce box."
+          },
+          {
+            "id": "h4n-18-neg-04",
+            "content": "For weekday cooking, the user's record says Dill Farm Parcel is not the selected produce box."
+          },
+          {
+            "id": "h4n-18-neg-05",
+            "content": "For weekday cooking, the user's record says Eggplant Grove Crate is not the selected produce box."
+          },
+          {
+            "id": "h4n-18-neg-06",
+            "content": "For weekday cooking, the user's record says Fennel Field Box is not the selected produce box."
+          },
+          {
+            "id": "h4n-18-neg-07",
+            "content": "For weekday cooking, the user's record says Garden Row Basket is not the selected produce box."
+          },
+          {
+            "id": "h4n-18-neg-08",
+            "content": "For weekday cooking, the user's record says Harvest Path Parcel is not the selected produce box."
+          }
+        ],
+        "contextual_competing_value_control": [
+          {
+            "id": "h4n-18-ctx-01",
+            "content": "For weekday cooking, the user's record compares Apple Lane Crate as a possible produce box."
+          },
+          {
+            "id": "h4n-18-ctx-02",
+            "content": "For weekday cooking, the user's record compares Basil Basket as a possible produce box."
+          },
+          {
+            "id": "h4n-18-ctx-03",
+            "content": "For weekday cooking, the user's record compares Carrot Corner Box as a possible produce box."
+          },
+          {
+            "id": "h4n-18-ctx-04",
+            "content": "For weekday cooking, the user's record compares Dill Farm Parcel as a possible produce box."
+          },
+          {
+            "id": "h4n-18-ctx-05",
+            "content": "For weekday cooking, the user's record compares Eggplant Grove Crate as a possible produce box."
+          },
+          {
+            "id": "h4n-18-ctx-06",
+            "content": "For weekday cooking, the user's record compares Fennel Field Box as a possible produce box."
+          },
+          {
+            "id": "h4n-18-ctx-07",
+            "content": "For weekday cooking, the user's record compares Garden Row Basket as a possible produce box."
+          },
+          {
+            "id": "h4n-18-ctx-08",
+            "content": "For weekday cooking, the user's record compares Harvest Path Parcel as a possible produce box."
+          }
+        ],
+        "low_overlap_control": [
+          {
+            "id": "h4n-18-low-01",
+            "content": "A linen apron rests beside the woodland bridge."
+          },
+          {
+            "id": "h4n-18-low-02",
+            "content": "A ceramic pitcher rests beside the woodland bridge."
+          },
+          {
+            "id": "h4n-18-low-03",
+            "content": "A brass compass rests beside the woodland bridge."
+          },
+          {
+            "id": "h4n-18-low-04",
+            "content": "A paper lantern rests beside the woodland bridge."
+          },
+          {
+            "id": "h4n-18-low-05",
+            "content": "A wool blanket rests beside the woodland bridge."
+          },
+          {
+            "id": "h4n-18-low-06",
+            "content": "A silver thimble rests beside the woodland bridge."
+          },
+          {
+            "id": "h4n-18-low-07",
+            "content": "A wooden mallet rests beside the woodland bridge."
+          },
+          {
+            "id": "h4n-18-low-08",
+            "content": "A glass marble rests beside the woodland bridge."
+          }
+        ]
+      }
+    }
+  ]
+}
