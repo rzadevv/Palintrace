@@ -538,11 +538,52 @@ inductions; no more than one low-overlap induction; and negation-induced cases i
 six domains. The only interpretations are `SUPPORTS_H4_N`, `DOES_NOT_SUPPORT_H4_N`, and
 `INCONCLUSIVE_BASELINE_CONSTRUCTION`.
 
-The fixture is frozen by byte hash before retrieval execution. Part 6I-A observes no retrieval
-outputs, BM25 scores, or target ranks. A future Part 6I-B may execute the frozen runner exactly once.
-Its result contract stores one shared baseline per scenario, recomputes every condition's paired
-assessment from stored observations, and then recomputes the global summary from those validated
-scenario records.
+The fixture was frozen by byte hash before retrieval execution. Part 6I-A observed no retrieval
+outputs, BM25 scores, or target ranks, and reserved the frozen runner for exactly one Part 6I-B
+invocation. Its result contract stores one shared baseline per scenario, recomputes every condition's
+paired assessment from stored observations, and then recomputes the global summary from those
+validated scenario records.
 This is fresh confirmatory synthetic evidence following a post-hoc hypothesis, not a real-world
 benchmark, independent production validation, or a prevalence estimate. Broad H4 remains negative,
 and H3 confidence/selectivity research remains untested.
+
+Part 6I-B subsequently executed that frozen confirmatory probe once. All 18 baselines were eligible.
+The negated and matched contextual conditions each induced shadowing in the same two scenarios;
+the low-overlap condition induced none, and there were zero negation-specific discordances. The
+negation-replication, matched-specificity, and domain-breadth gates failed, so the frozen
+interpretation is `DOES_NOT_SUPPORT_H4_N`. Broad H4 separately remains `DOES_NOT_SUPPORT_H4`.
+These synthetic negative results close the current retrieval branch without supporting a production
+prevalence claim.
+
+## Semantic selectivity / abstention probe
+
+Part 6J-A preregisters H3, which was previously untested. The evaluation asks whether a confidence-
+based decision layer can reduce clean unsupported-claim alerts while preserving unsupported
+detection and bounded abstention. It does not modify the frozen MiniLM NLI model, its relation
+labels, scores, tokenization, or the production `UnsupportedClaimChecker`. `ENTAILMENT` remains
+`NO_ALERT`; a non-entailment is `ALERT` when its frozen maximum-softmax score meets the selected
+threshold and otherwise becomes `ABSTAIN`. The score is not described as a calibrated probability.
+
+The synthetic fixture contains 48 fresh scenarios: 24 calibration and 24 confirmatory, balanced at
+four scenarios per split in each of six domains. Every premise and both hypotheses explicitly name
+the same third-person subject, avoiding the speaker-grounding confound. Each clean hypothesis is
+constructed as clearly supported, while its paired unsupported hypothesis changes exactly one
+exclusive factual value. Both splits and all text are authored and byte-frozen before any NLI run.
+
+Calibration considers only the frozen grid `0.50`, `0.60`, `0.70`, `0.80`, `0.90`, and `0.95`.
+A threshold is eligible only when at least 22/24 calibration unsupported cases remain alerts. The
+deterministic selection rule then minimizes clean alerts, maximizes unsupported alerts, minimizes
+total abstentions, and finally chooses the lower threshold. No confirmatory result can influence
+selection. A future Part 6J-B runner will load MiniLM once, calibrate, select mechanically, and—if
+selection succeeds—immediately execute confirmation in the same one-shot invocation.
+
+The confirmatory baseline must first produce at least four clean alerts. Unsupported safety then
+requires at least 22/24 selective alerts and a drop of at most one from baseline. Clean-alert
+reduction requires at least three fewer alerts and no more than half the baseline count. Total
+selective abstentions across the 48 confirmatory judgments may not exceed eight, preserving at least
+40 assessed decisions. The only interpretations are `SUPPORTS_H3`, `DOES_NOT_SUPPORT_H3`, and
+`INCONCLUSIVE_BASELINE_TOO_EASY`.
+
+Part 6J-A observes no NLI relation, confidence score, selected threshold, or confirmatory result.
+The probe is synthetic development evidence, not production calibration, universal confidence
+calibration, or a real-world prevalence study.
