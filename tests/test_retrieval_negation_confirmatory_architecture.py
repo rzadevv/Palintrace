@@ -1,0 +1,152 @@
+from __future__ import annotations
+
+import ast
+import hashlib
+from pathlib import Path
+
+PROBE_MODULE = Path("src/memlint/evaluation/retrieval_negation_confirmatory.py")
+RUNNER = Path("tools/evaluate_retrieval_negation_confirmatory.py")
+
+
+def _imports(path: Path) -> tuple[str, ...]:
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    modules: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            modules.extend(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            modules.append(node.module)
+    return tuple(modules)
+
+
+def test_frozen_retrieval_and_part_6h_predecessors_are_byte_exact() -> None:
+    expected = {
+        Path("src/memlint/retrieval/__init__.py"): (
+            "68d93a1d4349557b1a6f715935f07ebdca3501e05b04bc53146249d1b1c22af7"
+        ),
+        Path("src/memlint/retrieval/base.py"): (
+            "85157b75a506b70973544a2e1aef41c36cedaca51cd5607899dfebd053575b6c"
+        ),
+        Path("src/memlint/retrieval/challenge.py"): (
+            "b2e471c3ed14c6dd6619969a1b6df2db2ca66955fb5dd44763fc9d3448c72f7d"
+        ),
+        Path("src/memlint/retrieval/models.py"): (
+            "781100bedafa2f6306968dae06019325a35f350e8ca525b11fb0cd74383a8057"
+        ),
+        Path("src/memlint/retrieval/policy.py"): (
+            "3d954645236f1ed49671a1bcb48a947d1fde8723758738ac5fc55a9e77a14a85"
+        ),
+        Path("src/memlint/evaluation/experimental_lexical.py"): (
+            "570f2a0c2be3561be031c20dfe397696cb0e07e64efcc61b34eacd30f88fddaf"
+        ),
+        Path("src/memlint/evaluation/retrieval.py"): (
+            "e14c106599501ac2acacdc4454340e3ef77da774ee993fedb37466361608b897"
+        ),
+        Path("src/memlint/evaluation/retrieval_strong_probe.py"): (
+            "d3918e37da822adc77a59fdc5c0d3018e14655c26f71d485d064b9dda0fe87c6"
+        ),
+        Path("tools/evaluate_retrieval_strong_probe.py"): (
+            "d1a2778ad6b2198414dfecda26c483b2d6cad4a611ddffcb414e85e78ed05e0c"
+        ),
+        Path("tests/fixtures/retrieval_shadowing_strong_probe_v0.1.json"): (
+            "98c2a6e1f1f5a38f34691918dd99a1eeb9096888ca2c02d63469595820c87748"
+        ),
+        Path("src/memlint/checkers/retrieval_shadowing.py"): (
+            "d3e549812d071b9b516f21bfdaf4be2ca5f685d53090aa01d32913dd4cf64dca"
+        ),
+        Path("src/memlint/mutations/shadowing.py"): (
+            "73197cae26979e939009252272b156d2f1e48d0d784fb07580cb47c2f6f3bbd1"
+        ),
+    }
+    assert {
+        path: hashlib.sha256(path.read_bytes()).hexdigest() for path in expected
+    } == expected
+
+
+def test_frozen_identity_semantic_benchmark_and_cli_files_are_byte_exact() -> None:
+    expected = {
+        Path("src/memlint/checkers/unsupported_claim.py"): (
+            "04fd713308d9ed55e79501a31e99904939a2caf8ef90f2187e3fe1f594d09a8a"
+        ),
+        Path("src/memlint/checkers/unsupported_claim_identity_grounded.py"): (
+            "6b742eeff6d4280661adba61ed201b67a6bc25a7d9a2b0c967ebbccd0c3210c5"
+        ),
+        Path("src/memlint/semantics/identity.py"): (
+            "c6b54d0229cb6b87b5e23997685e9855b8b789ea2d68f6e6f07ee45a749f82f9"
+        ),
+        Path("src/memlint/semantics/identity_source.py"): (
+            "058590ef7258b9f611de486b5130b866893f0e4a2c1091d5ecd0d0a465463e87"
+        ),
+        Path("src/memlint/semantics/local_nli.py"): (
+            "aafe1e1a9d662879640285784704cdbfecefec4c25e402fae07101dd7ea087b1"
+        ),
+        Path("src/memlint/semantics/composition.py"): (
+            "cd617221c65bb6a58de7164f7438143d661903f62f57076f4869d3e28d6a7629"
+        ),
+        Path("tests/fixtures/benchmark_v0.1.sha256.json"): (
+            "de4bb8c2076a2c89b7e2df95518ef5588934644b711119fccc8727e0e9ac73fb"
+        ),
+        Path("src/memlint/cli.py"): (
+            "75379bfe370a8d56573bb3f6d022ed01c180cb00d84edf097309871df1dd51ca"
+        ),
+    }
+    assert {
+        path: hashlib.sha256(path.read_bytes()).hexdigest() for path in expected
+    } == expected
+
+
+def test_production_modules_do_not_depend_on_confirmatory_evaluation() -> None:
+    forbidden_roots = (
+        Path("src/memlint/adapters"),
+        Path("src/memlint/retrieval"),
+        Path("src/memlint/checkers"),
+        Path("src/memlint/semantics"),
+    )
+    for root in forbidden_roots:
+        for path in root.glob("*.py"):
+            assert "memlint.evaluation.retrieval_negation_confirmatory" not in _imports(
+                path
+            )
+    assert "memlint.evaluation.retrieval_negation_confirmatory" not in _imports(
+        Path("src/memlint/cli.py")
+    )
+    assert "retrieval_negation_confirmatory" not in Path(
+        "src/memlint/__init__.py"
+    ).read_text(encoding="utf-8")
+
+
+def test_evaluation_models_do_not_import_concrete_retriever_or_checker() -> None:
+    imports = _imports(PROBE_MODULE)
+    assert "memlint.evaluation.experimental_lexical" not in imports
+    assert not any(
+        module == "memlint.checkers" or module.startswith("memlint.checkers.")
+        for module in imports
+    )
+
+
+def test_runner_is_only_new_concrete_retriever_construction_site() -> None:
+    tree = ast.parse(RUNNER.read_text(encoding="utf-8"), filename=str(RUNNER))
+    calls = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "ExperimentalLexicalRetriever"
+    ]
+    assert len(calls) == 1
+    parents = [
+        function
+        for function in ast.walk(tree)
+        if isinstance(function, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and calls[0] in tuple(ast.walk(function))
+    ]
+    assert [function.name for function in parents] == ["_build_retriever"]
+
+
+def test_confirmatory_probe_is_not_in_benchmark_or_public_cli() -> None:
+    benchmark = Path("tests/fixtures/benchmark_v0.1/benchmark.json").read_text(
+        encoding="utf-8"
+    )
+    cli = Path("src/memlint/cli.py").read_text(encoding="utf-8")
+    assert "retrieval-negation-confirmatory-v0.1" not in benchmark
+    assert "negation-confirmatory" not in cli
