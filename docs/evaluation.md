@@ -508,3 +508,41 @@ This probe is development-only, not a held-out final benchmark or a production p
 Even `SUPPORTS_H4` would establish only susceptibility of this frozen lexical retriever under the
 preregistered synthetic challenge. It would not establish that BM25 is generally poor, that other
 memory retrievers share the behavior, or that the induced rate estimates real-world prevalence.
+
+## Fresh negation-retrieval confirmatory probe
+
+Broad H4 remains `DOES_NOT_SUPPORT_H4`. The frozen Part 6H-B development run induced shadowing in
+8/24 strong cases (33.33%), below its preregistered 40% requirement. Part 6H-C then observed post
+hoc that seven of eight negated competing-value cases were induced, compared with one of eight
+query-crowding cases, zero of eight contextual-mention cases, and zero of six low-overlap controls.
+That post-hoc pattern generated a new hypothesis, H4-N; it was not known before the 6H-B result and
+remains `NOT TESTED`.
+
+Part 6I-A preregisters a fresh synthetic confirmatory probe for H4-N. Its 18 newly authored base
+scenarios are balanced across six organizational domains. Each scenario stores one target and three
+baseline non-targets, then reuses that exact query, target, baseline, expected ID, `top_k=3`, and
+`ALL_EXPECTED` policy across three matched mutations: eight explicitly negated competing-value
+decoys, eight contextual non-answer controls using the same competing values one-for-one, and eight
+low-overlap controls. The scenario—not its three condition variants—is the primary matched unit.
+
+Before freezing, a separate lowercase `[A-Za-z0-9]+` tokenizer verifies all 144
+negated/contextual pairs use the same competing value, have the same query-token intersection
+count, and differ in length by at most three tokens. It also verifies each scenario's median
+low-overlap Jaccard is below both matched conditions. These are fixture-construction invariants,
+not retrieval outcomes, and the production tokenizer and BM25 implementation are not used.
+
+The baseline gate requires at least 17/18 eligible scenarios. Confirmation then requires at least
+12 negation-induced scenarios and at least two thirds of eligible scenarios; at least eight
+negation-specific discordances and at most two reverse discordances; no more than five contextual
+inductions; no more than one low-overlap induction; and negation-induced cases in at least five of
+six domains. The only interpretations are `SUPPORTS_H4_N`, `DOES_NOT_SUPPORT_H4_N`, and
+`INCONCLUSIVE_BASELINE_CONSTRUCTION`.
+
+The fixture is frozen by byte hash before retrieval execution. Part 6I-A observes no retrieval
+outputs, BM25 scores, or target ranks. A future Part 6I-B may execute the frozen runner exactly once.
+Its result contract stores one shared baseline per scenario, recomputes every condition's paired
+assessment from stored observations, and then recomputes the global summary from those validated
+scenario records.
+This is fresh confirmatory synthetic evidence following a post-hoc hypothesis, not a real-world
+benchmark, independent production validation, or a prevalence estimate. Broad H4 remains negative,
+and H3 confidence/selectivity research remains untested.
