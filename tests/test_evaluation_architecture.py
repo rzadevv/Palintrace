@@ -38,6 +38,7 @@ def test_evaluation_package_contains_frozen_accounting_and_execution_layers() ->
         "retrieval.py",
         "retrieval_negation_confirmatory.py",
         "retrieval_strong_probe.py",
+        "semantic_selectivity.py",
     }
 
 
