@@ -5,6 +5,9 @@ benchmark, tune a checker, select a model, or report a performance result. Evalu
 gold mutation metadata only after a checker has produced its independent `CheckerResult`; manifests,
 gold labels, base-store status, mutation IDs, and changed-memory lists are never detector inputs.
 
+Completed Part 6 results and their claim boundaries are summarized in
+[Evaluation results](results.md).
+
 ## Controlled static mutation accounting
 
 `evaluate_mutation_trial` joins one base store, its mutated store, the separate mutation manifest,
@@ -325,18 +328,19 @@ failure-pattern, clean-rescue, unsupported-safety, and prefix-stability gates al
 This is a DEVELOPMENT experiment, not independent held-out validation of a v0.2 checker. It does
 not make identity grounding production-ready, show real-world generalization, or prove that speaker
 identity is the sole semantic failure mechanism. No production method was changed after observing
-the result. H3 confidence/selectivity policy and H4 retrieval challenge design remain untested.
+the result. H3 confidence/selectivity and H4 retrieval were still untested at this stage.
 
 ### Part 6G-B candidate integration freeze
 
-Part 6G-B freezes a separate identity-grounded unsupported-claim candidate implementation before
+Part 6G-B froze a separate identity-grounded unsupported-claim candidate implementation before
 designing or running a new held-out evaluation. The method requires explicit turn-level speaker
 bindings, uses fixed PLAIN evidence plus the exact Part 6F speaker prefix, and abstains without a
 PLAIN fallback when identity is unavailable or conflicting. It is not a CLI or default method.
 
-No semantic model or held-out benchmark is run in Part 6G-B, so there are no candidate performance
-results to report. A future fresh evaluation must report both semantic outcomes among assessed
-memories and identity-grounding coverage and abstention counts. H3 and H4 remain untested.
+No semantic model or held-out benchmark was run in Part 6G-B, so that phase produced no candidate
+performance result. The subsequent fresh evaluation reports both semantic outcomes among assessed
+memories and identity-grounding coverage and abstention counts. H3 and H4 were untested at this
+stage.
 
 ## Part 6G-C identity-grounded held-out preregistration
 
@@ -458,7 +462,7 @@ This supports the exact frozen representation on this independently constructed 
 set. It is not real-world deployment validation or proof that production integrations can supply
 trustworthy speaker bindings. The experiment supplied every semantic-case binding explicitly.
 Candidate promotion, CLI/default integration, and production binding availability require later
-decisions and evidence. Benchmark v0.1 remains frozen; H3 and H4 remain untested.
+decisions and evidence. Benchmark v0.1 remained frozen; H3 and H4 were still untested at this point.
 
 ### Part 6G-D speaker-binding feasibility
 
@@ -516,9 +520,9 @@ Broad H4 remains `DOES_NOT_SUPPORT_H4`. The frozen Part 6H-B development run ind
 hoc that seven of eight negated competing-value cases were induced, compared with one of eight
 query-crowding cases, zero of eight contextual-mention cases, and zero of six low-overlap controls.
 That post-hoc pattern generated a new hypothesis, H4-N; it was not known before the 6H-B result and
-remains `NOT TESTED`.
+was `NOT TESTED` at hypothesis generation.
 
-Part 6I-A preregisters a fresh synthetic confirmatory probe for H4-N. Its 18 newly authored base
+Part 6I-A preregistered a fresh synthetic confirmatory probe for H4-N. Its 18 newly authored base
 scenarios are balanced across six organizational domains. Each scenario stores one target and three
 baseline non-targets, then reuses that exact query, target, baseline, expected ID, `top_k=3`, and
 `ALL_EXPECTED` policy across three matched mutations: eight explicitly negated competing-value
@@ -545,7 +549,7 @@ paired assessment from stored observations, and then recomputes the global summa
 validated scenario records.
 This is fresh confirmatory synthetic evidence following a post-hoc hypothesis, not a real-world
 benchmark, independent production validation, or a prevalence estimate. Broad H4 remains negative,
-and H3 confidence/selectivity research remains untested.
+and H3 confidence/selectivity was still untested before Part 6J.
 
 Part 6I-B subsequently executed that frozen confirmatory probe once. All 18 baselines were eligible.
 The negated and matched contextual conditions each induced shadowing in the same two scenarios;
@@ -557,7 +561,7 @@ prevalence claim.
 
 ## Semantic selectivity / abstention probe
 
-Part 6J-A preregisters H3, which was previously untested. The evaluation asks whether a confidence-
+Part 6J-A preregistered H3, which was previously untested. The evaluation asks whether a confidence-
 based decision layer can reduce clean unsupported-claim alerts while preserving unsupported
 detection and bounded abstention. It does not modify the frozen MiniLM NLI model, its relation
 labels, scores, tokenization, or the production `UnsupportedClaimChecker`. `ENTAILMENT` remains
@@ -574,8 +578,8 @@ Calibration considers only the frozen grid `0.50`, `0.60`, `0.70`, `0.80`, `0.90
 A threshold is eligible only when at least 22/24 calibration unsupported cases remain alerts. The
 deterministic selection rule then minimizes clean alerts, maximizes unsupported alerts, minimizes
 total abstentions, and finally chooses the lower threshold. No confirmatory result can influence
-selection. A future Part 6J-B runner will load MiniLM once, calibrate, select mechanically, and—if
-selection succeeds—immediately execute confirmation in the same one-shot invocation.
+selection. The Part 6J-B runner was frozen to load MiniLM once, calibrate, select mechanically,
+and—if selection succeeded—immediately execute confirmation in the same one-shot invocation.
 
 The confirmatory baseline must first produce at least four clean alerts. Unsupported safety then
 requires at least 22/24 selective alerts and a drop of at most one from baseline. Clean-alert
@@ -584,6 +588,12 @@ selective abstentions across the 48 confirmatory judgments may not exceed eight,
 40 assessed decisions. The only interpretations are `SUPPORTS_H3`, `DOES_NOT_SUPPORT_H3`, and
 `INCONCLUSIVE_BASELINE_TOO_EASY`.
 
-Part 6J-A observes no NLI relation, confidence score, selected threshold, or confirmatory result.
+Part 6J-A observed no NLI relation, confidence score, selected threshold, or confirmatory result.
 The probe is synthetic development evidence, not production calibration, universal confidence
 calibration, or a real-world prevalence study.
+
+Part 6J-B subsequently executed the frozen runner once. All six thresholds were eligible and the
+mechanical rule selected 0.50. The confirmatory baseline produced 0/24 clean alerts and 24/24
+unsupported alerts; the selective policy produced the same counts and 0/48 abstentions. Because the
+baseline clean-alert challenge failed, the exact interpretation is
+`INCONCLUSIVE_BASELINE_TOO_EASY`, not support for or evidence against H3.

@@ -4,6 +4,11 @@ MemLint is a system-agnostic foundation for auditing agent memory. Its research 
 which memory defects can eventually be detected from an existing store and its source transcripts,
 without external annotations or hidden canonical user state.
 
+## Evaluation status
+
+Part 6 is complete. See the [evaluation results and claim boundaries](docs/results.md) for the
+canonical controlled evidence, negative and inconclusive results, and current capability limits.
+
 This repository currently implements the frozen Foundation, the Part 2 taxonomy and mutation
 harness, four structural checkers, and the first semantic checker prototype.
 
@@ -31,7 +36,7 @@ Implemented:
 - gold-safe controlled-mutation and paired-retrieval evaluation accounting, without benchmark
   performance claims;
 - controlled benchmark v0.1 specification and execution methodology frozen, including an
-  evaluation-only lexical baseline; benchmark execution has not yet been run;
+  evaluation-only lexical baseline; the canonical controlled execution is complete;
 - `memlint dump`, `memlint mutate`, `memlint audit`, and `memlint retrieval-audit`.
 
 Not implemented yet:
@@ -285,7 +290,8 @@ The [semantic groundwork](docs/semantics.md) resolves and composes declared tran
 and defines a provider-independent judgment contract. The dependency-injected `unsupported_claim`
 prototype uses that contract, while an optional pinned local CPU NLI implementation is available for
 explicit development use. The current MiniLM plus PLAIN configuration is not a final research winner,
-and semantic performance has not been established. There is no score threshold, and zero findings
+and it is not production-validated; its controlled evidence and limitations are summarized above.
+There is no score threshold, and zero findings
 does not imply that every memory was assessed; inspect the checker skip counters. Core installs and
 structural audits do not include, construct, or download the local semantic model.
 
