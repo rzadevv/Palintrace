@@ -57,7 +57,7 @@ def test_identity_source_contract_is_available_without_exporting_candidate() -> 
 def test_cli_public_checker_and_transcript_contracts_remain_byte_frozen() -> None:
     expected = {
         Path("src/memlint/cli.py"): (
-            "75379bfe370a8d56573bb3f6d022ed01c180cb00d84edf097309871df1dd51ca"
+            "4a1f558e8e421f3cde965d5cdbe4c464082685e30e760249d0b9416503ddd942"
         ),
         Path("src/memlint/checkers/__init__.py"): (
             "b1a66c0ccc12182cc041f0baae0ad5f9267fb13a4f3be0a08c6dc11008a67b05"

@@ -48,7 +48,9 @@ CHECKER_NAMES = (*CHECKER_FACTORIES, "privacy_scope_violation", "unsupported_cla
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="memlint", description="Normalize agent memory stores")
+    parser = argparse.ArgumentParser(
+        prog="memlint", description="Normalize and audit agent memory stores"
+    )
     commands = parser.add_subparsers(dest="command", required=True)
     dump = commands.add_parser("dump", help="export one backend as a NormalizedStore")
     dump.add_argument("--adapter", choices=("file", "mem0", "graphiti", "letta"), required=True)

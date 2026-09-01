@@ -87,7 +87,7 @@ def test_frozen_identity_semantic_benchmark_and_cli_files_are_byte_exact() -> No
             "de4bb8c2076a2c89b7e2df95518ef5588934644b711119fccc8727e0e9ac73fb"
         ),
         Path("src/memlint/cli.py"): (
-            "75379bfe370a8d56573bb3f6d022ed01c180cb00d84edf097309871df1dd51ca"
+            "4a1f558e8e421f3cde965d5cdbe4c464082685e30e760249d0b9416503ddd942"
         ),
     }
     assert {

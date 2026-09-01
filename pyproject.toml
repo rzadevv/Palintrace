@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "memlint"
-version = "0.1.0"
-description = "System-agnostic normalization foundation for auditing agent memory"
+version = "0.2.0"
+description = "Provenance-aware auditing toolkit for LLM agent memory stores"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }

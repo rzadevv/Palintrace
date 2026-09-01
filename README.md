@@ -10,7 +10,7 @@ Part 6 is complete. See the [evaluation results and claim boundaries](docs/resul
 canonical controlled evidence, negative and inconclusive results, and current capability limits.
 
 This repository currently implements the frozen Foundation, the Part 2 taxonomy and mutation
-harness, four structural checkers, and the first semantic checker prototype.
+harness, four structural checker classes, and the frozen unsupported-claim semantic checker.
 
 Implemented:
 
@@ -43,7 +43,7 @@ Not implemented yet:
 
 - the `internal_contradiction` checker or semantic duplicate detection;
 - the instruction-related checker;
-- the retrieval or retrieval-shadowing checker;
+- a production/live backend retriever or automatic store-scanning retrieval-shadowing detector;
 - any API-hosted or generative LLM judge;
 - paper benchmark evaluation, including HaluMem, LongMemEval, or LoCoMo;
 - embedding generation, automatic repair, or benchmark scoring.

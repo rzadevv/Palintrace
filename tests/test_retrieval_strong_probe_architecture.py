@@ -49,7 +49,7 @@ def test_frozen_retrieval_implementation_and_part_five_contracts_are_byte_exact(
             "73197cae26979e939009252272b156d2f1e48d0d784fb07580cb47c2f6f3bbd1"
         ),
         Path("src/memlint/cli.py"): (
-            "75379bfe370a8d56573bb3f6d022ed01c180cb00d84edf097309871df1dd51ca"
+            "4a1f558e8e421f3cde965d5cdbe4c464082685e30e760249d0b9416503ddd942"
         ),
     }
     assert {
