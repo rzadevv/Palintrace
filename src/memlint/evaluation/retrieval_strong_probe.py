@@ -1,4 +1,4 @@
-"""Preregistered models and pure accounting for the Part 6H retrieval probe."""
+"""Models and pure accounting for the preregistered strong retrieval probe."""
 
 from __future__ import annotations
 
@@ -102,7 +102,7 @@ class RetrievalStrongProbeGateResult(StrEnum):
 
 
 class RetrievalStrongProbeInterpretation(StrEnum):
-    """The only allowed Part 6H-B interpretations."""
+    """Allowed interpretations for the strong retrieval probe."""
 
     SUPPORTS_H4 = "SUPPORTS_H4"
     DOES_NOT_SUPPORT_H4 = "DOES_NOT_SUPPORT_H4"
@@ -348,7 +348,7 @@ class RetrievalStrongProbeSpec(_DeterministicModel):
             or self.probe_id != RETRIEVAL_STRONG_PROBE_ID
             or self.split != RETRIEVAL_STRONG_PROBE_SPLIT
         ):
-            raise ValueError("probe identity must match the frozen Part 6H-A contract")
+            raise ValueError("probe identity must match the preregistered contract")
         if tuple(case.case_id for case in self.cases) != EXPECTED_CASE_IDS:
             raise ValueError("cases must use the exact canonical 30-case order")
 
@@ -626,7 +626,7 @@ class RetrievalStrongProbeSummary(_DeterministicModel):
 
 
 class RetrievalStrongProbeExecutionResult(_DeterministicModel):
-    """Deterministic future Part 6H-B result without query or memory text."""
+    """Deterministic execution result without query or memory text."""
 
     schema_version: StrictStr
     probe_id: StrictStr
@@ -672,7 +672,7 @@ def _outcome_counts(
 def summarize_retrieval_strong_probe(
     observations: tuple[RetrievalStrongProbeObservation, ...],
 ) -> RetrievalStrongProbeSummary:
-    """Apply the frozen Part 6H gates to complete paired observations."""
+    """Apply the preregistered gates to complete paired observations."""
 
     if not isinstance(observations, tuple) or any(
         not isinstance(observation, RetrievalStrongProbeObservation)

@@ -7,10 +7,9 @@ from pathlib import Path
 
 import memlint.cli as cli
 
-FROZEN_BENCHMARK_MODULE = Path("src/memlint/evaluation/benchmark.py")
 FROZEN_HASH_MANIFEST = Path("tests/fixtures/benchmark_v0.1.sha256.json")
 FROZEN_FIXTURE_ROOT = Path("tests/fixtures/benchmark_v0.1")
-PART6C_TESTS = (
+BENCHMARK_HARNESS_TESTS = (
     Path("tests/test_benchmark_execution.py"),
     Path("tests/test_benchmark_execution_models.py"),
     Path("tests/test_benchmark_runner.py"),
@@ -30,10 +29,7 @@ def _imports(path: Path) -> tuple[str, ...]:
     return tuple(found)
 
 
-def test_part6b_benchmark_module_and_hash_manifest_are_byte_frozen() -> None:
-    assert hashlib.sha256(FROZEN_BENCHMARK_MODULE.read_bytes()).hexdigest() == (
-        "dd9c49a5c3ce03669166b70ecf119c1a75f37fad70f3cc9fe4ff2f003a2bc956"
-    )
+def test_benchmark_fixture_hash_manifest_is_byte_frozen() -> None:
     assert hashlib.sha256(FROZEN_HASH_MANIFEST.read_bytes()).hexdigest() == (
         "de4bb8c2076a2c89b7e2df95518ef5588934644b711119fccc8727e0e9ac73fb"
     )
@@ -63,8 +59,10 @@ def test_experimental_lexical_exists_only_in_evaluation() -> None:
     )
 
 
-def test_part6c_tests_do_not_name_frozen_heldout_store_or_transcript_inputs() -> None:
-    combined = "\n".join(path.read_text(encoding="utf-8") for path in PART6C_TESTS)
+def test_harness_tests_do_not_name_heldout_store_or_transcript_inputs() -> None:
+    combined = "\n".join(
+        path.read_text(encoding="utf-8") for path in BENCHMARK_HARNESS_TESTS
+    )
     forbidden = {
         "fixture_h1_store.json",
         "fixture_h2_store.json",

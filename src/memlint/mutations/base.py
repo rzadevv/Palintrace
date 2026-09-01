@@ -96,7 +96,7 @@ def require_no_embedding(memory: NormalizedMemory) -> None:
 
     if memory.embedding is not None:
         raise MutationPreconditionError(
-            "Part 2 cannot safely mutate content without regenerating the embedding"
+            "content cannot be mutated safely without regenerating the embedding"
         )
 
 

@@ -10,7 +10,7 @@ from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import UTC, date, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Protocol, runtime_checkable
+from typing import Any
 
 from pydantic import AwareDatetime, JsonValue, TypeAdapter, ValidationError
 
@@ -33,15 +33,6 @@ class AdapterAuthenticationError(AdapterError):
 
 class AdapterDataError(AdapterError):
     """A source record or export has an unsupported/malformed shape."""
-
-
-@runtime_checkable
-class AdapterContract(Protocol):
-    """Structural interface available to future normalized consumers."""
-
-    name: str
-
-    def dump(self) -> NormalizedStore: ...
 
 
 class MemoryAdapter(ABC):

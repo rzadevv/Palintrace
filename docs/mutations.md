@@ -7,7 +7,7 @@ result = mutate(store, request, transcripts=None)
 ```
 
 Mutation manifest schema 1.1 adds explicit gold-label units and structural invariants. It remains
-separate from the frozen taxonomy version 1.0.
+separate from taxonomy version 1.0.
 
 `result.mutated_store` is the detector-visible normalized store. `result.manifest` is separate gold
 data for later evaluation and must never be passed to a detector. Mutation labels, mutation IDs, and
@@ -83,7 +83,7 @@ is rejected.
 Synthetic benchmarks must not reward detectors for recognizing the harness instead of the defect:
 
 - generated memory and broken-reference IDs are opaque and contain no mutation role or class names;
-- content-changing substitutions require targets without stored embeddings, because Part 2 does not
+- content-changing substitutions require targets without stored embeddings, because the harness does not
   regenerate embeddings; derived changed-content records also carry no copied embedding;
 - mutation metadata and gold semantics never enter detector-visible records or `raw`;
 - relational gold is scored as one memory-pair relation, not two independent memory labels;

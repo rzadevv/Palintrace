@@ -26,7 +26,7 @@ def test_backend_sdks_are_imported_only_inside_their_adapters() -> None:
 
 
 def test_generic_code_does_not_read_raw_attributes() -> None:
-    """Future generic/checker modules must use typed normalized fields, never ``.raw``."""
+    """Generic and checker modules use typed normalized fields, never ``.raw``."""
 
     allowed = {SOURCE_ROOT / "models" / "memory.py"}
     violations: list[str] = []
@@ -40,7 +40,7 @@ def test_generic_code_does_not_read_raw_attributes() -> None:
     assert violations == []
 
 
-def test_part_three_does_not_contain_later_phase_packages() -> None:
+def test_package_has_no_unimplemented_detector_repair_or_benchmark_layers() -> None:
     forbidden = {"detectors", "repair", "benchmarks"}
     assert not any(path.name in forbidden for path in SOURCE_ROOT.rglob("*"))
 

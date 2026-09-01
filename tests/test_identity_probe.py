@@ -419,8 +419,9 @@ def test_identity_probe_is_evaluation_only_and_has_no_production_or_cli_dependen
     assert not any("threshold" in field for field in IdentityProbeExecutionResult.model_fields)
 
 
-def test_evaluation_docs_do_not_restore_stale_current_benchmark_status() -> None:
+def test_evaluation_docs_link_current_results_without_stale_status() -> None:
     text = Path("docs/evaluation.md").read_text(encoding="utf-8")
     assert "No final research benchmark has been run." not in text
     assert "Benchmark v0.1 remains `NOT_RUN`." not in text
-    assert "execution status at specification freeze time: `NOT_RUN`" in text
+    assert "[Evaluation results](results.md)" in text
+    assert "Result JSON files remain external" in text

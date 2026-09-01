@@ -2,7 +2,7 @@
 
 Taxonomy version: `1.0`
 
-Version 1.0 freezes the following eight research labels before detector development. Package
+Version 1.0 defines the following eight research labels. Package
 versions and detector thresholds do not change this taxonomy version. A later taxonomy revision must
 be explicit rather than renaming a class in response to detector behavior.
 
@@ -141,7 +141,7 @@ which editor the user prefers fails to return it after related editor memories a
 **Required evidence.** The query, expected target ID, configured retrieval mechanism, returned result,
 and the experiment's sufficiency criterion are required for an observed defect.
 
-**Gold label target.** A runtime observation labels the query/target retrieval case. A Part 2 challenge
+**Gold label target.** A runtime observation labels the query/target retrieval case. A controlled challenge
 records the expected target but explicitly does not label an observed failure.
 
 **Establishment.** Runtime retrieval behavior is mandatory. Static store inspection cannot establish
@@ -189,7 +189,7 @@ case requires an explicit session-isolation rule.
 
 **Exclusion criteria.** Ordinary user, agent, or session differences are not violations without a
 defined boundary. General sensitivity or normative privacy judgments are outside this taxonomy's
-core Part 2 mutation.
+core controlled mutation.
 
 **Example.** A memory belonging to Alice is copied into Bob's user scope while Alice's source record
 is left unchanged.
@@ -232,7 +232,7 @@ duplicate storage is unnecessary are required.
 both IDs.
 
 **Establishment.** Exact duplicates are statically established. Uncontrolled paraphrase equivalence
-would require semantic evidence and is not generated in Part 2.
+would require semantic evidence and is not produced by the mutation harness.
 
 **Mutation strategy.** `exact_duplicate` copies a record into the same scope with a new deterministic
 ID and preserves the original record.

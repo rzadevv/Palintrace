@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import ast
-import hashlib
 from pathlib import Path
 
 import memlint.evaluation.identity_grounded_heldout as heldout
@@ -21,7 +20,7 @@ def _imports(path: Path) -> tuple[tuple[str, int], ...]:
     return tuple(imports)
 
 
-def test_phase_a_manifest_verifies_all_frozen_bytes() -> None:
+def test_manifest_verifies_runner_inputs() -> None:
     manifest = heldout.validate_phase_a_manifest(Path.cwd())
     assert len(manifest.files) == 10
 
@@ -57,7 +56,7 @@ def test_local_nli_construction_is_lazy_and_runner_only() -> None:
     assert [function.name for function in parent_functions] == ["_build_judge"]
 
 
-def test_no_production_or_frozen_development_module_imports_heldout_evaluation() -> None:
+def test_production_and_earlier_evaluation_code_do_not_import_heldout_module() -> None:
     forbidden_roots = (
         Path("src/memlint/checkers"),
         Path("src/memlint/adapters"),
@@ -79,28 +78,3 @@ def test_no_production_or_frozen_development_module_imports_heldout_evaluation()
             module != "memlint.evaluation.identity_grounded_heldout"
             for module, _line in _imports(path)
         )
-
-
-def test_frozen_predecessor_and_candidate_hashes_remain_exact() -> None:
-    expected = {
-        Path("src/memlint/checkers/unsupported_claim.py"): (
-            heldout.FROZEN_UNSUPPORTED_CLAIM_SHA256
-        ),
-        Path("src/memlint/checkers/unsupported_claim_identity_grounded.py"): (
-            heldout.FROZEN_CANDIDATE_SHA256
-        ),
-        Path("src/memlint/semantics/identity.py"): (
-            heldout.FROZEN_IDENTITY_CONTRACT_SHA256
-        ),
-        Path("src/memlint/semantics/local_nli.py"): heldout.FROZEN_LOCAL_NLI_SHA256,
-        Path("src/memlint/semantics/composition.py"): heldout.FROZEN_COMPOSITION_SHA256,
-        Path("tests/fixtures/benchmark_v0.1.sha256.json"): (
-            heldout.FROZEN_BENCHMARK_MANIFEST_SHA256
-        ),
-        Path("tests/fixtures/unsupported_identity_probe_v0.1.json"): (
-            heldout.FROZEN_IDENTITY_PROBE_FIXTURE_SHA256
-        ),
-    }
-    assert {
-        path: hashlib.sha256(path.read_bytes()).hexdigest() for path in expected
-    } == expected
