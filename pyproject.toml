@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "palintrace"
 version = "0.2.0"
-description = "Provenance-aware auditing toolkit for LLM agent memory stores"
+description = "Backend-independent forensic auditing for persistent AI-agent memory"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }

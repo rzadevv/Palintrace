@@ -1,8 +1,10 @@
 # Palintrace
 
-Palintrace is a provenance-aware auditing toolkit for LLM agent memory stores. It normalizes memory
-exports, runs structural and evidence-based checks, creates controlled mutations for evaluation,
-and audits recorded retrieval observations without requiring hidden canonical user state.
+Palintrace is a backend-independent forensic analyzer for persistent AI-agent memory. It inspects
+stored memory artifacts for provenance, state, scope, and evidence-integrity problems and produces
+reproducible findings for debugging, investigation, review, and CI. Palintrace audits the state
+produced by memory systems; it does not replace the memory backend or benchmark which backend
+performs best.
 
 ## Architecture
 
@@ -192,6 +194,7 @@ recorded retrieval observations; see [retrieval auditing](docs/retrieval.md).
 
 ## Documentation
 
+- [Compatibility policy](docs/compatibility.md)
 - [Checker behavior](docs/checkers.md)
 - [Evaluation methodology](docs/evaluation.md)
 - [Evaluation results](docs/results.md)
