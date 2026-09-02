@@ -19,7 +19,8 @@ assessed through paired retrieval experiments rather than store inspection.
 
 Every checker returns a `CheckerResult` containing:
 
-- checker and defect-class identity;
+- checker identity and implementation version;
+- rule identity, rule version, default severity, and defect class;
 - zero or more deterministic `Finding` objects;
 - model-call and token accounting;
 - aggregate scan statistics.
@@ -27,6 +28,9 @@ Every checker returns a `CheckerResult` containing:
 A finding identifies affected memory IDs and structured evidence. Finding IDs are derived from the
 checker identity, version, defect class, memory IDs, and evidence. Repeated checks over the same
 normalized input therefore produce stable output.
+
+Result severity expresses a rule's default importance. `Finding.confidence` expresses confidence in
+one particular finding; it is not a severity level.
 
 Findings avoid serializing memory content and transcript text. Semantic findings contain hashes and
 source coordinates instead. Mutation manifests and benchmark gold labels are never checker inputs.

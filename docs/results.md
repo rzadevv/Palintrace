@@ -132,5 +132,8 @@ The result artifacts are external to the repository. Their SHA-256 identifiers a
 | Negation confirmatory probe | `fdec1cd253bdfb078f60b1b9a40d35b1058362d4b591933f37adf3db8515eba2` |
 | Confidence-selectivity probe | `a16bf5d4bc98973b3f43061c794959adeddf3faf81f99a8b907fa94f171ec9dd` |
 
+These SHA-256 values identify the historical published evaluation artifacts. Later checker-result
+schema changes do not rewrite them.
+
 The repository retains the corresponding fixtures, evaluation modules, runners, and validation
 tests. These hashes identify external results; the result JSON files are not committed.

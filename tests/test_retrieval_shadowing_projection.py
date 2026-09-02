@@ -81,10 +81,13 @@ def _finding_id(
 def test_projection_uses_frozen_result_identity_and_schema() -> None:
     result = _project(_observation())
 
-    assert CHECKER_RESULT_SCHEMA_VERSION == "0.2"
-    assert result.schema_version == "0.2"
+    assert CHECKER_RESULT_SCHEMA_VERSION == "0.3"
+    assert result.schema_version == "0.3"
     assert result.checker_id == "retrieval_shadowing"
     assert result.checker_version == "1.0"
+    assert result.rule_id == "memory.retrieval.shadowing"
+    assert result.rule_version == "1.0.0"
+    assert result.severity == "error"
     assert result.defect_class is DefectClass.RETRIEVAL_SHADOWING
 
 

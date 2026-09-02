@@ -84,11 +84,15 @@ def _result(
     *,
     checker_id: str = "alternative-candidate",
     checker_version: str = "revision-test",
+    rule_id: str = "memory.test.synthetic",
 ) -> CheckerResult:
     finding_tuple = tuple(findings)
     return CheckerResult(
         checker_id=checker_id,
         checker_version=checker_version,
+        rule_id=rule_id,
+        rule_version="1.0.0",
+        severity="error",
         defect_class=defect_class,
         findings=finding_tuple,
         stats=CheckerStats(
@@ -258,6 +262,7 @@ def test_result_defect_class_must_match_but_checker_id_may_differ(
             DefectClass.ORPHANED_PROVENANCE,
             (_finding("gold", DefectClass.ORPHANED_PROVENANCE, gold_ids),),
             checker_id="experimental-provenance-baseline",
+            rule_id="memory.provenance.orphaned",
         ),
     )
     assert trial.checker_id == "experimental-provenance-baseline"

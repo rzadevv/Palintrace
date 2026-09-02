@@ -1,7 +1,7 @@
 # Compatibility
 
 This document records the public identity and compatibility rules that apply as Palintrace evolves.
-It does not add fields or behavior to the current package.
+Package version `0.3.0` implements the first result-level rule identity contract.
 
 ## Package versions
 
@@ -46,8 +46,12 @@ The canonical rule mapping for the five supported public static checkers is:
 | `privacy_scope_violation` | `memory.scope.prohibited-exact-replica` |
 | `unsupported_claim` | `memory.claim.unsupported` |
 
-These mappings define stable semantic names for future public rule support. Current result models do
-not contain `rule_id` or `rule_version` fields.
+Recorded retrieval results use `retrieval_shadowing` with `memory.retrieval.shadowing`. This is a
+projection of a recorded observation, not a sixth static production checker.
+
+The experimental `unsupported_claim_identity_grounded` checker also uses
+`memory.claim.unsupported`. It is an alternate implementation of the same semantic rule and remains
+nondefault.
 
 ## Checker and rule identity
 
@@ -59,9 +63,9 @@ rule_id      = stable semantic identity of the defect or invariant
 rule_version = version of that rule's public semantics
 ```
 
-For example, the existing `unsupported_claim` checker is mapped conceptually to
-`memory.claim.unsupported` at rule version `1.0.0`. This example documents the policy; it is not a
-serialized production contract in package version `0.2.0`.
+For example, the existing `unsupported_claim` checker maps to `memory.claim.unsupported` at rule
+version `1.0.0`. Since checker-result schema `0.3`, `CheckerResult` serializes `rule_id`,
+`rule_version`, and `severity` once on the result envelope.
 
 Existing checker IDs participate in code, tests, result identities, evaluation, and frozen research
 artifacts. They remain unchanged. A material change to a rule's public meaning uses a distinct
@@ -79,12 +83,12 @@ taxonomy version
 future Memory IR version
 ```
 
-For example, package `0.3.0` can emit checker-result schema `0.2`, evaluate
+For example, package `0.3.0` can emit checker-result schema `0.3`, evaluate
 `memory.claim.unsupported@1.0.0`, and use taxonomy `1.0`. A package release does not by itself require
 changes to the other version domains.
 
 Serialized formats carry their own schema versions. Compatibility is stated for each format rather
-than inferred from the package version. The current checker-result schema version is `0.2`.
+than inferred from the package version. The current checker-result schema version is `0.3`.
 
 The defect taxonomy is independently versioned and is currently `1.0`. Its version changes when the
 taxonomy contract changes, not whenever the package changes.

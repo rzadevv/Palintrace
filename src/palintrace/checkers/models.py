@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Mapping
 from pathlib import Path
 from types import MappingProxyType
-from typing import cast
+from typing import Literal, cast
 
 from pydantic import (
     BaseModel,
@@ -22,7 +23,65 @@ from pydantic import (
 
 from palintrace.taxonomy import DefectClass
 
-CHECKER_RESULT_SCHEMA_VERSION = "0.2"
+CHECKER_RESULT_SCHEMA_VERSION = "0.3"
+
+Severity = Literal["info", "warning", "error"]
+
+_BUILTIN_RULE_METADATA: Mapping[
+    str, tuple[DefectClass, str, str, Severity]
+] = MappingProxyType(
+    {
+        "orphaned_provenance": (
+            DefectClass.ORPHANED_PROVENANCE,
+            "memory.provenance.orphaned",
+            "1.0.0",
+            "error",
+        ),
+        "redundancy_bloat": (
+            DefectClass.REDUNDANCY_BLOAT,
+            "memory.duplication.exact",
+            "1.0.0",
+            "warning",
+        ),
+        "stale_active": (
+            DefectClass.STALE_ACTIVE,
+            "memory.state.explicit-stale",
+            "1.0.0",
+            "error",
+        ),
+        "privacy_scope_violation": (
+            DefectClass.PRIVACY_SCOPE_VIOLATION,
+            "memory.scope.prohibited-exact-replica",
+            "1.0.0",
+            "error",
+        ),
+        "unsupported_claim": (
+            DefectClass.UNSUPPORTED_CLAIM,
+            "memory.claim.unsupported",
+            "1.0.0",
+            "error",
+        ),
+        "unsupported_claim_identity_grounded": (
+            DefectClass.UNSUPPORTED_CLAIM,
+            "memory.claim.unsupported",
+            "1.0.0",
+            "error",
+        ),
+        "retrieval_shadowing": (
+            DefectClass.RETRIEVAL_SHADOWING,
+            "memory.retrieval.shadowing",
+            "1.0.0",
+            "error",
+        ),
+    }
+)
+
+_RULE_ID_PATTERN = re.compile(
+    r"memory\.[a-z0-9]+(?:-[a-z0-9]+)*\.[a-z0-9]+(?:-[a-z0-9]+)*"
+)
+_RULE_VERSION_PATTERN = re.compile(
+    r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)"
+)
 
 
 def _freeze_json(value: JsonValue) -> object:
@@ -186,10 +245,33 @@ class CheckerResult(BaseModel):
     schema_version: str = CHECKER_RESULT_SCHEMA_VERSION
     checker_id: str
     checker_version: str
+    rule_id: str = Field(default="", validate_default=True)
+    rule_version: str = Field(default="", validate_default=True)
+    severity: Severity = Field(default="info", validate_default=True)
     defect_class: DefectClass
     findings: tuple[Finding, ...] = ()
     cost: CheckerCost = Field(default_factory=CheckerCost)
     stats: CheckerStats
+
+    @model_validator(mode="before")
+    @classmethod
+    def populate_builtin_rule_metadata(cls, data: object) -> object:
+        if not isinstance(data, Mapping):
+            return data
+        checker_id = data.get("checker_id")
+        if not isinstance(checker_id, str):
+            return data
+        metadata = _BUILTIN_RULE_METADATA.get(checker_id)
+        if metadata is None:
+            if any(field not in data for field in ("rule_id", "rule_version", "severity")):
+                raise ValueError("custom checkers must supply explicit rule metadata")
+            return data
+        _, rule_id, rule_version, severity = metadata
+        populated = dict(data)
+        populated.setdefault("rule_id", rule_id)
+        populated.setdefault("rule_version", rule_version)
+        populated.setdefault("severity", severity)
+        return populated
 
     @field_validator("schema_version")
     @classmethod
@@ -205,6 +287,20 @@ class CheckerResult(BaseModel):
             raise ValueError("checker_id and checker_version must not be blank")
         return value
 
+    @field_validator("rule_id")
+    @classmethod
+    def rule_id_must_be_canonical(cls, value: str) -> str:
+        if _RULE_ID_PATTERN.fullmatch(value) is None or "palintrace" in value:
+            raise ValueError("rule_id must use the memory.<area>.<defect> format")
+        return value
+
+    @field_validator("rule_version")
+    @classmethod
+    def rule_version_must_be_numeric_semver(cls, value: str) -> str:
+        if _RULE_VERSION_PATTERN.fullmatch(value) is None:
+            raise ValueError("rule_version must use numeric MAJOR.MINOR.PATCH form")
+        return value
+
     @field_validator("findings")
     @classmethod
     def findings_are_sorted(cls, value: tuple[Finding, ...]) -> tuple[Finding, ...]:
@@ -212,6 +308,17 @@ class CheckerResult(BaseModel):
 
     @model_validator(mode="after")
     def findings_match_result(self) -> CheckerResult:
+        metadata = _BUILTIN_RULE_METADATA.get(self.checker_id)
+        if metadata is not None:
+            expected_defect, rule_id, rule_version, severity = metadata
+            if self.defect_class is not expected_defect:
+                raise ValueError("built-in checker_id does not match defect_class")
+            if (self.rule_id, self.rule_version, self.severity) != (
+                rule_id,
+                rule_version,
+                severity,
+            ):
+                raise ValueError("built-in checker rule metadata must match canonical values")
         finding_ids = [finding.finding_id for finding in self.findings]
         if len(set(finding_ids)) != len(finding_ids):
             raise ValueError("finding IDs must be unique")
