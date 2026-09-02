@@ -1,9 +1,9 @@
 import pytest
 
-from memlint.adapters import AdapterDataError
-from memlint.adapters.base import deterministic_memory_id, json_safe
-from memlint.adapters.file import normalize_file_record
-from memlint.models import MemoryScope, SourceRef
+from palintrace.adapters import AdapterDataError
+from palintrace.adapters.base import deterministic_memory_id, json_safe
+from palintrace.adapters.file import normalize_file_record
+from palintrace.models import MemoryScope, SourceRef
 
 
 @pytest.mark.parametrize("invalid", [float("nan"), float("inf"), float("-inf")])

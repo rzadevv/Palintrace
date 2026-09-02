@@ -10,15 +10,15 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
-import memlint.cli as cli
-from memlint.checkers import (
+import palintrace.cli as cli
+from palintrace.checkers import (
     OrphanedProvenanceChecker,
     PrivacyScopeViolationChecker,
     RedundancyBloatChecker,
     StaleActiveChecker,
     load_scope_policy,
 )
-from memlint.evaluation import (
+from palintrace.evaluation import (
     BENCHMARK_ID,
     BENCHMARK_SCHEMA_VERSION,
     BENCHMARK_SPEC_SHA256,
@@ -29,18 +29,18 @@ from memlint.evaluation import (
     load_benchmark_spec,
     validate_benchmark_fixture_eligibility,
 )
-from memlint.models import NormalizedMemory, NormalizedStore, TranscriptSet
-from memlint.mutations import BaseStoreStatus, GoldLabelUnit, MutationRequest, mutate
-from memlint.mutations.base import semantic_store_digest
-from memlint.retrieval import RetrievalSufficiencyPolicy
-from memlint.serialization import load_store, load_transcripts
-from memlint.taxonomy import DefectClass
+from palintrace.models import NormalizedMemory, NormalizedStore, TranscriptSet
+from palintrace.mutations import BaseStoreStatus, GoldLabelUnit, MutationRequest, mutate
+from palintrace.mutations.base import semantic_store_digest
+from palintrace.retrieval import RetrievalSufficiencyPolicy
+from palintrace.serialization import load_store, load_transcripts
+from palintrace.taxonomy import DefectClass
 
 REPOSITORY_ROOT = Path(".")
 FIXTURE_ROOT = Path("tests/fixtures/benchmark_v0.1")
 BENCHMARK_PATH = FIXTURE_ROOT / "benchmark.json"
 HASH_MANIFEST_PATH = Path("tests/fixtures/benchmark_v0.1.sha256.json")
-BENCHMARK_MODULE_PATH = Path("src/memlint/evaluation/benchmark.py")
+BENCHMARK_MODULE_PATH = Path("src/palintrace/evaluation/benchmark.py")
 
 EXPECTED_SOURCE_VALUES = {
     "h1-journal-app": "Obsidian",
@@ -122,7 +122,7 @@ def _all_json_strings(value: object) -> set[str]:
 
 def test_benchmark_version_split_and_case_kind_are_exact() -> None:
     assert BENCHMARK_SCHEMA_VERSION == "0.1"
-    assert BENCHMARK_ID == "memlint-controlled-v0.1"
+    assert BENCHMARK_ID == "palintrace-controlled-v0.1"
     assert tuple(BenchmarkSplit) == (
         BenchmarkSplit.DEVELOPMENT,
         BenchmarkSplit.HELD_OUT,
@@ -154,7 +154,7 @@ def test_benchmark_spec_loads_and_serializes_deterministically(
 def test_benchmark_canonical_sha_is_frozen(benchmark_spec: BenchmarkSpec) -> None:
     digest = hashlib.sha256(benchmark_spec.to_json(indent=None).encode("utf-8")).hexdigest()
     assert digest == BENCHMARK_SPEC_SHA256
-    assert digest == "fd11b0d547197495d51684f005ac17c861392891e464d818815e04eb6f37dad0"
+    assert digest == "90793984a6e191cad4cd276c185dfe8a1eac814035493a101768a96051a240f1"
 
 
 def test_every_benchmark_fixture_file_hash_is_frozen() -> None:

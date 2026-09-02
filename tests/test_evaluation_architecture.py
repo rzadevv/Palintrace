@@ -1,9 +1,9 @@
 import ast
 from pathlib import Path
 
-import memlint.cli as cli
+import palintrace.cli as cli
 
-SOURCE_ROOT = Path("src/memlint")
+SOURCE_ROOT = Path("src/palintrace")
 EVALUATION_ROOT = SOURCE_ROOT / "evaluation"
 DETECTOR_ROOTS = tuple(
     SOURCE_ROOT / package
@@ -48,7 +48,7 @@ def test_detector_and_runtime_packages_do_not_import_evaluation() -> None:
         for root in DETECTOR_ROOTS
         for path in root.rglob("*.py")
         for module in _absolute_imports(path)
-        if module == "memlint.evaluation" or module.startswith("memlint.evaluation.")
+        if module == "palintrace.evaluation" or module.startswith("palintrace.evaluation.")
     ]
     assert violations == []
 
@@ -92,10 +92,10 @@ def test_retrieval_summary_module_has_no_manifest_or_mutation_dependency() -> No
     violations: list[str] = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
-            if any(alias.name.startswith("memlint.mutations") for alias in node.names):
+            if any(alias.name.startswith("palintrace.mutations") for alias in node.names):
                 violations.append(f"{node.lineno}:mutation import")
         elif isinstance(node, ast.ImportFrom):
-            if (node.module or "").startswith("memlint.mutations"):
+            if (node.module or "").startswith("palintrace.mutations"):
                 violations.append(f"{node.lineno}:mutation import")
             if any(alias.name in forbidden_names for alias in node.names):
                 violations.append(f"{node.lineno}:gold model import")
@@ -122,6 +122,6 @@ def test_no_evaluation_or_benchmark_cli_and_audit_accepts_no_manifest() -> None:
 
 def test_cli_has_no_evaluation_package_dependency() -> None:
     assert not any(
-        module == "memlint.evaluation" or module.startswith("memlint.evaluation.")
+        module == "palintrace.evaluation" or module.startswith("palintrace.evaluation.")
         for module in _absolute_imports(SOURCE_ROOT / "cli.py")
     )

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from memlint.adapters.file import normalize_file_record
-from memlint.adapters.graphiti import normalize_graphiti_record
-from memlint.adapters.letta import normalize_letta_record
-from memlint.adapters.mem0 import normalize_mem0_record
-from memlint.models import (
+from palintrace.adapters.file import normalize_file_record
+from palintrace.adapters.graphiti import normalize_graphiti_record
+from palintrace.adapters.letta import normalize_letta_record
+from palintrace.adapters.mem0 import normalize_mem0_record
+from palintrace.models import (
     MemoryScope,
     NormalizedMemory,
     ProvenanceStatus,
@@ -13,7 +13,7 @@ from memlint.models import (
     TranscriptSet,
     TranscriptTurn,
 )
-from memlint.semantics import (
+from palintrace.semantics import (
     SpeakerIdentityBinding,
     SpeakerIdentityBindings,
     SpeakerIdentityResolutionStatus,

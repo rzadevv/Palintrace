@@ -1,6 +1,6 @@
 # Evaluation results
 
-MemLint has been evaluated with controlled synthetic fixtures. These experiments test specific
+Palintrace has been evaluated with controlled synthetic fixtures. These experiments test specific
 methods under known conditions; they do not estimate real-world accuracy, false-positive rates,
 identity availability, retrieval failures, or defect prevalence.
 
@@ -106,12 +106,12 @@ neither support for nor evidence against H3.
 
 ## Current limitations
 
-MemLint has five public static checker classes: `orphaned_provenance`, `redundancy_bloat`,
+Palintrace has five public static checker classes: `orphaned_provenance`, `redundancy_bloat`,
 `stale_active`, `privacy_scope_violation`, and `unsupported_claim`. Their claims are checker-specific.
 The identity-grounded unsupported-claim implementation remains a separate non-CLI candidate.
 
 Retrieval observation, sufficiency, paired assessment, and finding projection are implemented, but
-MemLint does not include a live production retriever. `internal_contradiction` and
+Palintrace does not include a live production retriever. `internal_contradiction` and
 `injected_instruction` remain deferred because the available zero-cost CPU probes did not identify
 methods robust enough for production checkers.
 

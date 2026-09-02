@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from memlint.semantics import SemanticJudgment, SemanticRelation, SemanticUsage
+from palintrace.semantics import SemanticJudgment, SemanticRelation, SemanticUsage
 from tools.evaluate_compatibility_reframing import (
     CANDIDATES,
     COMPATIBILITY_HYPOTHESIS,

@@ -14,7 +14,7 @@ from importlib.metadata import version
 from pathlib import Path
 from typing import Any
 
-from memlint.semantics import (
+from palintrace.semantics import (
     EvidenceCompositionStyle,
     EvidenceSegment,
     LocalNLISemanticJudge,
@@ -150,7 +150,7 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "Compare the two frozen evidence representations as a development sanity probe; "
-            "not a MemLint benchmark."
+            "not a Palintrace benchmark."
         )
     )
     parser.add_argument("--cases", type=Path, default=DEFAULT_CASES)
@@ -170,7 +170,7 @@ def main(argv: list[str] | None = None) -> int:
         device=args.device,
     )
 
-    print("probe_kind: evidence-composition development probe; not a MemLint benchmark")
+    print("probe_kind: evidence-composition development probe; not a Palintrace benchmark")
     print(f"model_id: {MODEL_ID}")
     print(f"revision: {MODEL_REVISION}")
     print(f"device: {args.device}")

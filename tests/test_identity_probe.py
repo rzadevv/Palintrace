@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from memlint.evaluation.identity_probe import (
+from palintrace.evaluation.identity_probe import (
     IDENTITY_PROBE_FIXTURE_SHA256,
     IDENTITY_PROBE_ID,
     IDENTITY_PROBE_MODEL_ID,
@@ -35,8 +35,8 @@ from memlint.evaluation.identity_probe import (
     preflight_identity_probe,
     summarize_identity_probe_judgments,
 )
-from memlint.evaluation.preflight import preflight_benchmark_v0_1
-from memlint.semantics import SemanticJudgment, SemanticRelation, SemanticUsage
+from palintrace.evaluation.preflight import preflight_benchmark_v0_1
+from palintrace.semantics import SemanticJudgment, SemanticRelation, SemanticUsage
 
 FIXTURE = Path("tests/fixtures/unsupported_identity_probe_v0.1.json")
 PINNED_JUDGE_ID = f"hf-nli:{IDENTITY_PROBE_MODEL_ID}"
@@ -396,25 +396,25 @@ def test_fake_judge_execution_requires_96_and_serializes_deterministically() -> 
 
 def test_v01_preflight_and_manifest_hash_remain_frozen() -> None:
     benchmark = preflight_benchmark_v0_1(repository_root=Path.cwd())
-    assert benchmark.benchmark_id == "memlint-controlled-v0.1"
+    assert benchmark.benchmark_id == "palintrace-controlled-v0.1"
     canonical_sha = hashlib.sha256(benchmark.to_json(indent=None).encode("utf-8")).hexdigest()
-    assert canonical_sha == "fd11b0d547197495d51684f005ac17c861392891e464d818815e04eb6f37dad0"
+    assert canonical_sha == "90793984a6e191cad4cd276c185dfe8a1eac814035493a101768a96051a240f1"
     manifest_sha = hashlib.sha256(
         Path("tests/fixtures/benchmark_v0.1.sha256.json").read_bytes()
     ).hexdigest()
-    assert manifest_sha == "de4bb8c2076a2c89b7e2df95518ef5588934644b711119fccc8727e0e9ac73fb"
+    assert manifest_sha == "028fe4e096adc556b4d23bd89c6f5c79f635cbcfe327ad94a2a5a2e7794a659d"
 
 
 def test_identity_probe_is_evaluation_only_and_has_no_production_or_cli_dependency() -> None:
     for root in (
-        Path("src/memlint/checkers"),
-        Path("src/memlint/semantics"),
-        Path("src/memlint/mutations"),
-        Path("src/memlint/retrieval"),
+        Path("src/palintrace/checkers"),
+        Path("src/palintrace/semantics"),
+        Path("src/palintrace/mutations"),
+        Path("src/palintrace/retrieval"),
     ):
         for source_path in root.rglob("*.py"):
             assert "identity_probe" not in source_path.read_text(encoding="utf-8")
-    assert "identity" not in Path("src/memlint/cli.py").read_text(encoding="utf-8")
+    assert "identity" not in Path("src/palintrace/cli.py").read_text(encoding="utf-8")
     assert not any("threshold" in field for field in IdentityProbeJudgment.model_fields)
     assert not any("threshold" in field for field in IdentityProbeExecutionResult.model_fields)
 

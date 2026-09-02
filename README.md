@@ -1,6 +1,6 @@
-# MemLint
+# Palintrace
 
-MemLint is a provenance-aware auditing toolkit for LLM agent memory stores. It normalizes memory
+Palintrace is a provenance-aware auditing toolkit for LLM agent memory stores. It normalizes memory
 exports, runs structural and evidence-based checks, creates controlled mutations for evaluation,
 and audits recorded retrieval observations without requiring hidden canonical user state.
 
@@ -56,7 +56,7 @@ See [checker behavior](docs/checkers.md) for the checker-specific requirements.
 
 ## Installation
 
-MemLint requires Python 3.11 or newer.
+Palintrace requires Python 3.11 or newer.
 
 ```bash
 python -m pip install -e .
@@ -81,7 +81,7 @@ python -m pip install -e '.[semantic-local]'
 Normalize a file-backed memory store:
 
 ```bash
-memlint dump \
+palintrace dump \
   --adapter file \
   --source examples/store.yaml \
   --output normalized.json
@@ -90,7 +90,7 @@ memlint dump \
 Run a structural audit:
 
 ```bash
-memlint audit \
+palintrace audit \
   --store normalized.json \
   --transcripts examples/transcripts.json \
   --checker orphaned_provenance \
@@ -100,7 +100,7 @@ memlint audit \
 Create a controlled mutation and a separate gold manifest:
 
 ```bash
-memlint mutate \
+palintrace mutate \
   --store examples/mutation-store.json \
   --transcripts examples/mutation-transcripts.json \
   --defect unsupported_claim \
@@ -114,7 +114,7 @@ memlint mutate \
 Project a recorded retrieval observation into a checker result:
 
 ```bash
-memlint retrieval-audit \
+palintrace retrieval-audit \
   --observation retrieval-observation.json \
   --policy all_expected \
   --output retrieval-findings.json
@@ -146,7 +146,7 @@ provenance remain explicitly unavailable rather than being inferred.
 
 ## Evaluation
 
-MemLint includes gold-safe controlled-mutation accounting and reproducible synthetic probes. The
+Palintrace includes gold-safe controlled-mutation accounting and reproducible synthetic probes. The
 results are controlled evidence, not estimates of production accuracy or defect prevalence. They
 include supported, negative, and inconclusive findings.
 
@@ -182,13 +182,13 @@ recorded retrieval observations; see [retrieval auditing](docs/retrieval.md).
 
 ## Limitations
 
-- MemLint does not ship a production/live backend retriever.
+- Palintrace does not ship a production/live backend retriever.
 - Retrieval shadowing can be projected from recorded observations but is not automatically scanned.
 - The identity-grounded unsupported-claim candidate is optional and nondefault; current adapters do
   not automatically supply trusted human-readable speaker bindings.
 - `internal_contradiction` and `injected_instruction` detectors remain deferred.
 - Semantic conclusions depend on the evidence and context supplied to the audit.
-- MemLint does not perform automatic repair or generate embeddings.
+- Palintrace does not perform automatic repair or generate embeddings.
 
 ## Documentation
 
@@ -206,7 +206,7 @@ recorded retrieval observations; see [retrieval auditing](docs/retrieval.md).
 ```bash
 pytest
 ruff check .
-mypy src/memlint
+mypy src/palintrace
 ```
 
 ## License

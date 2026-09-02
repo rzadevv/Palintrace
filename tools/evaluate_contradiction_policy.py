@@ -14,7 +14,7 @@ from importlib.metadata import version
 from pathlib import Path
 from typing import Any
 
-from memlint.semantics import (
+from palintrace.semantics import (
     LocalNLISemanticJudge,
     SemanticJudge,
     SemanticJudgment,

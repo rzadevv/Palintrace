@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from memlint.cli import build_parser
+from palintrace.cli import build_parser
 from tools.evaluate_contradiction_models import (
     CANDIDATES,
     MAXIMUM_TEMPORAL_FALSE_POSITIVES,

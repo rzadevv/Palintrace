@@ -8,8 +8,8 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-import memlint.evaluation.identity_probe as identity_probe
-from memlint.semantics import SemanticJudge
+import palintrace.evaluation.identity_probe as identity_probe
+from palintrace.semantics import SemanticJudge
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 FROZEN_FIXTURE_PATH = REPOSITORY_ROOT / identity_probe.IDENTITY_PROBE_FIXTURE_PATH
@@ -33,7 +33,7 @@ def _parser() -> argparse.ArgumentParser:
 def _build_judge() -> SemanticJudge:
     """Construct pinned MiniLM only after every fixture and method preflight check."""
 
-    from memlint.semantics import LocalNLISemanticJudge
+    from palintrace.semantics import LocalNLISemanticJudge
 
     return LocalNLISemanticJudge(
         model_id=identity_probe.IDENTITY_PROBE_MODEL_ID,

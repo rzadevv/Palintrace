@@ -7,10 +7,10 @@ from pathlib import Path
 
 import pytest
 
-import memlint.cli as cli
-import memlint.evaluation.preflight as preflight
+import palintrace.cli as cli
+import palintrace.evaluation.preflight as preflight
 import tools.run_benchmark_v0_1 as runner
-from memlint.evaluation import EvaluationInputError, load_benchmark_spec
+from palintrace.evaluation import EvaluationInputError, load_benchmark_spec
 
 
 class _JsonArtifact:

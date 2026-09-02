@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from memlint.semantics import (
+from palintrace.semantics import (
     PRIMARY_EVIDENCE_COMPOSITION_STYLE,
     ComposedEvidence,
     EvidenceCompositionStyle,

@@ -6,7 +6,7 @@ import argparse
 from collections.abc import Sequence
 from pathlib import Path
 
-from memlint.evaluation import (
+from palintrace.evaluation import (
     DEFAULT_BENCHMARK_PATH,
     UNSUPPORTED_MODEL_ID,
     UNSUPPORTED_MODEL_REVISION,
@@ -15,7 +15,7 @@ from memlint.evaluation import (
     execute_benchmark_v0_1,
     preflight_benchmark_v0_1,
 )
-from memlint.semantics import LocalNLISemanticJudge
+from palintrace.semantics import LocalNLISemanticJudge
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 FROZEN_FIXTURE_ROOT = REPOSITORY_ROOT / "tests/fixtures/benchmark_v0.1"
@@ -23,7 +23,7 @@ FROZEN_FIXTURE_ROOT = REPOSITORY_ROOT / "tests/fixtures/benchmark_v0.1"
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Run the frozen MemLint controlled benchmark v0.1.",
+        description="Run the frozen Palintrace controlled benchmark v0.1.",
     )
     parser.add_argument(
         "--output-dir",

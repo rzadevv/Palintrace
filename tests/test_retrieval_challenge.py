@@ -8,10 +8,10 @@ from typing import cast
 import pytest
 from pydantic import ValidationError
 
-import memlint.cli as cli
-from memlint.models import NormalizedMemory, NormalizedStore
-from memlint.mutations import DistractorFamily, MutationRequest, mutate
-from memlint.retrieval import (
+import palintrace.cli as cli
+from palintrace.models import NormalizedMemory, NormalizedStore
+from palintrace.mutations import DistractorFamily, MutationRequest, mutate
+from palintrace.retrieval import (
     PairedRetrievalChallengeAssessment,
     RetrievalAuditRequest,
     RetrievalChallengeInputError,
@@ -25,9 +25,9 @@ from memlint.retrieval import (
     assess_paired_retrieval_challenge,
     run_retrieval_audit,
 )
-from memlint.taxonomy import DefectClass
+from palintrace.taxonomy import DefectClass
 
-CHALLENGE_PATH = Path("src/memlint/retrieval/challenge.py")
+CHALLENGE_PATH = Path("src/palintrace/retrieval/challenge.py")
 QUERY_TEXT = "Which target should this paired retrieval challenge return?"
 
 
@@ -409,7 +409,7 @@ def test_assessment_serialization_is_deterministic_and_contains_no_runtime_paylo
 
 
 def test_pair_reuses_frozen_sufficiency_assessor_twice(monkeypatch: pytest.MonkeyPatch) -> None:
-    module = importlib.import_module("memlint.retrieval.challenge")
+    module = importlib.import_module("palintrace.retrieval.challenge")
     original = module.assess_retrieval_sufficiency
     calls: list[tuple[RetrievalObservation, RetrievalSufficiencyPolicy]] = []
 
@@ -444,10 +444,10 @@ def test_challenge_module_has_no_store_retriever_checker_mutation_semantic_or_ra
         filename=str(CHALLENGE_PATH),
     )
     forbidden_modules = {
-        "memlint.checkers",
-        "memlint.models",
-        "memlint.mutations",
-        "memlint.semantics",
+        "palintrace.checkers",
+        "palintrace.models",
+        "palintrace.mutations",
+        "palintrace.semantics",
     }
     forbidden_names = {
         "CheckerResult",

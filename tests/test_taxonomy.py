@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from memlint.taxonomy import TAXONOMY_VERSION, DefectClass
+from palintrace.taxonomy import TAXONOMY_VERSION, DefectClass
 
 EXPECTED_LABELS = (
     "unsupported_claim",

@@ -11,8 +11,8 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-import memlint.evaluation.retrieval_strong_probe as probe
-from memlint.retrieval import (
+import palintrace.evaluation.retrieval_strong_probe as probe
+from palintrace.retrieval import (
     PairedRetrievalChallengeAssessment,
     RetrievalChallengeOutcome,
     RetrievalHit,
@@ -234,7 +234,7 @@ def test_fixture_reuses_no_exact_prior_retrieval_query_or_memory_text(
     previous_contents.update(memory["content"] for memory in example["memories"])
 
     for source_path in (
-        Path("src/memlint/mutations/shadowing.py"),
+        Path("src/palintrace/mutations/shadowing.py"),
         Path("tests/test_retrieval_challenge.py"),
     ):
         tree = ast.parse(source_path.read_text(encoding="utf-8"))

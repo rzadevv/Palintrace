@@ -7,12 +7,12 @@ from typing import cast
 import pytest
 from pydantic import ValidationError
 
-import memlint.retrieval as retrieval_api
-from memlint import cli
-from memlint.checkers import CheckerCost, Finding
-from memlint.models import NormalizedMemory, NormalizedStore
-from memlint.mutations import DistractorFamily, MutationRequest, mutate
-from memlint.retrieval import (
+import palintrace.retrieval as retrieval_api
+from palintrace import cli
+from palintrace.checkers import CheckerCost, Finding
+from palintrace.models import NormalizedMemory, NormalizedStore
+from palintrace.mutations import DistractorFamily, MutationRequest, mutate
+from palintrace.retrieval import (
     RetrievalAuditRequest,
     RetrievalHit,
     RetrievalObservation,
@@ -23,9 +23,9 @@ from memlint.retrieval import (
     assess_retrieval_sufficiency,
     run_retrieval_audit,
 )
-from memlint.taxonomy import DefectClass
+from palintrace.taxonomy import DefectClass
 
-POLICY_PATH = Path("src/memlint/retrieval/policy.py")
+POLICY_PATH = Path("src/palintrace/retrieval/policy.py")
 QUERY_TEXT = "Which stored memory answers this exact audit query?"
 
 
@@ -377,10 +377,10 @@ def test_assessment_json_is_deterministic_and_contains_no_query() -> None:
 def test_policy_module_has_no_execution_or_forbidden_dependencies() -> None:
     tree = ast.parse(POLICY_PATH.read_text(encoding="utf-8"), filename=str(POLICY_PATH))
     forbidden_modules = {
-        "memlint.checkers",
-        "memlint.models",
-        "memlint.mutations",
-        "memlint.semantics",
+        "palintrace.checkers",
+        "palintrace.models",
+        "palintrace.mutations",
+        "palintrace.semantics",
     }
     forbidden_names = {
         "Finding",
@@ -420,7 +420,7 @@ def test_finding_and_checker_cost_schemas_are_unchanged_and_no_checker_exists() 
     }
     assert "RetrievalShadowingChecker" not in {
         node.name
-        for path in Path("src/memlint").rglob("*.py")
+        for path in Path("src/palintrace").rglob("*.py")
         for node in ast.walk(ast.parse(path.read_text(encoding="utf-8")))
         if isinstance(node, ast.ClassDef)
     }

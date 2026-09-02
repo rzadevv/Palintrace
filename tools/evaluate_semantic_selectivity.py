@@ -7,8 +7,8 @@ import argparse
 from collections.abc import Sequence
 from pathlib import Path
 
-import memlint.evaluation.semantic_selectivity as probe
-from memlint.semantics import SemanticJudge
+import palintrace.evaluation.semantic_selectivity as probe
+from palintrace.semantics import SemanticJudge
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 FROZEN_FIXTURE_PATH = REPOSITORY_ROOT / probe.SEMANTIC_SELECTIVITY_FIXTURE_PATH
@@ -29,7 +29,7 @@ def _validate_output_path(path: Path) -> Path:
 def _build_judge() -> SemanticJudge:
     """Construct pinned MiniLM only after fixture and output preflight."""
 
-    from memlint.semantics import LocalNLISemanticJudge
+    from palintrace.semantics import LocalNLISemanticJudge
 
     return LocalNLISemanticJudge(
         model_id=probe.SEMANTIC_SELECTIVITY_MODEL_ID,

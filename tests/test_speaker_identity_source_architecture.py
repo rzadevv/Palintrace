@@ -4,11 +4,11 @@ import ast
 import hashlib
 from pathlib import Path
 
-import memlint.semantics as semantics
+import palintrace.semantics as semantics
 
-SOURCE_MODULE = Path("src/memlint/semantics/identity_source.py")
+SOURCE_MODULE = Path("src/palintrace/semantics/identity_source.py")
 CANDIDATE_MODULE = Path(
-    "src/memlint/checkers/unsupported_claim_identity_grounded.py"
+    "src/palintrace/checkers/unsupported_claim_identity_grounded.py"
 )
 
 
@@ -25,7 +25,7 @@ def _imports(path: Path) -> tuple[str, ...]:
 
 def test_identity_source_contract_has_no_adapter_checker_or_evaluation_dependency() -> None:
     imports = _imports(SOURCE_MODULE)
-    forbidden = ("memlint.adapters", "memlint.checkers", "memlint.evaluation")
+    forbidden = ("palintrace.adapters", "palintrace.checkers", "palintrace.evaluation")
     assert not any(
         module == prefix or module.startswith(f"{prefix}.")
         for module in imports
@@ -34,35 +34,35 @@ def test_identity_source_contract_has_no_adapter_checker_or_evaluation_dependenc
 
 
 def test_no_adapter_or_candidate_depends_on_identity_source_admission() -> None:
-    for path in Path("src/memlint/adapters").glob("*.py"):
-        assert "memlint.semantics.identity_source" not in _imports(path)
-    assert "memlint.semantics.identity_source" not in _imports(CANDIDATE_MODULE)
+    for path in Path("src/palintrace/adapters").glob("*.py"):
+        assert "palintrace.semantics.identity_source" not in _imports(path)
+    assert "palintrace.semantics.identity_source" not in _imports(CANDIDATE_MODULE)
 
 
 def test_identity_source_contract_is_available_without_exporting_candidate() -> None:
     assert (
         semantics.SpeakerIdentitySourceAssertion.__module__
-        == "memlint.semantics.identity_source"
+        == "palintrace.semantics.identity_source"
     )
     assert (
         semantics.SpeakerIdentitySourceAssertions.__module__
-        == "memlint.semantics.identity_source"
+        == "palintrace.semantics.identity_source"
     )
-    assert semantics.SpeakerIdentityTrust.__module__ == "memlint.semantics.identity_source"
-    import memlint.checkers as checkers
+    assert semantics.SpeakerIdentityTrust.__module__ == "palintrace.semantics.identity_source"
+    import palintrace.checkers as checkers
 
     assert not hasattr(checkers, "IdentityGroundedUnsupportedClaimChecker")
 
 
 def test_cli_public_checker_and_transcript_contracts_remain_byte_frozen() -> None:
     expected = {
-        Path("src/memlint/cli.py"): (
-            "4a1f558e8e421f3cde965d5cdbe4c464082685e30e760249d0b9416503ddd942"
+        Path("src/palintrace/cli.py"): (
+            "620aba148c80f6b6468156876eb3c9a4e6cc6d4b12b4d5325f8615823a2c9c57"
         ),
-        Path("src/memlint/checkers/__init__.py"): (
-            "b1a66c0ccc12182cc041f0baae0ad5f9267fb13a4f3be0a08c6dc11008a67b05"
+        Path("src/palintrace/checkers/__init__.py"): (
+            "c2ff4192aef0d5830e323f476e3b22db66e1cf6283e35ec0ee88c7c80602379a"
         ),
-        Path("src/memlint/models/transcript.py"): (
+        Path("src/palintrace/models/transcript.py"): (
             "07af2300089581966435c844c4ab944184e11eeff1fb467ea72900ae07f6639a"
         ),
     }
@@ -73,20 +73,20 @@ def test_cli_public_checker_and_transcript_contracts_remain_byte_frozen() -> Non
 
 def test_all_scientific_predecessors_remain_byte_frozen() -> None:
     expected = {
-        Path("src/memlint/checkers/unsupported_claim.py"): (
-            "04fd713308d9ed55e79501a31e99904939a2caf8ef90f2187e3fe1f594d09a8a"
+        Path("src/palintrace/checkers/unsupported_claim.py"): (
+            "604d08b766cf901475be78258c31162d76d748759db2f205049bbac285fa6cdc"
         ),
         CANDIDATE_MODULE: (
-            "6b742eeff6d4280661adba61ed201b67a6bc25a7d9a2b0c967ebbccd0c3210c5"
+            "0bae646f781a63a90371c45411696c780a2ced6f6d1a0d2a3c6343b46aa06d98"
         ),
-        Path("src/memlint/semantics/identity.py"): (
-            "c6b54d0229cb6b87b5e23997685e9855b8b789ea2d68f6e6f07ee45a749f82f9"
+        Path("src/palintrace/semantics/identity.py"): (
+            "23cd31a3d75fea5bd260dc5f8f9fd87c39dd930d851d1a44477c77a9423bd4f2"
         ),
-        Path("src/memlint/semantics/local_nli.py"): (
-            "aafe1e1a9d662879640285784704cdbfecefec4c25e402fae07101dd7ea087b1"
+        Path("src/palintrace/semantics/local_nli.py"): (
+            "41b853a6540b6bc18b1abd644c3477c3c05e28978c8e6ec3ef861ea9d37f8f19"
         ),
-        Path("src/memlint/semantics/composition.py"): (
-            "cd617221c65bb6a58de7164f7438143d661903f62f57076f4869d3e28d6a7629"
+        Path("src/palintrace/semantics/composition.py"): (
+            "5c710e879126f80153ee80be3b20392c7a3bcea3f1c8a7089fba761876cb87e3"
         ),
         Path("tests/fixtures/unsupported_identity_probe_v0.1.json"): (
             "4cbc1dc77b1d6a315992c2b564e438f77d6ff6df3f5dfa621d0542cdf7ea7beb"
@@ -94,11 +94,11 @@ def test_all_scientific_predecessors_remain_byte_frozen() -> None:
         Path("tests/fixtures/unsupported_identity_grounded_heldout_v0.1.json"): (
             "a0384e2d4e5d7764c45c87e1c729762cbd2714ced2faa3cb7e36a2b50283169b"
         ),
-        Path("src/memlint/evaluation/identity_grounded_heldout.py"): (
-            "0bd4746d72cd0b082a08d82000c2b31bc273fca286d957e47f5df57aff86ebf0"
+        Path("src/palintrace/evaluation/identity_grounded_heldout.py"): (
+            "da573daa40de94036f6916ab882e2ab61db52eba3a1a642f5a804fe650d8bb00"
         ),
         Path("tests/fixtures/benchmark_v0.1.sha256.json"): (
-            "de4bb8c2076a2c89b7e2df95518ef5588934644b711119fccc8727e0e9ac73fb"
+            "028fe4e096adc556b4d23bd89c6f5c79f635cbcfe327ad94a2a5a2e7794a659d"
         ),
     }
     assert {

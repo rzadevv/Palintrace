@@ -10,8 +10,8 @@ from typing import Any
 
 import pytest
 
-import memlint.semantics.local_nli as local_nli
-from memlint.semantics import (
+import palintrace.semantics.local_nli as local_nli
+from palintrace.semantics import (
     LocalNLISemanticJudge,
     SemanticDependencyError,
     SemanticInputError,
@@ -149,7 +149,7 @@ def test_importing_public_packages_does_not_import_optional_libraries() -> None:
             sys.executable,
             "-c",
             (
-                "import sys; import memlint; import memlint.semantics; "
+                "import sys; import palintrace; import palintrace.semantics; "
                 "assert 'torch' not in sys.modules; "
                 "assert 'transformers' not in sys.modules"
             ),
@@ -168,7 +168,7 @@ def test_missing_optional_dependency_has_clear_install_error(
         raise ImportError(name)
 
     monkeypatch.setattr(local_nli, "import_module", missing_import)
-    with pytest.raises(SemanticDependencyError, match=r"memlint\[semantic-local\]"):
+    with pytest.raises(SemanticDependencyError, match=r"palintrace\[semantic-local\]"):
         LocalNLISemanticJudge(model_id="example/nli", revision="a" * 40)
 
 

@@ -1,5 +1,5 @@
 {
-  "benchmark_id": "memlint-controlled-v0.1",
+  "benchmark_id": "palintrace-controlled-v0.1",
   "checker_identities": [
     {"checker_id": "orphaned_provenance", "checker_version": "1.0", "defect_class": "orphaned_provenance"},
     {"checker_id": "privacy_scope_violation", "checker_version": "1.0", "defect_class": "privacy_scope_violation"},

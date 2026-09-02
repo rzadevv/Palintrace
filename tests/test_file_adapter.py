@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from memlint.adapters import AdapterDataError, FileAdapter
-from memlint.adapters.file import normalize_file_record
-from memlint.models import ProvenanceStatus
+from palintrace.adapters import AdapterDataError, FileAdapter
+from palintrace.adapters.file import normalize_file_record
+from palintrace.models import ProvenanceStatus
 
 FIXTURES = Path("tests/fixtures")
 

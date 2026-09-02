@@ -7,17 +7,17 @@ from typing import cast
 
 import pytest
 
-from memlint import cli
-from memlint.checkers import (
+from palintrace import cli
+from palintrace.checkers import (
     CHECKER_RESULT_SCHEMA_VERSION,
     CheckerCost,
     CheckerResult,
     Finding,
     project_retrieval_shadowing_result,
 )
-from memlint.models import NormalizedMemory, NormalizedStore
-from memlint.mutations import DistractorFamily, GoldLabelUnit, MutationRequest, mutate
-from memlint.retrieval import (
+from palintrace.models import NormalizedMemory, NormalizedStore
+from palintrace.mutations import DistractorFamily, GoldLabelUnit, MutationRequest, mutate
+from palintrace.retrieval import (
     RetrievalAuditRequest,
     RetrievalHit,
     RetrievalObservation,
@@ -26,9 +26,9 @@ from memlint.retrieval import (
     RetrievalUsage,
     run_retrieval_audit,
 )
-from memlint.taxonomy import DefectClass
+from palintrace.taxonomy import DefectClass
 
-PROJECTION_PATH = Path("src/memlint/checkers/retrieval_shadowing.py")
+PROJECTION_PATH = Path("src/palintrace/checkers/retrieval_shadowing.py")
 QUERY_TEXT = "Which exact stored preference should retrieval return?"
 
 
@@ -365,7 +365,7 @@ def test_checker_result_serialization_is_deterministic_and_private() -> None:
 
 
 def test_projection_recomputes_assessment_internally(monkeypatch: pytest.MonkeyPatch) -> None:
-    module = importlib.import_module("memlint.checkers.retrieval_shadowing")
+    module = importlib.import_module("palintrace.checkers.retrieval_shadowing")
     original = module.assess_retrieval_sufficiency
     calls: list[tuple[RetrievalObservation, RetrievalSufficiencyPolicy]] = []
 
@@ -393,7 +393,7 @@ def test_projection_module_has_no_store_retriever_mutation_or_raw_dependency() -
         PROJECTION_PATH.read_text(encoding="utf-8"),
         filename=str(PROJECTION_PATH),
     )
-    forbidden_modules = {"memlint.models", "memlint.mutations", "memlint.semantics"}
+    forbidden_modules = {"palintrace.models", "palintrace.mutations", "palintrace.semantics"}
     forbidden_names = {
         "GoldLabel",
         "MutationManifest",

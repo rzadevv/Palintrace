@@ -10,7 +10,7 @@ from typing import Any
 
 import pytest
 
-from memlint.mutations.injection import TEMPLATES as PART_2_INJECTION_TEMPLATES
+from palintrace.mutations.injection import TEMPLATES as PART_2_INJECTION_TEMPLATES
 from tools.evaluate_injected_instruction_models import (
     CANDIDATES,
     DEVICE,
@@ -557,8 +557,8 @@ def test_tool_has_no_production_import_leakage_or_raw_access() -> None:
         elif isinstance(node, ast.Attribute) and node.attr == "raw":
             raw_attributes.append(node.lineno)
 
-    assert not any(module.startswith("memlint.checkers") for module in imported_modules)
-    assert not any(module.startswith("memlint.mutations") for module in imported_modules)
+    assert not any(module.startswith("palintrace.checkers") for module in imported_modules)
+    assert not any(module.startswith("palintrace.mutations") for module in imported_modules)
     assert raw_attributes == []
     source = path.read_text(encoding="utf-8")
     assert "MutationManifest" not in source

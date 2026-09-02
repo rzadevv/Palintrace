@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-import memlint.evaluation.execution as execution
-import memlint.evaluation.preflight as preflight
-from memlint.checkers import load_scope_policy
-from memlint.evaluation import (
+import palintrace.evaluation.execution as execution
+import palintrace.evaluation.preflight as preflight
+from palintrace.checkers import load_scope_policy
+from palintrace.evaluation import (
     BENCHMARK_SPEC_SHA256,
     BenchmarkCaseKind,
     BenchmarkCheckerIdentity,
@@ -27,19 +27,19 @@ from memlint.evaluation import (
     run_retrieval_benchmark_case,
     run_static_benchmark_case,
 )
-from memlint.models import MemoryScope, NormalizedMemory, NormalizedStore
-from memlint.mutations import BaseStoreStatus, DistractorFamily, MutationRequest
-from memlint.retrieval import (
+from palintrace.models import MemoryScope, NormalizedMemory, NormalizedStore
+from palintrace.mutations import BaseStoreStatus, DistractorFamily, MutationRequest
+from palintrace.retrieval import (
     RetrievalObservation,
     RetrievalSufficiencyPolicy,
 )
-from memlint.semantics import (
+from palintrace.semantics import (
     SemanticJudgment,
     SemanticRelation,
     SemanticUsage,
 )
-from memlint.serialization import load_store, load_transcripts
-from memlint.taxonomy import DefectClass
+from palintrace.serialization import load_store, load_transcripts
+from palintrace.taxonomy import DefectClass
 
 BENCHMARK_PATH = Path("tests/fixtures/benchmark_v0.1/benchmark.json")
 
@@ -339,7 +339,7 @@ def test_preflight_verifies_canonical_and_fixture_hashes(
     )
 
     monkeypatch.setattr(
-        "memlint.evaluation.preflight._sha256_bytes",
+        "palintrace.evaluation.preflight._sha256_bytes",
         lambda path: (
             preflight.FROZEN_FIXTURE_HASH_MANIFEST_SHA256
             if path.name == "benchmark_v0.1.sha256.json"

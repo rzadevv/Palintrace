@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from memlint.evaluation import identity_grounded_heldout as heldout
-from memlint.semantics import SemanticJudgment, SemanticRelation, SemanticUsage
+from palintrace.evaluation import identity_grounded_heldout as heldout
+from palintrace.semantics import SemanticJudgment, SemanticRelation, SemanticUsage
 
 FIXTURE = Path("tests/fixtures/unsupported_identity_grounded_heldout_v0.1.json")
 DEVELOPMENT_FIXTURE = Path("tests/fixtures/unsupported_identity_probe_v0.1.json")

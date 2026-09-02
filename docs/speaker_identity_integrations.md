@@ -1,7 +1,7 @@
 # Speaker identity integration
 
 Identity grounding is safe only when a caller or integration supplies trustworthy speaker
-assertions for exact transcript turns. MemLint does not infer those assertions from conversational
+assertions for exact transcript turns. Palintrace does not infer those assertions from conversational
 roles, memory scope, provider metadata, transcript prose, or memory claims.
 
 ## Trust levels
@@ -66,7 +66,7 @@ These concepts remain separate:
 - a speaker label is human-readable text used in the semantic premise.
 
 An opaque principal ID can support a reliable join without being a suitable label. A label such as
-`Alice` can be useful in a premise without being globally unique. MemLint therefore retains both
+`Alice` can be useful in a premise without being globally unique. Palintrace therefore retains both
 when available and never converts one into the other implicitly.
 
 ## Current status

@@ -5,8 +5,8 @@ from typing import cast
 import pytest
 from pydantic import ValidationError
 
-from memlint.checkers import OrphanedProvenanceChecker
-from memlint.models import (
+from palintrace.checkers import OrphanedProvenanceChecker
+from palintrace.models import (
     NormalizedMemory,
     NormalizedStore,
     ProvenanceStatus,
@@ -15,7 +15,7 @@ from memlint.models import (
     TranscriptSet,
     TranscriptTurn,
 )
-from memlint.semantics import (
+from palintrace.semantics import (
     EvidenceIssueKind,
     EvidenceResolution,
     EvidenceResolutionIssue,

@@ -3,13 +3,13 @@ requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [project]
-name = "memlint"
+name = "palintrace"
 version = "0.2.0"
 description = "Provenance-aware auditing toolkit for LLM agent memory stores"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "MemLint contributors" }]
+authors = [{ name = "Palintrace contributors" }]
 dependencies = [
   "pydantic>=2.8,<3",
   "PyYAML>=6,<7",
@@ -31,10 +31,10 @@ dev = [
 ]
 
 [project.scripts]
-memlint = "memlint.cli:main"
+palintrace = "palintrace.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/memlint"]
+packages = ["src/palintrace"]
 
 [tool.pytest.ini_options]
 addopts = "-q"
@@ -51,4 +51,4 @@ select = ["B", "E", "F", "I", "UP"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-packages = ["memlint"]
+packages = ["palintrace"]

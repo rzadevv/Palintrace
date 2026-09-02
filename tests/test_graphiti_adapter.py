@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from memlint.adapters.graphiti import GraphitiAdapter, normalize_graphiti_record
-from memlint.models import MemoryScope, ProvenanceStatus
+from palintrace.adapters.graphiti import GraphitiAdapter, normalize_graphiti_record
+from palintrace.models import MemoryScope, ProvenanceStatus
 
 
 def _fixture_record() -> dict[str, Any]:

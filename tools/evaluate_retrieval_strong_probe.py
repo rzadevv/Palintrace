@@ -7,10 +7,10 @@ import argparse
 from collections.abc import Sequence
 from pathlib import Path
 
-import memlint.evaluation.retrieval_strong_probe as probe
-from memlint.evaluation.experimental_lexical import ExperimentalLexicalRetriever
-from memlint.models import MemoryScope, NormalizedMemory, NormalizedStore
-from memlint.retrieval import (
+import palintrace.evaluation.retrieval_strong_probe as probe
+from palintrace.evaluation.experimental_lexical import ExperimentalLexicalRetriever
+from palintrace.models import MemoryScope, NormalizedMemory, NormalizedStore
+from palintrace.retrieval import (
     RetrievalAuditRequest,
     assess_paired_retrieval_challenge,
     run_retrieval_audit,

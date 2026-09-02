@@ -1,7 +1,7 @@
 import pytest
 
-from memlint.checkers import Checker, CheckerInputError, OrphanedProvenanceChecker
-from memlint.models import (
+from palintrace.checkers import Checker, CheckerInputError, OrphanedProvenanceChecker
+from palintrace.models import (
     NormalizedMemory,
     NormalizedStore,
     ProvenanceStatus,
@@ -10,9 +10,9 @@ from memlint.models import (
     TranscriptSet,
     TranscriptTurn,
 )
-from memlint.mutations import MutationRequest, mutate
-from memlint.serialization import load_store, load_transcripts
-from memlint.taxonomy import DefectClass
+from palintrace.mutations import MutationRequest, mutate
+from palintrace.serialization import load_store, load_transcripts
+from palintrace.taxonomy import DefectClass
 
 
 def _store(*memories: NormalizedMemory) -> NormalizedStore:

@@ -14,7 +14,7 @@ from importlib.metadata import version
 from pathlib import Path
 from typing import Any
 
-from memlint.semantics import LocalNLISemanticJudge, SemanticRelation
+from palintrace.semantics import LocalNLISemanticJudge, SemanticRelation
 
 
 @dataclass(frozen=True)
@@ -51,7 +51,7 @@ def _load_cases(path: Path) -> tuple[ProbeCase, ...]:
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Run the local NLI development sanity probe (not a MemLint benchmark)."
+        description="Run the local NLI development sanity probe (not a Palintrace benchmark)."
     )
     parser.add_argument("--model-id", required=True)
     parser.add_argument("--revision", required=True)
@@ -104,7 +104,7 @@ def main(argv: list[str] | None = None) -> int:
             latencies_ms.append((time.perf_counter_ns() - start) / 1_000_000)
 
     correct_count = sum(correct.values())
-    print("probe_kind: development sanity probe; not a MemLint benchmark")
+    print("probe_kind: development sanity probe; not a Palintrace benchmark")
     print(f"model_id: {args.model_id}")
     print(f"revision: {args.revision}")
     print(f"device: {args.device}")

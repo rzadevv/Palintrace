@@ -3,8 +3,8 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from memlint.checkers import CheckerResult, CheckerStats, EvidenceItem, Finding
-from memlint.evaluation import (
+from palintrace.checkers import CheckerResult, CheckerStats, EvidenceItem, Finding
+from palintrace.evaluation import (
     BenchmarkCaseKind,
     BenchmarkFixture,
     BenchmarkSplit,
@@ -16,9 +16,9 @@ from memlint.evaluation import (
     evaluate_clean_control,
     summarize_static_defect_benchmark,
 )
-from memlint.models import NormalizedMemory, NormalizedStore
-from memlint.mutations import BaseStoreStatus, GoldLabelUnit
-from memlint.taxonomy import DefectClass
+from palintrace.models import NormalizedMemory, NormalizedStore
+from palintrace.mutations import BaseStoreStatus, GoldLabelUnit
+from palintrace.taxonomy import DefectClass
 
 IMPLEMENTED = (
     DefectClass.ORPHANED_PROVENANCE,

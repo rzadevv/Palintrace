@@ -3,7 +3,7 @@ from collections.abc import Mapping
 import pytest
 from pydantic import ValidationError
 
-from memlint.checkers import (
+from palintrace.checkers import (
     CHECKER_RESULT_SCHEMA_VERSION,
     CheckerCost,
     CheckerResult,
@@ -12,7 +12,7 @@ from memlint.checkers import (
     Finding,
     deterministic_finding_id,
 )
-from memlint.taxonomy import DefectClass
+from palintrace.taxonomy import DefectClass
 
 
 def _evidence() -> EvidenceItem:

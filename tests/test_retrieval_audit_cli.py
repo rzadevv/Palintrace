@@ -6,16 +6,16 @@ from pathlib import Path
 
 import pytest
 
-import memlint.cli as cli
-import memlint.retrieval as retrieval
-from memlint.checkers import CheckerResult
-from memlint.retrieval import (
+import palintrace.cli as cli
+import palintrace.retrieval as retrieval
+from palintrace.checkers import CheckerResult
+from palintrace.retrieval import (
     RetrievalHit,
     RetrievalObservation,
     RetrievalSufficiencyPolicy,
     RetrievalUsage,
 )
-from memlint.taxonomy import DefectClass
+from palintrace.taxonomy import DefectClass
 
 QUERY_TEXT = "Which preference should the recorded retrieval have returned?"
 
@@ -359,7 +359,7 @@ def test_cli_never_executes_runtime_retrieval(
 
 
 def test_retrieval_cli_handler_delegates_without_projection_logic() -> None:
-    tree = ast.parse(Path("src/memlint/cli.py").read_text(encoding="utf-8"))
+    tree = ast.parse(Path("src/palintrace/cli.py").read_text(encoding="utf-8"))
     function = next(
         node
         for node in tree.body

@@ -5,9 +5,9 @@ import json
 import pytest
 from pydantic import ValidationError
 
-import memlint.evaluation.execution as execution
-from memlint.checkers import CheckerResult, CheckerStats
-from memlint.evaluation import (
+import palintrace.evaluation.execution as execution
+from palintrace.checkers import CheckerResult, CheckerStats
+from palintrace.evaluation import (
     BENCHMARK_ID,
     BENCHMARK_SPEC_SHA256,
     BenchmarkExecutionProvenance,
@@ -21,15 +21,15 @@ from memlint.evaluation import (
     build_execution_provenance,
     summarize_retrieval_challenges,
 )
-from memlint.mutations import BaseStoreStatus, GoldLabelUnit
-from memlint.retrieval import (
+from palintrace.mutations import BaseStoreStatus, GoldLabelUnit
+from palintrace.retrieval import (
     RetrievalChallengeOutcome,
     RetrievalObservation,
     RetrievalSufficiencyPolicy,
     RetrievalUsage,
     assess_paired_retrieval_challenge,
 )
-from memlint.taxonomy import DefectClass
+from palintrace.taxonomy import DefectClass
 
 IMPLEMENTED = (
     DefectClass.ORPHANED_PROVENANCE,

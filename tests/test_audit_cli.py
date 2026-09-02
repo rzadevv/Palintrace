@@ -2,10 +2,10 @@ from pathlib import Path
 
 import pytest
 
-import memlint.cli as cli
-from memlint.checkers import CheckerResult
-from memlint.cli import main
-from memlint.models import (
+import palintrace.cli as cli
+from palintrace.checkers import CheckerResult
+from palintrace.cli import main
+from palintrace.models import (
     NormalizedMemory,
     NormalizedStore,
     ProvenanceStatus,
@@ -14,8 +14,8 @@ from memlint.models import (
     TranscriptSet,
     TranscriptTurn,
 )
-from memlint.mutations import MutationRequest, mutate
-from memlint.semantics import (
+from palintrace.mutations import MutationRequest, mutate
+from palintrace.semantics import (
     SemanticDependencyError,
     SemanticJudgeError,
     SemanticJudgment,
@@ -23,8 +23,8 @@ from memlint.semantics import (
     SemanticRelation,
     SemanticUsage,
 )
-from memlint.serialization import dumps_transcripts, load_store, load_transcripts
-from memlint.taxonomy import DefectClass
+from palintrace.serialization import dumps_transcripts, load_store, load_transcripts
+from palintrace.taxonomy import DefectClass
 
 
 class _FakeLocalJudge:
@@ -373,9 +373,9 @@ def test_unsupported_audit_rejects_incomplete_or_blank_model_configuration(
         (
             SemanticDependencyError(
                 "local NLI requires the 'semantic-local' optional dependencies; "
-                "install memlint[semantic-local]"
+                "install palintrace[semantic-local]"
             ),
-            "install memlint[semantic-local]",
+            "install palintrace[semantic-local]",
         ),
         (SemanticModelConfigError("unsafe semantic model configuration"), "unsafe semantic model"),
         (SemanticJudgeError("failed to load local semantic model"), "failed to load"),

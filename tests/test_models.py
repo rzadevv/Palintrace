@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 from pydantic import ValidationError
 
-from memlint.models import (
+from palintrace.models import (
     MemoryScope,
     NormalizedMemory,
     NormalizedStore,

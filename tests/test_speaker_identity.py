@@ -5,8 +5,8 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from memlint.models import MemoryScope, NormalizedMemory, ProvenanceStatus, SourceRef
-from memlint.semantics import (
+from palintrace.models import MemoryScope, NormalizedMemory, ProvenanceStatus, SourceRef
+from palintrace.semantics import (
     SpeakerIdentityBinding,
     SpeakerIdentityBindings,
     SpeakerIdentityError,

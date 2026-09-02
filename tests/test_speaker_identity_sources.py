@@ -3,8 +3,8 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from memlint.models import NormalizedMemory, ProvenanceStatus, SourceRef
-from memlint.semantics import (
+from palintrace.models import NormalizedMemory, ProvenanceStatus, SourceRef
+from palintrace.semantics import (
     SpeakerIdentityAdmissionError,
     SpeakerIdentityResolutionStatus,
     SpeakerIdentitySourceAssertion,

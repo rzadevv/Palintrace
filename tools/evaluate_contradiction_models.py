@@ -16,7 +16,7 @@ from pathlib import Path
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from memlint.semantics import LocalNLISemanticJudge, SemanticJudgment, SemanticRelation
+from palintrace.semantics import LocalNLISemanticJudge, SemanticJudgment, SemanticRelation
 from tools.evaluate_contradiction_policy import (
     ContradictionAggregationPolicy,
     ContradictionProbeCase,

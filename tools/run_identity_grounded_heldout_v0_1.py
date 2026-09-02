@@ -9,8 +9,8 @@ import platform
 from collections.abc import Sequence
 from pathlib import Path
 
-import memlint.evaluation.identity_grounded_heldout as heldout
-from memlint.semantics import SemanticJudge
+import palintrace.evaluation.identity_grounded_heldout as heldout
+from palintrace.semantics import SemanticJudge
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 FROZEN_FIXTURE_PATH = REPOSITORY_ROOT / heldout.HELDOUT_FIXTURE_PATH
@@ -18,7 +18,7 @@ DEVELOPMENT_FIXTURE_PATH = (
     REPOSITORY_ROOT / "tests/fixtures/unsupported_identity_probe_v0.1.json"
 )
 EXTERNAL_6F_RESULT_PATH = Path(
-    "/home/chisste/Desktop/Projects/memlint-identity-probe-v0.1-first-run/"
+    "/home/chisste/Desktop/Projects/palintrace-identity-probe-v0.1-first-run/"
     "identity-probe-result.json"
 )
 
@@ -37,7 +37,7 @@ def _parser() -> argparse.ArgumentParser:
 def _build_judge() -> SemanticJudge:
     """Construct pinned MiniLM only after complete fail-closed preflight."""
 
-    from memlint.semantics import LocalNLISemanticJudge
+    from palintrace.semantics import LocalNLISemanticJudge
 
     return LocalNLISemanticJudge(
         model_id=heldout.HELDOUT_MODEL_ID,

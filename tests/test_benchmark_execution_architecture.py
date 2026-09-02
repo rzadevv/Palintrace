@@ -5,9 +5,9 @@ import hashlib
 import json
 from pathlib import Path
 
-import memlint.cli as cli
+import palintrace.cli as cli
 
-FROZEN_BENCHMARK_MODULE = Path("src/memlint/evaluation/benchmark.py")
+FROZEN_BENCHMARK_MODULE = Path("src/palintrace/evaluation/benchmark.py")
 FROZEN_HASH_MANIFEST = Path("tests/fixtures/benchmark_v0.1.sha256.json")
 FROZEN_FIXTURE_ROOT = Path("tests/fixtures/benchmark_v0.1")
 PART6C_TESTS = (
@@ -32,10 +32,10 @@ def _imports(path: Path) -> tuple[str, ...]:
 
 def test_part6b_benchmark_module_and_hash_manifest_are_byte_frozen() -> None:
     assert hashlib.sha256(FROZEN_BENCHMARK_MODULE.read_bytes()).hexdigest() == (
-        "dd9c49a5c3ce03669166b70ecf119c1a75f37fad70f3cc9fe4ff2f003a2bc956"
+        "585cfcc0683edf9d9fc7bb692f350ae1b97920c7c224bbadf217d7f2107130c7"
     )
     assert hashlib.sha256(FROZEN_HASH_MANIFEST.read_bytes()).hexdigest() == (
-        "de4bb8c2076a2c89b7e2df95518ef5588934644b711119fccc8727e0e9ac73fb"
+        "028fe4e096adc556b4d23bd89c6f5c79f635cbcfe327ad94a2a5a2e7794a659d"
     )
     expected = json.loads(FROZEN_HASH_MANIFEST.read_text(encoding="utf-8"))
     actual = {
@@ -47,9 +47,9 @@ def test_part6b_benchmark_module_and_hash_manifest_are_byte_frozen() -> None:
 
 
 def test_experimental_lexical_exists_only_in_evaluation() -> None:
-    assert Path("src/memlint/evaluation/experimental_lexical.py").is_file()
-    assert not Path("src/memlint/retrieval/lexical.py").exists()
-    assert {path.name for path in Path("src/memlint/retrieval").glob("*.py")} == {
+    assert Path("src/palintrace/evaluation/experimental_lexical.py").is_file()
+    assert not Path("src/palintrace/retrieval/lexical.py").exists()
+    assert {path.name for path in Path("src/palintrace/retrieval").glob("*.py")} == {
         "__init__.py",
         "base.py",
         "challenge.py",
@@ -57,8 +57,8 @@ def test_experimental_lexical_exists_only_in_evaluation() -> None:
         "policy.py",
     }
     assert not any(
-        module == "memlint.evaluation" or module.startswith("memlint.evaluation.")
-        for path in Path("src/memlint/retrieval").glob("*.py")
+        module == "palintrace.evaluation" or module.startswith("palintrace.evaluation.")
+        for path in Path("src/palintrace/retrieval").glob("*.py")
         for module in _imports(path)
     )
 
@@ -77,7 +77,7 @@ def test_part6c_tests_do_not_name_frozen_heldout_store_or_transcript_inputs() ->
 
 
 def test_execution_models_have_no_inferential_or_generic_classification_metrics() -> None:
-    source = Path("src/memlint/evaluation/execution_models.py").read_text(
+    source = Path("src/palintrace/evaluation/execution_models.py").read_text(
         encoding="utf-8"
     )
     forbidden = (

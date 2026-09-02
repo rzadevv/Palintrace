@@ -7,10 +7,10 @@ from typing import cast
 import pytest
 from pydantic import ValidationError
 
-from memlint import cli
-from memlint.models import NormalizedMemory, NormalizedStore
-from memlint.mutations import DistractorFamily, MutationRequest, mutate
-from memlint.retrieval import (
+from palintrace import cli
+from palintrace.models import NormalizedMemory, NormalizedStore
+from palintrace.mutations import DistractorFamily, MutationRequest, mutate
+from palintrace.retrieval import (
     RetrievalAuditRequest,
     RetrievalHit,
     RetrievalInputError,
@@ -23,9 +23,9 @@ from memlint.retrieval import (
     run_retrieval_audit,
     validate_retrieval_audit_request,
 )
-from memlint.taxonomy import DefectClass
+from palintrace.taxonomy import DefectClass
 
-RETRIEVAL_ROOT = Path("src/memlint/retrieval")
+RETRIEVAL_ROOT = Path("src/palintrace/retrieval")
 
 
 def _store(*memory_ids: str) -> NormalizedStore:
@@ -377,9 +377,9 @@ def test_observation_serialization_is_byte_deterministic() -> None:
 
 def test_retrieval_package_has_no_forbidden_dependencies_or_raw_access() -> None:
     forbidden_modules = {
-        "memlint.checkers",
-        "memlint.mutations",
-        "memlint.semantics",
+        "palintrace.checkers",
+        "palintrace.mutations",
+        "palintrace.semantics",
     }
     forbidden_names = {
         "GoldLabel",
@@ -418,7 +418,7 @@ def test_retrieval_architecture_has_contract_only() -> None:
     }
     assert "RetrievalShadowingChecker" not in {
         node.name
-        for path in Path("src/memlint").rglob("*.py")
+        for path in Path("src/palintrace").rglob("*.py")
         for node in ast.walk(ast.parse(path.read_text(encoding="utf-8")))
         if isinstance(node, ast.ClassDef)
     }

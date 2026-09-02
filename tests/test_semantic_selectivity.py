@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from memlint.evaluation.semantic_selectivity import (
+from palintrace.evaluation.semantic_selectivity import (
     SEMANTIC_SELECTIVITY_FIXTURE_SHA256,
     SEMANTIC_SELECTIVITY_MODEL_ID,
     SEMANTIC_SELECTIVITY_MODEL_REVISION,
@@ -34,7 +34,7 @@ from memlint.evaluation.semantic_selectivity import (
     selective_decision,
     summarize_semantic_selectivity,
 )
-from memlint.semantics import SemanticRelation, SemanticUsage
+from palintrace.semantics import SemanticRelation, SemanticUsage
 
 FIXTURE = Path("tests/fixtures/semantic_selectivity_probe_v0.1.json")
 PINNED_JUDGE_ID = f"hf-nli:{SEMANTIC_SELECTIVITY_MODEL_ID}"

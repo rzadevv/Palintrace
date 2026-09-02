@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from memlint.adapters.letta import LettaAdapter, normalize_letta_record
-from memlint.models import MemoryScope, ProvenanceStatus
+from palintrace.adapters.letta import LettaAdapter, normalize_letta_record
+from palintrace.models import MemoryScope, ProvenanceStatus
 
 
 def _archival_fixture() -> dict[str, Any]:

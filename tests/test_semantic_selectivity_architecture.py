@@ -4,30 +4,30 @@ import ast
 import hashlib
 from pathlib import Path
 
-import memlint.cli as cli
+import palintrace.cli as cli
 
-EVALUATION_MODULE = Path("src/memlint/evaluation/semantic_selectivity.py")
+EVALUATION_MODULE = Path("src/palintrace/evaluation/semantic_selectivity.py")
 RUNNER = Path("tools/evaluate_semantic_selectivity.py")
-SOURCE_ROOT = Path("src/memlint")
+SOURCE_ROOT = Path("src/palintrace")
 
 FROZEN_HASHES = {
-    Path("src/memlint/semantics/local_nli.py"): (
-        "aafe1e1a9d662879640285784704cdbfecefec4c25e402fae07101dd7ea087b1"
+    Path("src/palintrace/semantics/local_nli.py"): (
+        "41b853a6540b6bc18b1abd644c3477c3c05e28978c8e6ec3ef861ea9d37f8f19"
     ),
-    Path("src/memlint/semantics/composition.py"): (
-        "cd617221c65bb6a58de7164f7438143d661903f62f57076f4869d3e28d6a7629"
+    Path("src/palintrace/semantics/composition.py"): (
+        "5c710e879126f80153ee80be3b20392c7a3bcea3f1c8a7089fba761876cb87e3"
     ),
-    Path("src/memlint/checkers/unsupported_claim.py"): (
-        "04fd713308d9ed55e79501a31e99904939a2caf8ef90f2187e3fe1f594d09a8a"
+    Path("src/palintrace/checkers/unsupported_claim.py"): (
+        "604d08b766cf901475be78258c31162d76d748759db2f205049bbac285fa6cdc"
     ),
-    Path("src/memlint/checkers/unsupported_claim_identity_grounded.py"): (
-        "6b742eeff6d4280661adba61ed201b67a6bc25a7d9a2b0c967ebbccd0c3210c5"
+    Path("src/palintrace/checkers/unsupported_claim_identity_grounded.py"): (
+        "0bae646f781a63a90371c45411696c780a2ced6f6d1a0d2a3c6343b46aa06d98"
     ),
-    Path("src/memlint/semantics/identity.py"): (
-        "c6b54d0229cb6b87b5e23997685e9855b8b789ea2d68f6e6f07ee45a749f82f9"
+    Path("src/palintrace/semantics/identity.py"): (
+        "23cd31a3d75fea5bd260dc5f8f9fd87c39dd930d851d1a44477c77a9423bd4f2"
     ),
-    Path("src/memlint/semantics/identity_source.py"): (
-        "058590ef7258b9f611de486b5130b866893f0e4a2c1091d5ecd0d0a465463e87"
+    Path("src/palintrace/semantics/identity_source.py"): (
+        "7fde1d795c74b2ef05b2fc9842047e50d075b886f9298c862f635080b8e34179"
     ),
 }
 
@@ -52,11 +52,11 @@ def test_frozen_semantic_and_identity_predecessors_are_byte_identical() -> None:
 def test_new_probe_is_evaluation_only_and_production_does_not_import_it() -> None:
     evaluation_imports = _imports(EVALUATION_MODULE)
     assert any(
-        module == "memlint.semantics" or module.startswith("memlint.semantics.")
+        module == "palintrace.semantics" or module.startswith("palintrace.semantics.")
         for module in evaluation_imports
     )
     assert not any(
-        module.startswith(("memlint.checkers", "memlint.adapters", "memlint.retrieval"))
+        module.startswith(("palintrace.checkers", "palintrace.adapters", "palintrace.retrieval"))
         for module in evaluation_imports
     )
     violations = [
@@ -64,7 +64,7 @@ def test_new_probe_is_evaluation_only_and_production_does_not_import_it() -> Non
         for root_name in ("semantics", "checkers", "adapters", "retrieval")
         for path in (SOURCE_ROOT / root_name).rglob("*.py")
         if any(
-            module == "memlint.evaluation.semantic_selectivity"
+            module == "palintrace.evaluation.semantic_selectivity"
             for module in _imports(path)
         )
     ]

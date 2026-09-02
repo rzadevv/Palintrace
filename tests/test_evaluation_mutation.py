@@ -5,7 +5,7 @@ from collections.abc import Sequence
 import pytest
 from pydantic import ValidationError
 
-from memlint.checkers import (
+from palintrace.checkers import (
     CheckerResult,
     CheckerStats,
     EvidenceItem,
@@ -19,7 +19,7 @@ from memlint.checkers import (
     StaleActiveChecker,
     UnsupportedClaimChecker,
 )
-from memlint.evaluation import (
+from palintrace.evaluation import (
     EvaluationInputError,
     MutationEvaluationSummary,
     MutationScientificLabel,
@@ -27,8 +27,8 @@ from memlint.evaluation import (
     evaluate_mutation_trial,
     summarize_mutation_trials,
 )
-from memlint.models import NormalizedMemory, NormalizedStore, TranscriptSet
-from memlint.mutations import (
+from palintrace.models import NormalizedMemory, NormalizedStore, TranscriptSet
+from palintrace.mutations import (
     BaseStoreStatus,
     DistractorFamily,
     GoldLabelUnit,
@@ -37,13 +37,13 @@ from memlint.mutations import (
     MutationResult,
     mutate,
 )
-from memlint.semantics import (
+from palintrace.semantics import (
     SemanticJudgment,
     SemanticRelation,
     SemanticUsage,
 )
-from memlint.serialization import load_store, load_transcripts
-from memlint.taxonomy import DefectClass
+from palintrace.serialization import load_store, load_transcripts
+from palintrace.taxonomy import DefectClass
 
 
 @pytest.fixture

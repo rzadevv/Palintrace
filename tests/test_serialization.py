@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from memlint.models import MemoryScope, NormalizedMemory, NormalizedStore, TranscriptSet
-from memlint.serialization import (
+from palintrace.models import MemoryScope, NormalizedMemory, NormalizedStore, TranscriptSet
+from palintrace.serialization import (
     dumps_transcripts,
     load_store,
     load_transcripts,

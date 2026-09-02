@@ -18,7 +18,7 @@ from pathlib import Path
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from memlint.semantics import (  # noqa: E402
+from palintrace.semantics import (  # noqa: E402
     LocalNLISemanticJudge,
     SemanticJudge,
     SemanticJudgment,

@@ -1,6 +1,6 @@
 # Mutation harness
 
-MemLint mutations create controlled defects; they do not detect them. The public entry point is:
+Palintrace mutations create controlled defects; they do not detect them. The public entry point is:
 
 ```python
 result = mutate(store, request, transcripts=None)
@@ -74,7 +74,7 @@ topic or present these templates as generic distractors.
 current value. For example, one current preferred editor cannot simultaneously be both Neovim and VS
 Code under that fixture contract.
 
-MemLint does not claim that arbitrary substitutions conflict. "User knows Python" and "User knows
+Palintrace does not claim that arbitrary substitutions conflict. "User knows Python" and "User knows
 Rust" may both be true, so a programming-language substitution without an exclusive-value contract
 is rejected.
 
@@ -96,7 +96,7 @@ The mutated store and gold manifest require different output paths. Outputs also
 input store or transcripts.
 
 ```bash
-memlint mutate \
+palintrace mutate \
   --store examples/mutation-store.json \
   --transcripts examples/mutation-transcripts.json \
   --defect unsupported_claim \

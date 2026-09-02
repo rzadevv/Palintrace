@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from memlint.cli import main
-from memlint.models import NormalizedStore
+from palintrace.cli import main
+from palintrace.models import NormalizedStore
 
 
 def test_file_dump_cli_to_stdout(capsys: pytest.CaptureFixture[str]) -> None:

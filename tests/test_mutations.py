@@ -3,7 +3,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
-from memlint.models import (
+from palintrace.models import (
     NormalizedMemory,
     NormalizedStore,
     ProvenanceStatus,
@@ -12,7 +12,7 @@ from memlint.models import (
     TranscriptSet,
     TranscriptTurn,
 )
-from memlint.mutations import (
+from palintrace.mutations import (
     BaseStoreStatus,
     ConflictRelation,
     DistractorFamily,
@@ -23,9 +23,9 @@ from memlint.mutations import (
     RetrievalProbe,
     mutate,
 )
-from memlint.mutations.base import semantic_store_digest
-from memlint.serialization import load_store, load_transcripts
-from memlint.taxonomy import DefectClass
+from palintrace.mutations.base import semantic_store_digest
+from palintrace.serialization import load_store, load_transcripts
+from palintrace.taxonomy import DefectClass
 
 OPAQUE_ID_FORBIDDEN_WORDS = {
     "mutated",

@@ -5,10 +5,10 @@ from pathlib import Path
 
 import pytest
 
-import memlint.evaluation.identity_probe as identity_probe
-import memlint.semantics as semantics
+import palintrace.evaluation.identity_probe as identity_probe
+import palintrace.semantics as semantics
 import tools.evaluate_identity_grounding as runner
-from memlint.semantics import SemanticJudgment, SemanticRelation, SemanticUsage
+from palintrace.semantics import SemanticJudgment, SemanticRelation, SemanticUsage
 
 
 class _FakePinnedJudge:

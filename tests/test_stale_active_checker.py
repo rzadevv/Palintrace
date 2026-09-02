@@ -3,18 +3,18 @@ from pathlib import Path
 
 import pytest
 
-from memlint.checkers import Checker, CheckerResult, StaleActiveChecker
-from memlint.cli import main
-from memlint.models import (
+from palintrace.checkers import Checker, CheckerResult, StaleActiveChecker
+from palintrace.cli import main
+from palintrace.models import (
     NormalizedMemory,
     NormalizedStore,
     ProvenanceStatus,
     SourceRef,
     TranscriptSet,
 )
-from memlint.mutations import MutationRequest, mutate
-from memlint.serialization import load_store
-from memlint.taxonomy import DefectClass
+from palintrace.mutations import MutationRequest, mutate
+from palintrace.serialization import load_store
+from palintrace.taxonomy import DefectClass
 
 
 def _memory(

@@ -1,7 +1,7 @@
 import ast
 from pathlib import Path
 
-SOURCE_ROOT = Path("src/memlint")
+SOURCE_ROOT = Path("src/palintrace")
 CHECKER_ROOT = SOURCE_ROOT / "checkers"
 SEMANTICS_ROOT = SOURCE_ROOT / "semantics"
 
@@ -52,15 +52,15 @@ def test_checker_package_cannot_import_mutation_code_or_gold_models() -> None:
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
-                if any(alias.name.startswith("memlint.mutations") for alias in node.names):
+                if any(alias.name.startswith("palintrace.mutations") for alias in node.names):
                     violations.append(f"{path}:{node.lineno}:mutation import")
             elif isinstance(node, ast.ImportFrom):
                 module = node.module or ""
-                is_absolute_mutation_import = module.startswith("memlint.mutations")
+                is_absolute_mutation_import = module.startswith("palintrace.mutations")
                 is_relative_mutation_import = node.level > 0 and module.startswith("mutations")
                 imports_mutations_symbol = any(
                     alias.name == "mutations" for alias in node.names
-                ) and (node.level > 0 or module == "memlint")
+                ) and (node.level > 0 or module == "palintrace")
                 imports_gold_model = any(alias.name in forbidden_names for alias in node.names)
                 if (
                     is_absolute_mutation_import
@@ -101,7 +101,7 @@ def test_checker_package_has_only_implemented_modules() -> None:
 
 
 def test_semantics_has_no_checker_or_mutation_dependency() -> None:
-    forbidden_roots = {"memlint.checkers", "memlint.mutations"}
+    forbidden_roots = {"palintrace.checkers", "palintrace.mutations"}
     forbidden_relative_roots = {"checkers", "mutations"}
     forbidden_model_names = {"GoldLabel", "MutationManifest", "MutationRequest"}
     violations: list[str] = []

@@ -5,14 +5,14 @@ import os
 
 import pytest
 
-from memlint.checkers import (
+from palintrace.checkers import (
     Checker,
     CheckerError,
     CheckerInputError,
     CheckerResult,
     UnsupportedClaimChecker,
 )
-from memlint.models import (
+from palintrace.models import (
     NormalizedMemory,
     NormalizedStore,
     ProvenanceStatus,
@@ -21,7 +21,7 @@ from memlint.models import (
     TranscriptSet,
     TranscriptTurn,
 )
-from memlint.semantics import (
+from palintrace.semantics import (
     EvidenceCompositionStyle,
     LocalNLISemanticJudge,
     SemanticInputTooLongError,
@@ -30,7 +30,7 @@ from memlint.semantics import (
     SemanticRelation,
     SemanticUsage,
 )
-from memlint.taxonomy import DefectClass
+from palintrace.taxonomy import DefectClass
 
 MINILM_MODEL_ID = "cross-encoder/nli-MiniLM2-L6-H768"
 MINILM_REVISION = "b95119ce93d3e065de6214e38cd4a97b0f2f2c6d"
@@ -687,8 +687,8 @@ def test_checker_result_excludes_full_semantic_and_raw_text() -> None:
 
 
 def test_part_two_unsupported_gold_unit_matches_without_checker_manifest_access() -> None:
-    from memlint.mutations import MutationRequest, mutate
-    from memlint.serialization import load_store, load_transcripts
+    from palintrace.mutations import MutationRequest, mutate
+    from palintrace.serialization import load_store, load_transcripts
 
     base_store = load_store("examples/mutation-store.json")
     transcripts = load_transcripts("examples/mutation-transcripts.json")
@@ -724,14 +724,14 @@ def test_part_two_unsupported_gold_unit_matches_without_checker_manifest_access(
 
 
 def test_unsupported_claim_is_exposed_in_audit_cli() -> None:
-    from memlint.cli import CHECKER_NAMES
+    from palintrace.cli import CHECKER_NAMES
 
     assert "unsupported_claim" in CHECKER_NAMES
 
 
 @pytest.mark.skipif(
-    os.getenv("MEMLINT_RUN_LOCAL_NLI") != "1",
-    reason="set MEMLINT_RUN_LOCAL_NLI=1 for the pinned CPU MiniLM integration",
+    os.getenv("PALINTRACE_RUN_LOCAL_NLI") != "1",
+    reason="set PALINTRACE_RUN_LOCAL_NLI=1 for the pinned CPU MiniLM integration",
 )
 def test_pinned_minilm_simple_unsupported_checker_integration() -> None:
     judge = LocalNLISemanticJudge(

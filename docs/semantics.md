@@ -1,6 +1,6 @@
 # Semantic evidence
 
-MemLint separates transcript evidence resolution, evidence composition, and semantic judgment. The
+Palintrace separates transcript evidence resolution, evidence composition, and semantic judgment. The
 semantic package is independent of checker and mutation code; checkers receive a `SemanticJudge`
 through dependency injection.
 
@@ -71,7 +71,7 @@ the model.
 
 The model configuration must map labels unambiguously to contradiction, entailment, and neutral.
 Each call encodes one complete premise/hypothesis pair with truncation disabled. Inputs above the
-effective model/tokenizer limit raise `SemanticInputTooLongError`; MemLint does not silently remove
+effective model/tokenizer limit raise `SemanticInputTooLongError`; Palintrace does not silently remove
 evidence. The selected-class softmax value is reported as a classifier score, not factual
 probability.
 
@@ -93,7 +93,7 @@ records so that zero findings cannot be mistaken for complete coverage.
 
 ## Speaker identity
 
-First-person transcript evidence can be ambiguous when a memory names the speaker. MemLint does not
+First-person transcript evidence can be ambiguous when a memory names the speaker. Palintrace does not
 infer identity from transcript text, memory claims, roles, metadata, scope IDs, raw backend fields,
 NER, embeddings, or another model.
 

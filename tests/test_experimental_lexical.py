@@ -5,14 +5,14 @@ import math
 from collections import Counter
 from pathlib import Path
 
-from memlint.evaluation import (
+from palintrace.evaluation import (
     BM25_B,
     BM25_K1,
     TOKEN_RE,
     ExperimentalLexicalRetriever,
     tokenize_lexical,
 )
-from memlint.models import MemoryScope, NormalizedMemory, NormalizedStore
+from palintrace.models import MemoryScope, NormalizedMemory, NormalizedStore
 
 
 def _store(*memories: NormalizedMemory) -> NormalizedStore:
@@ -135,7 +135,7 @@ def test_only_memory_content_affects_scoring() -> None:
 def test_retriever_boundary_is_target_blind_and_has_no_external_methodology() -> None:
     signature = inspect.signature(ExperimentalLexicalRetriever.retrieve)
     assert tuple(signature.parameters) == ("self", "query", "top_k")
-    source = Path("src/memlint/evaluation/experimental_lexical.py").read_text(
+    source = Path("src/palintrace/evaluation/experimental_lexical.py").read_text(
         encoding="utf-8"
     )
     forbidden = (

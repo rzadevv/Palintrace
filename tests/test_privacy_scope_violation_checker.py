@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from memlint.checkers import (
+from palintrace.checkers import (
     Checker,
     CheckerInputError,
     CheckerResult,
@@ -17,17 +17,17 @@ from memlint.checkers import (
     ScopeIsolationPolicy,
     load_scope_policy,
 )
-from memlint.cli import main
-from memlint.models import (
+from palintrace.cli import main
+from palintrace.models import (
     NormalizedMemory,
     NormalizedStore,
     ProvenanceStatus,
     SourceRef,
     TranscriptSet,
 )
-from memlint.mutations import MutationRequest, mutate
-from memlint.serialization import load_store
-from memlint.taxonomy import DefectClass
+from palintrace.mutations import MutationRequest, mutate
+from palintrace.serialization import load_store
+from palintrace.taxonomy import DefectClass
 
 
 def _memory(

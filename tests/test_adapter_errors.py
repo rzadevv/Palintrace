@@ -1,9 +1,9 @@
 import pytest
 
-from memlint.adapters import AdapterAuthenticationError, AdapterDataError
-from memlint.adapters.graphiti import GraphitiAdapter
-from memlint.adapters.letta import LettaAdapter
-from memlint.adapters.mem0 import Mem0Adapter
+from palintrace.adapters import AdapterAuthenticationError, AdapterDataError
+from palintrace.adapters.graphiti import GraphitiAdapter
+from palintrace.adapters.letta import LettaAdapter
+from palintrace.adapters.mem0 import Mem0Adapter
 
 
 def test_mem0_missing_credentials_are_actionable(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -1,6 +1,6 @@
 {
   "tests/fixtures/benchmark_v0.1/README.md": "5037ed3d59a3680ef51371dd5f982eb3abc887e1e9c6c3226ecf28f13222226c",
-  "tests/fixtures/benchmark_v0.1/benchmark.json": "93013dccf171db8ca6cb8558bccbd10021a19d65673a31a490e99fc39baaa9fc",
+  "tests/fixtures/benchmark_v0.1/benchmark.json": "a819e171cbf6896114060d4b31d2a4f4d3654fc722ad054673ec4b7cd696f4df",
   "tests/fixtures/benchmark_v0.1/fixture_h1_store.json": "2b688007a19a88835779b9ad44d02891f5c2f643930811a21d4ac477904a7474",
   "tests/fixtures/benchmark_v0.1/fixture_h1_transcripts.json": "0ac39a2003056e8d48a91bc597cf1c8e73477afe85a4daadd59e46169a66b9d9",
   "tests/fixtures/benchmark_v0.1/fixture_h2_store.json": "6eef745671708adb38844c358bb25a29692657478331df49f1bad9aab5df0728",

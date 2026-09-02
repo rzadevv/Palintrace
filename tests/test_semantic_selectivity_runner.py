@@ -5,10 +5,10 @@ from pathlib import Path
 
 import pytest
 
-import memlint.evaluation.semantic_selectivity as probe
-import memlint.semantics as semantics
+import palintrace.evaluation.semantic_selectivity as probe
+import palintrace.semantics as semantics
 import tools.evaluate_semantic_selectivity as runner
-from memlint.semantics import SemanticJudgment, SemanticRelation, SemanticUsage
+from palintrace.semantics import SemanticJudgment, SemanticRelation, SemanticUsage
 
 
 class _FakePinnedJudge:

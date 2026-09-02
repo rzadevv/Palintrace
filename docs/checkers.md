@@ -1,6 +1,6 @@
 # Checkers
 
-MemLint checkers inspect normalized memory stores and return deterministic findings. Five checkers
+Palintrace checkers inspect normalized memory stores and return deterministic findings. Five checkers
 are supported by the public API and CLI.
 
 | Checker | Defect class | Additional input | Method |
@@ -90,7 +90,7 @@ Example policy:
 }
 ```
 
-Pass the policy to `memlint audit` with `--scope-policy` when selecting this checker.
+Pass the policy to `palintrace audit` with `--scope-policy` when selecting this checker.
 
 ## Unsupported claim
 
@@ -114,7 +114,7 @@ the three relation counts.
 For the CLI, install the semantic extra and provide both a model ID and immutable revision:
 
 ```bash
-memlint audit \
+palintrace audit \
   --store normalized.json \
   --transcripts transcripts.json \
   --checker unsupported_claim \
@@ -151,7 +151,7 @@ not selectable through the CLI, and not enabled by default. Its current readines
 Select one or more checkers explicitly:
 
 ```bash
-memlint audit \
+palintrace audit \
   --store normalized.json \
   --transcripts transcripts.json \
   --checker orphaned_provenance \
@@ -160,5 +160,5 @@ memlint audit \
   --output findings.json
 ```
 
-Input requirements are checker-specific. MemLint rejects missing required inputs rather than
+Input requirements are checker-specific. Palintrace rejects missing required inputs rather than
 silently omitting a selected check.

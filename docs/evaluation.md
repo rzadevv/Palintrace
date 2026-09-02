@@ -1,6 +1,6 @@
 # Evaluation
 
-MemLint evaluates controlled mutations without exposing gold information to the checker. Detector
+Palintrace evaluates controlled mutations without exposing gold information to the checker. Detector
 code receives only normalized memory data and checker-specific evidence. Mutation manifests,
 expected targets, base-store labels, and changed-memory lists are joined only after a
 `CheckerResult` has been produced.

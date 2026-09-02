@@ -5,10 +5,10 @@ from pathlib import Path
 
 import pytest
 
-import memlint.evaluation.identity_grounded_heldout as heldout
-import memlint.semantics as semantics
+import palintrace.evaluation.identity_grounded_heldout as heldout
+import palintrace.semantics as semantics
 import tools.run_identity_grounded_heldout_v0_1 as runner
-from memlint.semantics import SemanticJudgment, SemanticRelation, SemanticUsage
+from palintrace.semantics import SemanticJudgment, SemanticRelation, SemanticUsage
 
 
 class _FakePinnedJudge:

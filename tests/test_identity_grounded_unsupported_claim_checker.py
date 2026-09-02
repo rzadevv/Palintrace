@@ -4,12 +4,12 @@ import hashlib
 
 import pytest
 
-import memlint.checkers.unsupported_claim_identity_grounded as candidate_module
-from memlint.checkers import Checker, CheckerError, CheckerInputError
-from memlint.checkers.unsupported_claim_identity_grounded import (
+import palintrace.checkers.unsupported_claim_identity_grounded as candidate_module
+from palintrace.checkers import Checker, CheckerError, CheckerInputError
+from palintrace.checkers.unsupported_claim_identity_grounded import (
     IdentityGroundedUnsupportedClaimChecker,
 )
-from memlint.models import (
+from palintrace.models import (
     MemoryScope,
     NormalizedMemory,
     NormalizedStore,
@@ -19,7 +19,7 @@ from memlint.models import (
     TranscriptSet,
     TranscriptTurn,
 )
-from memlint.semantics import (
+from palintrace.semantics import (
     SemanticInputTooLongError,
     SemanticJudgment,
     SemanticRelation,
@@ -27,7 +27,7 @@ from memlint.semantics import (
     SpeakerIdentityBinding,
     SpeakerIdentityBindings,
 )
-from memlint.taxonomy import DefectClass
+from palintrace.taxonomy import DefectClass
 
 
 class _FakeJudge:
@@ -167,8 +167,8 @@ def test_checker_has_separate_candidate_identity_and_implements_protocol() -> No
 
 
 def test_candidate_is_not_public_default_or_cli_integrated() -> None:
-    import memlint.checkers as checkers
-    from memlint.cli import CHECKER_NAMES
+    import palintrace.checkers as checkers
+    from palintrace.cli import CHECKER_NAMES
 
     assert "IdentityGroundedUnsupportedClaimChecker" not in checkers.__all__
     assert not hasattr(checkers, "IdentityGroundedUnsupportedClaimChecker")

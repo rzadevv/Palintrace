@@ -4,9 +4,9 @@ from typing import Any
 
 import pytest
 
-from memlint.adapters import AdapterDataError
-from memlint.adapters.mem0 import Mem0Adapter, normalize_mem0_record
-from memlint.models import ProvenanceStatus
+from palintrace.adapters import AdapterDataError
+from palintrace.adapters.mem0 import Mem0Adapter, normalize_mem0_record
+from palintrace.models import ProvenanceStatus
 
 
 def _fixture_record() -> dict[str, Any]:

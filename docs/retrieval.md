@@ -1,6 +1,6 @@
 # Retrieval auditing
 
-MemLint represents and audits retrieval behavior without choosing a production retrieval backend.
+Palintrace represents and audits retrieval behavior without choosing a production retrieval backend.
 The caller supplies the target request and either runs a `Retriever` or provides an already-recorded
 observation.
 
@@ -62,7 +62,7 @@ by distractors. It reports that the explicit target was insufficient under the s
 ## Recorded-observation CLI
 
 ```bash
-memlint retrieval-audit \
+palintrace retrieval-audit \
   --observation retrieval-observation.json \
   --policy all_expected \
   --output retrieval-findings.json
@@ -87,14 +87,14 @@ challenge construction step, not proof that shadowing occurred.
 
 ## Evaluation retriever
 
-The repository includes a deterministic lexical BM25-style retriever under `memlint.evaluation` for
+The repository includes a deterministic lexical BM25-style retriever under `palintrace.evaluation` for
 reproducing controlled experiments. It tokenizes ASCII-alphanumeric terms, uses fixed scoring and
-tie ordering, and reads only memory content. It is intentionally absent from `memlint.retrieval` and
+tie ordering, and reads only memory content. It is intentionally absent from `palintrace.retrieval` and
 the public CLI.
 
 ## Limitations
 
-- MemLint does not ship a live production retriever.
+- Palintrace does not ship a live production retriever.
 - It does not automatically scan a store for retrieval-shadowing defects.
 - Relevance targets must come from the audit scenario or caller.
 - Observations bind retriever identity and query hash but not a cryptographic digest of every store

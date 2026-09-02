@@ -2,11 +2,11 @@ import json
 from pathlib import Path
 from typing import Any
 
-from memlint.adapters import FileAdapter
-from memlint.adapters.graphiti import normalize_graphiti_record
-from memlint.adapters.letta import normalize_letta_record
-from memlint.adapters.mem0 import normalize_mem0_record
-from memlint.models import MemoryScope
+from palintrace.adapters import FileAdapter
+from palintrace.adapters.graphiti import normalize_graphiti_record
+from palintrace.adapters.letta import normalize_letta_record
+from palintrace.adapters.mem0 import normalize_mem0_record
+from palintrace.models import MemoryScope
 
 FIXTURES = Path("tests/fixtures")
 

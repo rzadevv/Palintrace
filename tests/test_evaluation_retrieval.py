@@ -4,12 +4,12 @@ import inspect
 import pytest
 from pydantic import ValidationError
 
-from memlint.evaluation import (
+from palintrace.evaluation import (
     EvaluationInputError,
     RetrievalChallengeSummary,
     summarize_retrieval_challenges,
 )
-from memlint.retrieval import (
+from palintrace.retrieval import (
     PairedRetrievalChallengeAssessment,
     RetrievalChallengeOutcome,
     RetrievalHit,

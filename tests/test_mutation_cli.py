@@ -3,9 +3,9 @@ from pathlib import Path
 
 import pytest
 
-from memlint.cli import main
-from memlint.models import NormalizedStore
-from memlint.mutations import MutationManifest
+from palintrace.cli import main
+from palintrace.models import NormalizedStore
+from palintrace.mutations import MutationManifest
 
 
 def test_mutate_cli_writes_separate_deterministic_outputs(tmp_path: Path) -> None:

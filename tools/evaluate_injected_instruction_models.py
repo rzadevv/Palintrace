@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evaluate frozen prompt-injection classifiers on MemLint-specific memory cases."""
+"""Evaluate frozen prompt-injection classifiers on Palintrace-specific memory cases."""
 
 from __future__ import annotations
 
@@ -716,7 +716,7 @@ def _print_part_2_diagnostic(results: tuple[Part2DiagnosticResult, ...]) -> None
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Run one pinned prompt-injection classifier against the frozen MemLint-specific "
+            "Run one pinned prompt-injection classifier against the frozen Palintrace-specific "
             "development probe; this is not benchmark performance."
         )
     )
@@ -751,7 +751,7 @@ def main(argv: list[str] | None = None) -> int:
         gc.collect()
 
     print(
-        "probe_kind: MemLint-specific injected-instruction classifier development probe; "
+        "probe_kind: Palintrace-specific injected-instruction classifier development probe; "
         "not benchmark performance"
     )
     print(f"device: {DEVICE}")
