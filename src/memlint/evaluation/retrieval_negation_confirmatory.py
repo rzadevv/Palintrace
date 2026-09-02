@@ -122,7 +122,7 @@ class RetrievalNegationGateResult(StrEnum):
 
 
 class RetrievalNegationInterpretation(StrEnum):
-    """Allowed H4-N interpretations."""
+    """The only allowed future H4-N interpretations."""
 
     SUPPORTS_H4_N = "SUPPORTS_H4_N"
     DOES_NOT_SUPPORT_H4_N = "DOES_NOT_SUPPORT_H4_N"
@@ -185,7 +185,7 @@ class _DeterministicModel(BaseModel):
 
 
 class RetrievalNegationRetrieverSpec(_DeterministicModel):
-    """Non-tunable execution setup."""
+    """The exact non-tunable future execution setup."""
 
     kind: StrictStr
     version: StrictStr
@@ -692,7 +692,7 @@ class RetrievalNegationConfirmatorySummary(_DeterministicModel):
 
 
 class RetrievalNegationExecutionResult(_DeterministicModel):
-    """Deterministic execution result without query or memory text."""
+    """Future deterministic 6I-B result without query or memory text."""
 
     schema_version: StrictStr
     probe_id: StrictStr

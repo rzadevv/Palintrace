@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Execute the preregistered strong retrieval probe after complete preflight."""
+"""Execute the frozen Part 6H retrieval probe after complete preflight."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ FROZEN_FIXTURE_PATH = REPOSITORY_ROOT / probe.RETRIEVAL_STRONG_PROBE_FIXTURE_PAT
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Execute the preregistered strong retrieval-shadowing probe. "
+            "Execute the frozen Part 6H retrieval-shadowing development probe. "
             "No retriever or condition overrides are accepted."
         )
     )
@@ -156,5 +156,5 @@ def main(argv: Sequence[str] | None = None) -> int:
     return 0
 
 
-if __name__ == "__main__":  # pragma: no cover - command entry point
+if __name__ == "__main__":  # pragma: no cover - reserved for Part 6H-B
     raise SystemExit(main())

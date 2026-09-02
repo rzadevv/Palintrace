@@ -390,7 +390,7 @@ class IdentityProbeSpec(_DeterministicIdentityProbeModel):
 
 
 class IdentityProbeJudgment(_DeterministicIdentityProbeModel):
-    """One pinned-judge answer without rationale or chain of thought."""
+    """One future pinned-judge answer without rationale or chain of thought."""
 
     case_id: str
     case_kind: IdentityProbeCaseKind
@@ -504,7 +504,7 @@ class IdentityProbeGateEvaluation(_DeterministicIdentityProbeModel):
 
 
 class IdentityProbeExecutionResult(_DeterministicIdentityProbeModel):
-    """Complete execution artifact for exactly 96 frozen judgments."""
+    """Complete future execution artifact for exactly 96 frozen judgments."""
 
     schema_version: str = IDENTITY_PROBE_SCHEMA_VERSION
     probe_id: str
@@ -614,7 +614,7 @@ class IdentityProbeExecutionResult(_DeterministicIdentityProbeModel):
 
 
 def validate_identity_probe_model_identity() -> None:
-    """Fail closed if execution constants no longer match the freeze."""
+    """Fail closed if future execution constants no longer match the freeze."""
 
     if IDENTITY_PROBE_MODEL_ID != "cross-encoder/nli-MiniLM2-L6-H768":
         raise IdentityProbeInputError("identity-probe model ID does not match the freeze")

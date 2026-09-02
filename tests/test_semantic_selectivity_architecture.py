@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 from pathlib import Path
 
 import memlint.cli as cli
@@ -8,6 +9,28 @@ import memlint.cli as cli
 EVALUATION_MODULE = Path("src/memlint/evaluation/semantic_selectivity.py")
 RUNNER = Path("tools/evaluate_semantic_selectivity.py")
 SOURCE_ROOT = Path("src/memlint")
+
+FROZEN_HASHES = {
+    Path("src/memlint/semantics/local_nli.py"): (
+        "aafe1e1a9d662879640285784704cdbfecefec4c25e402fae07101dd7ea087b1"
+    ),
+    Path("src/memlint/semantics/composition.py"): (
+        "cd617221c65bb6a58de7164f7438143d661903f62f57076f4869d3e28d6a7629"
+    ),
+    Path("src/memlint/checkers/unsupported_claim.py"): (
+        "04fd713308d9ed55e79501a31e99904939a2caf8ef90f2187e3fe1f594d09a8a"
+    ),
+    Path("src/memlint/checkers/unsupported_claim_identity_grounded.py"): (
+        "6b742eeff6d4280661adba61ed201b67a6bc25a7d9a2b0c967ebbccd0c3210c5"
+    ),
+    Path("src/memlint/semantics/identity.py"): (
+        "c6b54d0229cb6b87b5e23997685e9855b8b789ea2d68f6e6f07ee45a749f82f9"
+    ),
+    Path("src/memlint/semantics/identity_source.py"): (
+        "058590ef7258b9f611de486b5130b866893f0e4a2c1091d5ecd0d0a465463e87"
+    ),
+}
+
 
 def _imports(path: Path) -> tuple[str, ...]:
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
@@ -20,7 +43,13 @@ def _imports(path: Path) -> tuple[str, ...]:
     return tuple(imports)
 
 
-def test_probe_is_evaluation_only_and_production_does_not_import_it() -> None:
+def test_frozen_semantic_and_identity_predecessors_are_byte_identical() -> None:
+    assert {
+        path: hashlib.sha256(path.read_bytes()).hexdigest() for path in FROZEN_HASHES
+    } == FROZEN_HASHES
+
+
+def test_new_probe_is_evaluation_only_and_production_does_not_import_it() -> None:
     evaluation_imports = _imports(EVALUATION_MODULE)
     assert any(
         module == "memlint.semantics" or module.startswith("memlint.semantics.")

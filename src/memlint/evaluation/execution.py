@@ -219,7 +219,7 @@ def run_retrieval_benchmark_case(
     transcripts: TranscriptSet | None,
     condition: RetrievalCondition,
 ) -> RetrievalCaseExecution:
-    """Execute one target-blind paired lexical challenge through retrieval contracts."""
+    """Execute one target-blind paired lexical challenge through Part 5 contracts."""
 
     if not isinstance(case, RetrievalBenchmarkCase):
         raise EvaluationInputError("case must be a RetrievalBenchmarkCase")

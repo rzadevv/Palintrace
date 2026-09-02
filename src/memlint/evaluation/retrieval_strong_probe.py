@@ -1,4 +1,4 @@
-"""Models and pure accounting for the preregistered strong retrieval probe."""
+"""Preregistered models and pure accounting for the Part 6H retrieval probe."""
 
 from __future__ import annotations
 
@@ -102,7 +102,7 @@ class RetrievalStrongProbeGateResult(StrEnum):
 
 
 class RetrievalStrongProbeInterpretation(StrEnum):
-    """Allowed interpretations for the strong retrieval probe."""
+    """The only allowed Part 6H-B interpretations."""
 
     SUPPORTS_H4 = "SUPPORTS_H4"
     DOES_NOT_SUPPORT_H4 = "DOES_NOT_SUPPORT_H4"
@@ -149,7 +149,7 @@ class _DeterministicModel(BaseModel):
 
 
 class RetrievalStrongProbeRetrieverSpec(_DeterministicModel):
-    """Non-tunable identity of the execution retriever."""
+    """Non-tunable identity of the future execution retriever."""
 
     kind: StrictStr
     version: StrictStr
@@ -348,7 +348,7 @@ class RetrievalStrongProbeSpec(_DeterministicModel):
             or self.probe_id != RETRIEVAL_STRONG_PROBE_ID
             or self.split != RETRIEVAL_STRONG_PROBE_SPLIT
         ):
-            raise ValueError("probe identity must match the preregistered contract")
+            raise ValueError("probe identity must match the frozen Part 6H-A contract")
         if tuple(case.case_id for case in self.cases) != EXPECTED_CASE_IDS:
             raise ValueError("cases must use the exact canonical 30-case order")
 
@@ -626,7 +626,7 @@ class RetrievalStrongProbeSummary(_DeterministicModel):
 
 
 class RetrievalStrongProbeExecutionResult(_DeterministicModel):
-    """Deterministic execution result without query or memory text."""
+    """Deterministic future Part 6H-B result without query or memory text."""
 
     schema_version: StrictStr
     probe_id: StrictStr
@@ -672,7 +672,7 @@ def _outcome_counts(
 def summarize_retrieval_strong_probe(
     observations: tuple[RetrievalStrongProbeObservation, ...],
 ) -> RetrievalStrongProbeSummary:
-    """Apply the preregistered gates to complete paired observations."""
+    """Apply the frozen Part 6H gates to complete paired observations."""
 
     if not isinstance(observations, tuple) or any(
         not isinstance(observation, RetrievalStrongProbeObservation)
@@ -795,7 +795,7 @@ def load_retrieval_strong_probe(path: Path) -> RetrievalStrongProbeSpec:
 
 
 def preflight_retrieval_strong_probe(path: Path) -> RetrievalStrongProbeSpec:
-    """Verify frozen bytes before parsing and before retriever construction."""
+    """Verify frozen bytes before parsing and before any future retriever construction."""
 
     try:
         actual_sha256 = sha256_file(path)

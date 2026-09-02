@@ -1,4 +1,4 @@
-"""Minimal transcript representation for provenance-aware auditing."""
+"""Minimal transcript representation for future provenance-aware research."""
 
 from __future__ import annotations
 
