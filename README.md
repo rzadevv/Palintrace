@@ -4,6 +4,46 @@ MemLint is a provenance-aware auditing toolkit for LLM agent memory stores. It n
 exports, runs structural and evidence-based checks, creates controlled mutations for evaluation,
 and audits recorded retrieval observations without requiring hidden canonical user state.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    File[File] --> Adapters[Adapters]
+    Mem0[Mem0] --> Adapters
+    Graphiti[Graphiti] --> Adapters
+    Letta[Letta] --> Adapters
+    Adapters --> Store[NormalizedStore]
+
+    Store --> Provenance["orphaned_provenance"]
+    Store --> Redundancy["redundancy_bloat"]
+    Store --> Stale["stale_active"]
+    Store --> Privacy["privacy_scope_violation"]
+    Store --> Unsupported["unsupported_claim"]
+
+    Transcripts[TranscriptSet] --> Provenance
+    Transcripts --> Unsupported
+    Policy[Scope policy] --> Privacy
+    Judge[SemanticJudge] --> Unsupported
+
+    Provenance --> Result[CheckerResult]
+    Redundancy --> Result
+    Stale --> Result
+    Privacy --> Result
+    Unsupported --> Result
+    Result --> JSON[JSON findings]
+```
+
+## How it works
+
+1. Load a memory export through the File, Mem0, Graphiti, or Letta adapter.
+2. Normalize backend records into a `NormalizedStore`. Backend-specific fields remain under `raw`.
+3. Select a checker and supply its required evidence, such as transcripts, a scope policy, or a
+   semantic judge.
+4. Run the checker over normalized fields and its declared supporting inputs.
+5. Receive a deterministic `CheckerResult`, which can be serialized as JSON.
+
+See [checker behavior](docs/checkers.md) for the checker-specific requirements.
+
 ## Features
 
 - A backend-independent normalized memory schema with deterministic JSON serialization.
@@ -108,9 +148,37 @@ provenance remain explicitly unavailable rather than being inferred.
 
 MemLint includes gold-safe controlled-mutation accounting and reproducible synthetic probes. The
 results are controlled evidence, not estimates of production accuracy or defect prevalence. They
-include supported, negative, and inconclusive findings; see [evaluation results](docs/results.md).
-The accounting design is documented in [evaluation](docs/evaluation.md), while retrieval contracts
-are documented in [retrieval](docs/retrieval.md).
+include supported, negative, and inconclusive findings.
+
+| Area | Current evidence |
+|---|---|
+| Structural checkers | Supported on the controlled synthetic benchmark |
+| Unsupported claim | Detects controlled substitutions; the plain representation has identity-sensitive clean failures |
+| Identity grounding | Supported as an optional experimental candidate |
+| Broad retrieval shadowing | Tested hypothesis not supported |
+| Negation-specific retrieval | Tested hypothesis not supported |
+| Confidence abstention | Inconclusive under the current synthetic probe |
+| Internal contradiction | Deferred |
+| Injected instruction | Deferred |
+
+See [evaluation results](docs/results.md) for the full experiments, counts, and limitations.
+
+The controlled static evaluation keeps mutation labels separate from checker input:
+
+```mermaid
+flowchart LR
+    Base[Base store] --> Harness[Mutation harness]
+    Harness --> Mutated[Mutated store]
+    Harness --> Manifest["Separate MutationManifest / gold labels"]
+    Mutated --> Checker[Checker]
+    Checker --> Result[CheckerResult]
+    Result --> Evaluator[Evaluator]
+    Manifest -->|joined only after checking| Evaluator
+    Evaluator --> Metrics[Evaluation metrics and results]
+```
+
+The checker never receives the gold manifest. Retrieval-shadowing challenges instead require paired
+recorded retrieval observations; see [retrieval auditing](docs/retrieval.md).
 
 ## Limitations
 
@@ -121,6 +189,17 @@ are documented in [retrieval](docs/retrieval.md).
 - `internal_contradiction` and `injected_instruction` detectors remain deferred.
 - Semantic conclusions depend on the evidence and context supplied to the audit.
 - MemLint does not perform automatic repair or generate embeddings.
+
+## Documentation
+
+- [Checker behavior](docs/checkers.md)
+- [Evaluation methodology](docs/evaluation.md)
+- [Evaluation results](docs/results.md)
+- [Retrieval auditing](docs/retrieval.md)
+- [Semantic evidence](docs/semantics.md)
+- [Mutation harness](docs/mutations.md)
+- [Defect taxonomy](docs/taxonomy.md)
+- [Speaker identity integration](docs/speaker_identity_integrations.md)
 
 ## Development
 
