@@ -1,4 +1,4 @@
-"""Public, backend-independent MemLint foundation API."""
+"""Public MemLint API."""
 
 from memlint.checkers import (
     CHECKER_RESULT_SCHEMA_VERSION,

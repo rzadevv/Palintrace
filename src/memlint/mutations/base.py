@@ -152,7 +152,7 @@ def validated_memory_copy(memory: NormalizedMemory, **changes: Any) -> Normalize
 
 
 def rebuilt_store(store: NormalizedStore, memories: Sequence[NormalizedMemory]) -> NormalizedStore:
-    """Build and validate a new store while preserving its Foundation envelope."""
+    """Build and validate a new store while preserving the normalized store envelope."""
 
     return NormalizedStore(
         schema_version=store.schema_version,

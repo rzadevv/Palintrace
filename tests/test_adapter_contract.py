@@ -16,7 +16,7 @@ def _load(name: str, key: str) -> dict[str, Any]:
 
 
 def test_equivalent_backend_records_share_the_same_normalized_core_fields() -> None:
-    """This is the Foundation's central adapter-boundary invariant."""
+    """Equivalent backend records preserve the same normalized core fields."""
 
     scope = MemoryScope(user_id="user-123")
     memories = [
