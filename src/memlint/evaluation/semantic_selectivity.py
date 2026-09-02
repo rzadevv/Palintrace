@@ -185,7 +185,7 @@ class _DeterministicModel(BaseModel):
 
 
 class SemanticSelectivityModelSpec(_DeterministicModel):
-    """The exact pinned future judge identity."""
+    """Pinned semantic judge identity."""
 
     model_id: StrictStr
     revision: StrictStr
@@ -910,7 +910,7 @@ class SemanticSelectivityExecutionResult(_DeterministicModel):
 
 
 def validate_semantic_selectivity_model_identity() -> None:
-    """Fail closed if future execution constants no longer match the freeze."""
+    """Fail closed if execution constants no longer match the freeze."""
 
     if (
         SEMANTIC_SELECTIVITY_MODEL_ID != "cross-encoder/nli-MiniLM2-L6-H768"

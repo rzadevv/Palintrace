@@ -431,8 +431,8 @@ def test_no_checker_class_or_cli_choice_was_added() -> None:
     assert "retrieval_shadowing" not in cli.CHECKER_NAMES
 
 
-class PartTwoFakeRetriever:
-    retriever_id = "part-two-fake"
+class FakeRetriever:
+    retriever_id = "projection-fake"
     retriever_version = "1"
 
     def __init__(self, response: RetrievalResponse) -> None:
@@ -444,7 +444,7 @@ class PartTwoFakeRetriever:
         return self.response
 
 
-def test_part_two_single_target_projects_to_zero_or_one_case_finding() -> None:
+def test_single_target_projects_to_zero_or_one_case_finding() -> None:
     base_store = NormalizedStore(
         adapter="test",
         memories=(
@@ -468,18 +468,18 @@ def test_part_two_single_target_projects_to_zero_or_one_case_finding() -> None:
     assert len(probe.expected_memory_ids) == 1
     assert mutation.manifest.gold_label.unit is GoldLabelUnit.RETRIEVAL_CASE
     request = RetrievalAuditRequest(
-        request_id="part-two-projection-cross-check",
+        request_id="projection-cross-check",
         query=probe.query,
         expected_memory_ids=probe.expected_memory_ids,
         top_k=2,
     )
-    target_returned_retriever = PartTwoFakeRetriever(
+    target_returned_retriever = FakeRetriever(
         RetrievalResponse(
             hits=(RetrievalHit(memory_id=probe.expected_memory_ids[0], rank=1),),
             usage=RetrievalUsage(retrieval_calls=1, candidate_count=1),
         )
     )
-    target_absent_retriever = PartTwoFakeRetriever(
+    target_absent_retriever = FakeRetriever(
         RetrievalResponse(
             hits=(),
             usage=RetrievalUsage(retrieval_calls=1, candidate_count=0),

@@ -122,6 +122,6 @@ def test_output_must_be_new_and_outside_fixtures(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="test fixtures"):
         runner._write_result(
-            runner.REPOSITORY_ROOT / "tests/fixtures/future-result.json",
+            runner.REPOSITORY_ROOT / "tests/fixtures/probe-output.json",
             "{}\n",
         )

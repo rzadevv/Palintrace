@@ -486,8 +486,8 @@ def test_no_paired_cli_command_or_static_checker_choice_exists() -> None:
     assert "retrieval_shadowing" not in cli.CHECKER_NAMES
 
 
-class PartTwoFakeRetriever:
-    retriever_id = "part-two-paired-fake"
+class FakeRetriever:
+    retriever_id = "paired-fake"
     retriever_version = "1"
 
     def __init__(self, response: RetrievalResponse) -> None:
@@ -508,7 +508,7 @@ class PartTwoFakeRetriever:
         (False, True, RetrievalChallengeOutcome.BASELINE_INSUFFICIENT),
     ],
 )
-def test_part_two_single_target_paired_scenarios_are_policy_compatible(
+def test_single_target_paired_scenarios_are_policy_compatible(
     baseline_present: bool,
     mutated_present: bool,
     expected_outcome: RetrievalChallengeOutcome,
@@ -535,25 +535,25 @@ def test_part_two_single_target_paired_scenarios_are_policy_compatible(
     assert probe is not None
     assert len(probe.expected_memory_ids) == 1
     baseline_request = RetrievalAuditRequest(
-        request_id="part-two-baseline",
+        request_id="paired-baseline",
         query=probe.query,
         expected_memory_ids=probe.expected_memory_ids,
         top_k=3,
     )
     mutated_request = RetrievalAuditRequest(
-        request_id="part-two-mutated",
+        request_id="paired-mutated",
         query=probe.query,
         expected_memory_ids=probe.expected_memory_ids,
         top_k=3,
     )
     target_hit = (RetrievalHit(memory_id=probe.expected_memory_ids[0], rank=1),)
-    baseline_retriever = PartTwoFakeRetriever(
+    baseline_retriever = FakeRetriever(
         RetrievalResponse(
             hits=target_hit if baseline_present else (),
             usage=RetrievalUsage(retrieval_calls=1, candidate_count=int(baseline_present)),
         )
     )
-    mutated_retriever = PartTwoFakeRetriever(
+    mutated_retriever = FakeRetriever(
         RetrievalResponse(
             hits=target_hit if mutated_present else (),
             usage=RetrievalUsage(retrieval_calls=1, candidate_count=int(mutated_present)),

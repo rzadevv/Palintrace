@@ -80,5 +80,5 @@ def main(argv: Sequence[str] | None = None) -> int:
     return 0
 
 
-if __name__ == "__main__":  # pragma: no cover - future real execution entry point
+if __name__ == "__main__":  # pragma: no cover - command entry point
     raise SystemExit(main())

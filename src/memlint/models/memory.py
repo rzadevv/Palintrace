@@ -75,7 +75,7 @@ class MemoryScope(BaseModel):
 
 
 class NormalizedMemory(BaseModel):
-    """Stable memory representation consumed by all future MemLint code.
+    """Stable memory representation used across MemLint.
 
     ``raw`` is intentionally frozen with the rest of the model and excluded by
     :meth:`semantic_dict`. It is for adapter diagnostics and reproduction only.

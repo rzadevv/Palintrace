@@ -149,7 +149,7 @@ class _DeterministicModel(BaseModel):
 
 
 class RetrievalStrongProbeRetrieverSpec(_DeterministicModel):
-    """Non-tunable identity of the future execution retriever."""
+    """Non-tunable identity of the execution retriever."""
 
     kind: StrictStr
     version: StrictStr
@@ -795,7 +795,7 @@ def load_retrieval_strong_probe(path: Path) -> RetrievalStrongProbeSpec:
 
 
 def preflight_retrieval_strong_probe(path: Path) -> RetrievalStrongProbeSpec:
-    """Verify frozen bytes before parsing and before any future retriever construction."""
+    """Verify frozen bytes before parsing and before retriever construction."""
 
     try:
         actual_sha256 = sha256_file(path)
