@@ -96,6 +96,20 @@ taxonomy contract changes, not whenever the package changes.
 If a public Memory IR is introduced later, it will have an independent version. No Memory IR version
 or schema is defined here.
 
+## CLI exit status
+
+The `audit` and `retrieval-audit` commands support an optional `--fail-on` threshold with severity
+ordering `info < warning < error`.
+
+| Status | Meaning |
+|---|---|
+| `0` | The command succeeded and no configured gate failed |
+| `1` | The audit succeeded, but findings met the configured severity threshold |
+| `2` | An argument, input, or configuration error occurred |
+
+When `--fail-on` is omitted, findings do not change a successful exit status. Gating occurs after
+the result is serialized and does not modify the `CheckerResult` content.
+
 ## Deprecation
 
 Published rule IDs are deprecated in place rather than silently renamed or assigned a different

@@ -30,7 +30,8 @@ checker identity, version, defect class, memory IDs, and evidence. Repeated chec
 normalized input therefore produce stable output.
 
 Result severity expresses a rule's default importance. `Finding.confidence` expresses confidence in
-one particular finding; it is not a severity level.
+one particular finding; it is not a severity level. CLI `--fail-on` gating compares only result
+severity and finding presence, so confidence does not affect the exit status.
 
 Findings avoid serializing memory content and transcript text. Semantic findings contain hashes and
 source coordinates instead. Mutation manifests and benchmark gold labels are never checker inputs.

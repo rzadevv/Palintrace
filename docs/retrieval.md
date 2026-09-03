@@ -69,7 +69,8 @@ palintrace retrieval-audit \
 ```
 
 The input observation and output result must be different paths. The command never receives a
-mutation manifest or expected answer text.
+mutation manifest or expected answer text. It also accepts the optional `--fail-on` threshold used
+by static audits, for example `--fail-on error`.
 
 ## Paired challenges
 

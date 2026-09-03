@@ -99,6 +99,20 @@ palintrace audit \
   --output findings.json
 ```
 
+To return exit status 1 when error-severity findings are present, opt into gating:
+
+```bash
+palintrace audit \
+  --store normalized.json \
+  --transcripts examples/transcripts.json \
+  --checker orphaned_provenance \
+  --fail-on error \
+  --output findings.json
+```
+
+Without `--fail-on`, a successful audit returns 0 even when it finds defects. Gated results are
+still written in full before the policy exit status is returned.
+
 Create a controlled mutation and a separate gold manifest:
 
 ```bash

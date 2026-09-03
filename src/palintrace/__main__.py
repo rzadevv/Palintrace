@@ -1,5 +1,6 @@
 """Allow ``python -m palintrace``."""
 
-from palintrace.cli import main
+from palintrace.command import main
 
-raise SystemExit(main())
+if __name__ == "__main__":
+    raise SystemExit(main())
