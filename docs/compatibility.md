@@ -78,6 +78,7 @@ The following versions serve different contracts and are not required to match:
 ```text
 Palintrace package version
 serialized result or schema version
+adapter capability schema version
 rule version
 taxonomy version
 future Memory IR version
@@ -95,6 +96,17 @@ taxonomy contract changes, not whenever the package changes.
 
 If a public Memory IR is introduced later, it will have an independent version. No Memory IR version
 or schema is defined here.
+
+## Adapter capabilities
+
+`AdapterCapabilities` schema `0.1` is an independently versioned contract describing the normalized
+facets each Palintrace adapter supports. It is separate from `NormalizedStore` schema `0.1`, and
+capability reporting does not modify normalized store serialization.
+
+Capability status describes adapter support rather than value presence in every record. `supported`
+means the adapter has a direct normalized mapping, `conditional` means an optional source field or
+caller configuration is required, and `unsupported` means the adapter has no current normalized
+mapping. This contract does not define checker eligibility semantics.
 
 ## CLI exit status
 

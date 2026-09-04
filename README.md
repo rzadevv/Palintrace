@@ -173,6 +173,24 @@ Mem0, Graphiti, and Letta exports can be loaded through optional adapters. Backe
 remain under `raw`; generic checks use normalized fields only. Missing timestamps, embeddings, or
 provenance remain explicitly unavailable rather than being inferred.
 
+Adapter capability status describes what an adapter can map, not whether every exported record
+contains that field. `supported` means a direct normalized mapping exists, `conditional` means an
+optional source field or caller configuration is required, and `unsupported` means there is no
+current normalized mapping.
+
+| Adapter | Provenance | Created | Updated | Active | Supersession | User scope | Agent scope | Session scope | Embeddings |
+|---|---|---|---|---|---|---|---|---|---|
+| File | supported | supported | supported | supported | supported | supported | supported | supported | supported |
+| Mem0 | conditional | supported | supported | conditional | conditional | supported | supported | supported | conditional |
+| Graphiti | conditional | supported | unsupported | supported | unsupported | conditional | conditional | conditional | conditional |
+| Letta | conditional | supported | supported | supported | unsupported | conditional | conditional | unsupported | conditional |
+
+Inspect the machine-readable contract without contacting a backend:
+
+```bash
+palintrace capabilities --adapter graphiti
+```
+
 ## Evaluation
 
 Palintrace includes gold-safe controlled-mutation accounting and reproducible synthetic probes. The

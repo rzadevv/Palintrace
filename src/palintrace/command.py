@@ -1,4 +1,4 @@
-"""Public command entry point with optional audit exit policy."""
+"""Public command entry point."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from palintrace import cli
-from palintrace.adapters import AdapterError
+from palintrace.adapters import AdapterError, adapter_capabilities
 from palintrace.checkers import CheckerResult
 from palintrace.sarif import render_sarif
 
@@ -21,6 +21,15 @@ def build_parser() -> argparse.ArgumentParser:
         action
         for action in parser._actions
         if isinstance(action, argparse._SubParsersAction)
+    )
+    capabilities = commands.add_parser(
+        "capabilities", help="show the normalized field support for one adapter"
+    )
+    capabilities.add_argument(
+        "--adapter", choices=("file", "mem0", "graphiti", "letta"), required=True
+    )
+    capabilities.add_argument(
+        "--output", type=Path, help="write capability JSON to this path instead of stdout"
     )
     for name in ("audit", "retrieval-audit"):
         commands.choices[name].add_argument(
@@ -60,6 +69,14 @@ def _validate_sarif_output(args: argparse.Namespace) -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.command == "capabilities":
+        try:
+            text = adapter_capabilities(args.adapter).to_json(args.output)
+        except (OSError, ValueError) as error:
+            parser.error(str(error))
+        if args.output is None:
+            sys.stdout.write(text)
+        return 0
     if args.command not in {"audit", "retrieval-audit"}:
         return cli.main(argv)
 

@@ -12,6 +12,13 @@ import pytest
 import palintrace.command as command
 from palintrace import __main__ as module_entrypoint
 from palintrace import cli
+from palintrace.adapters import (
+    AdapterCapabilities,
+    GraphitiAdapter,
+    LettaAdapter,
+    Mem0Adapter,
+    adapter_capabilities,
+)
 from palintrace.checkers import CheckerResult, CheckerStats, EvidenceItem, Finding
 from palintrace.models import MemoryScope, NormalizedMemory, NormalizedStore
 from palintrace.retrieval import RetrievalHit, RetrievalObservation, RetrievalUsage
@@ -114,6 +121,135 @@ def test_public_entrypoints_use_command_main() -> None:
 
     assert project["scripts"]["palintrace"] == "palintrace.command:main"
     assert module_entrypoint.main is command.main
+
+
+@pytest.mark.parametrize("adapter", ["file", "mem0", "graphiti", "letta"])
+def test_capabilities_parser_accepts_builtin_adapters(adapter: str) -> None:
+    parser, command_parser = _command_parser("capabilities")
+
+    args = parser.parse_args(["capabilities", "--adapter", adapter])
+    adapter_action = next(
+        action for action in command_parser._actions if action.dest == "adapter"
+    )
+
+    assert args.command == "capabilities"
+    assert args.adapter == adapter
+    assert tuple(adapter_action.choices) == ("file", "mem0", "graphiti", "letta")
+    assert adapter_action.required is True
+
+
+def test_capabilities_parser_requires_adapter(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    parser = command.build_parser()
+
+    with pytest.raises(SystemExit) as raised:
+        parser.parse_args(["capabilities"])
+
+    assert raised.value.code == 2
+    assert "the following arguments are required: --adapter" in capsys.readouterr().err
+
+
+def test_capabilities_parser_rejects_unknown_adapter(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    parser = command.build_parser()
+
+    with pytest.raises(SystemExit) as raised:
+        parser.parse_args(["capabilities", "--adapter", "unknown"])
+
+    error = capsys.readouterr().err
+    assert raised.value.code == 2
+    assert "invalid choice" in error
+    assert "Traceback" not in error
+
+
+def test_capabilities_parser_has_optional_path_output() -> None:
+    parser, command_parser = _command_parser("capabilities")
+    output_action = next(
+        action for action in command_parser._actions if action.dest == "output"
+    )
+
+    args = parser.parse_args(
+        ["capabilities", "--adapter", "file", "--output", "capabilities.json"]
+    )
+
+    assert args.output == Path("capabilities.json")
+    assert output_action.type is Path
+    assert output_action.default is None
+    assert output_action.required is False
+
+
+def test_capabilities_command_writes_json_stdout(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    assert command.main(["capabilities", "--adapter", "graphiti"]) == 0
+    captured = capsys.readouterr()
+    capabilities = AdapterCapabilities.model_validate_json(captured.out)
+
+    assert capabilities.adapter == "graphiti"
+    assert captured.out == adapter_capabilities("graphiti").to_json()
+    assert captured.err == ""
+
+
+def test_capabilities_command_writes_json_file(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    output = tmp_path / "graphiti-capabilities.json"
+
+    assert (
+        command.main(
+            [
+                "capabilities",
+                "--adapter",
+                "graphiti",
+                "--output",
+                str(output),
+            ]
+        )
+        == 0
+    )
+    captured = capsys.readouterr()
+
+    AdapterCapabilities.model_validate_json(output.read_text(encoding="utf-8"))
+    assert output.read_bytes() == adapter_capabilities("graphiti").to_json().encode("utf-8")
+    assert captured.out == ""
+    assert captured.err == ""
+
+
+@pytest.mark.parametrize("adapter", ["mem0", "graphiti", "letta"])
+def test_capabilities_command_does_not_access_backends(
+    adapter: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    def fail_backend_access(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("backend access attempted")
+
+    for adapter_type in (Mem0Adapter, GraphitiAdapter, LettaAdapter):
+        monkeypatch.setattr(adapter_type, "__init__", fail_backend_access)
+
+    assert command.main(["capabilities", "--adapter", adapter]) == 0
+    captured = capsys.readouterr()
+    assert AdapterCapabilities.model_validate_json(captured.out).adapter == adapter
+    assert captured.err == ""
+
+
+def test_capabilities_filesystem_error_returns_two(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    output = tmp_path / "missing" / "capabilities.json"
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            ["capabilities", "--adapter", "file", "--output", str(output)]
+        )
+
+    error = capsys.readouterr().err
+    assert raised.value.code == 2
+    assert "No such file or directory" in error
+    assert "Traceback" not in error
+    assert not output.exists()
 
 
 @pytest.mark.parametrize("name", ["audit", "retrieval-audit"])
