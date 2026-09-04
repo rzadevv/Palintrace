@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import tomllib
 from collections.abc import Sequence
 from pathlib import Path
@@ -58,12 +59,15 @@ def _audit_arguments(
     *,
     fail_on: str | None = None,
     output: Path | None = None,
+    sarif_output: Path | None = None,
 ) -> list[str]:
     arguments = ["audit", "--store", str(store), "--checker", checker]
     if fail_on is not None:
         arguments.extend(("--fail-on", fail_on))
     if output is not None:
         arguments.extend(("--output", str(output)))
+    if sarif_output is not None:
+        arguments.extend(("--sarif-output", str(sarif_output)))
     return arguments
 
 
@@ -87,6 +91,7 @@ def _retrieval_arguments(
     *,
     fail_on: str | None = None,
     output: Path | None = None,
+    sarif_output: Path | None = None,
 ) -> list[str]:
     arguments = [
         "retrieval-audit",
@@ -99,6 +104,8 @@ def _retrieval_arguments(
         arguments.extend(("--fail-on", fail_on))
     if output is not None:
         arguments.extend(("--output", str(output)))
+    if sarif_output is not None:
+        arguments.extend(("--sarif-output", str(sarif_output)))
     return arguments
 
 
@@ -115,6 +122,16 @@ def test_audit_parsers_have_optional_fail_on(name: str) -> None:
     action = next(action for action in parser._actions if action.dest == "fail_on")
 
     assert tuple(action.choices) == ("info", "warning", "error")
+    assert action.default is None
+    assert action.required is False
+
+
+@pytest.mark.parametrize("name", ["audit", "retrieval-audit"])
+def test_audit_parsers_have_optional_sarif_output(name: str) -> None:
+    _, parser = _command_parser(name)
+    action = next(action for action in parser._actions if action.dest == "sarif_output")
+
+    assert action.type is Path
     assert action.default is None
     assert action.required is False
 
@@ -148,6 +165,45 @@ def test_non_audit_parsers_reject_fail_on(
 
     assert raised.value.code == 2
     assert "unrecognized arguments: --fail-on error" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [
+        [
+            "dump",
+            "--adapter",
+            "file",
+            "--source",
+            "store.json",
+            "--sarif-output",
+            "result.sarif",
+        ],
+        [
+            "mutate",
+            "--store",
+            "store.json",
+            "--defect",
+            "stale_active",
+            "--output",
+            "mutated.json",
+            "--manifest",
+            "manifest.json",
+            "--sarif-output",
+            "result.sarif",
+        ],
+    ],
+)
+def test_non_audit_parsers_reject_sarif_output(
+    arguments: list[str], capsys: pytest.CaptureFixture[str]
+) -> None:
+    parser = command.build_parser()
+
+    with pytest.raises(SystemExit) as raised:
+        parser.parse_args(arguments)
+
+    assert raised.value.code == 2
+    assert "unrecognized arguments: --sarif-output result.sarif" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize(
@@ -352,3 +408,207 @@ def _result_with_confidence(confidence: float) -> CheckerResult:
 def test_gate_does_not_inspect_finding_confidence() -> None:
     assert command._gate_triggered(_result_with_confidence(0.0), "error") is True
     assert command._gate_triggered(_result_with_confidence(1.0), "error") is True
+
+
+def test_audit_writes_canonical_and_sarif_outputs(tmp_path: Path) -> None:
+    store = tmp_path / "stale.json"
+    output = tmp_path / "result.json"
+    sarif_output = tmp_path / "result.sarif"
+    _write_stale_store(store)
+
+    assert (
+        command.main(
+            _audit_arguments(
+                store,
+                "stale_active",
+                output=output,
+                sarif_output=sarif_output,
+            )
+        )
+        == 0
+    )
+    result = CheckerResult.model_validate_json(output.read_text(encoding="utf-8"))
+    sarif = json.loads(sarif_output.read_text(encoding="utf-8"))
+    sarif_results = sarif["runs"][0]["results"]
+
+    assert len(sarif_results) == len(result.findings) == 1
+    assert sarif_results[0]["ruleId"] == result.rule_id
+    assert (
+        sarif_results[0]["fingerprints"]["palintraceFindingId"]
+        == result.findings[0].finding_id
+    )
+
+
+def test_gated_audit_writes_both_outputs_before_exit_one(tmp_path: Path) -> None:
+    store = tmp_path / "stale.json"
+    output = tmp_path / "result.json"
+    sarif_output = tmp_path / "result.sarif"
+    _write_stale_store(store)
+
+    assert (
+        command.main(
+            _audit_arguments(
+                store,
+                "stale_active",
+                fail_on="error",
+                output=output,
+                sarif_output=sarif_output,
+            )
+        )
+        == 1
+    )
+    CheckerResult.model_validate_json(output.read_text(encoding="utf-8"))
+    assert json.loads(sarif_output.read_text(encoding="utf-8"))["version"] == "2.1.0"
+
+
+def test_sarif_output_does_not_change_canonical_json_bytes(tmp_path: Path) -> None:
+    store = tmp_path / "stale.json"
+    plain_output = tmp_path / "plain.json"
+    projected_output = tmp_path / "projected.json"
+    sarif_output = tmp_path / "result.sarif"
+    _write_stale_store(store)
+
+    assert command.main(_audit_arguments(store, "stale_active", output=plain_output)) == 0
+    assert (
+        command.main(
+            _audit_arguments(
+                store,
+                "stale_active",
+                output=projected_output,
+                sarif_output=sarif_output,
+            )
+        )
+        == 0
+    )
+    assert projected_output.read_bytes() == plain_output.read_bytes()
+
+
+def test_sarif_file_preserves_canonical_stdout(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = tmp_path / "stale.json"
+    sarif_output = tmp_path / "result.sarif"
+    _write_stale_store(store)
+
+    assert (
+        command.main(
+            _audit_arguments(store, "stale_active", sarif_output=sarif_output)
+        )
+        == 0
+    )
+    captured = capsys.readouterr()
+    result = CheckerResult.model_validate_json(captured.out)
+
+    assert captured.out == result.to_json()
+    assert captured.err == ""
+    assert "$schema" not in json.loads(captured.out)
+    assert "$schema" in json.loads(sarif_output.read_text(encoding="utf-8"))
+
+
+@pytest.mark.parametrize("sufficient", [False, True])
+def test_retrieval_audit_writes_matching_sarif(
+    tmp_path: Path, sufficient: bool
+) -> None:
+    observation = tmp_path / "observation.json"
+    output = tmp_path / "result.json"
+    sarif_output = tmp_path / "result.sarif"
+    _write_observation(observation, sufficient=sufficient)
+
+    assert (
+        command.main(
+            _retrieval_arguments(
+                observation,
+                output=output,
+                sarif_output=sarif_output,
+            )
+        )
+        == 0
+    )
+    result = CheckerResult.model_validate_json(output.read_text(encoding="utf-8"))
+    sarif_results = json.loads(sarif_output.read_text(encoding="utf-8"))["runs"][0][
+        "results"
+    ]
+
+    assert len(sarif_results) == len(result.findings) == (0 if sufficient else 1)
+
+
+def test_sarif_output_cannot_overwrite_audit_store(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = tmp_path / "stale.json"
+    _write_stale_store(store)
+    original = store.read_bytes()
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _audit_arguments(store, "stale_active", sarif_output=store)
+        )
+
+    assert raised.value.code == 2
+    assert "must not overwrite" in capsys.readouterr().err
+    assert store.read_bytes() == original
+
+
+def test_sarif_output_must_differ_from_canonical_output(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = tmp_path / "stale.json"
+    output = tmp_path / "result.json"
+    _write_stale_store(store)
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _audit_arguments(
+                store,
+                "stale_active",
+                output=output,
+                sarif_output=output,
+            )
+        )
+
+    assert raised.value.code == 2
+    assert "must not overwrite" in capsys.readouterr().err
+    assert not output.exists()
+
+
+def test_sarif_output_cannot_overwrite_retrieval_observation(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    observation = tmp_path / "observation.json"
+    _write_observation(observation, sufficient=False)
+    original = observation.read_bytes()
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _retrieval_arguments(observation, sarif_output=observation)
+        )
+
+    assert raised.value.code == 2
+    assert "must not overwrite" in capsys.readouterr().err
+    assert observation.read_bytes() == original
+
+
+def test_sarif_filesystem_error_returns_two(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = tmp_path / "stale.json"
+    output = tmp_path / "result.json"
+    sarif_output = tmp_path / "missing" / "result.sarif"
+    _write_stale_store(store)
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _audit_arguments(
+                store,
+                "stale_active",
+                output=output,
+                sarif_output=sarif_output,
+            )
+        )
+
+    error = capsys.readouterr().err
+    assert raised.value.code == 2
+    assert "No such file or directory" in error
+    assert "Traceback" not in error
+    CheckerResult.model_validate_json(output.read_text(encoding="utf-8"))
+    assert not sarif_output.exists()

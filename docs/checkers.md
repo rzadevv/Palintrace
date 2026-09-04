@@ -33,6 +33,10 @@ Result severity expresses a rule's default importance. `Finding.confidence` expr
 one particular finding; it is not a severity level. CLI `--fail-on` gating compares only result
 severity and finding presence, so confidence does not affect the exit status.
 
+`CheckerResult` is also the canonical source for optional SARIF rendering: `rule_id` becomes SARIF
+`ruleId`, severity determines its level, and `finding_id` is retained as a fingerprint. Memory IDs
+remain logical memory identifiers rather than fabricated source-code locations.
+
 Findings avoid serializing memory content and transcript text. Semantic findings contain hashes and
 source coordinates instead. Mutation manifests and benchmark gold labels are never checker inputs.
 

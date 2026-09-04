@@ -5,10 +5,12 @@ from __future__ import annotations
 import argparse
 import sys
 from collections.abc import Sequence
+from pathlib import Path
 
 from palintrace import cli
 from palintrace.adapters import AdapterError
 from palintrace.checkers import CheckerResult
+from palintrace.sarif import render_sarif
 
 _SEVERITY_RANK = {"info": 0, "warning": 1, "error": 2}
 
@@ -26,6 +28,11 @@ def build_parser() -> argparse.ArgumentParser:
             choices=tuple(_SEVERITY_RANK),
             help="return exit 1 when findings meet or exceed this severity",
         )
+        commands.choices[name].add_argument(
+            "--sarif-output",
+            type=Path,
+            help="write a SARIF 2.1.0 projection to this path",
+        )
     return parser
 
 
@@ -37,6 +44,19 @@ def _gate_triggered(result: CheckerResult, fail_on: str | None) -> bool:
     )
 
 
+def _validate_sarif_output(args: argparse.Namespace) -> None:
+    if args.sarif_output is None:
+        return
+    compared_paths = [args.output]
+    if args.command == "audit":
+        compared_paths.extend((args.store, args.transcripts, args.scope_policy))
+    else:
+        compared_paths.append(args.observation)
+    sarif_output = args.sarif_output.resolve()
+    if any(path is not None and path.resolve() == sarif_output for path in compared_paths):
+        raise ValueError("--sarif-output must not overwrite an input or canonical output")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -44,6 +64,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return cli.main(argv)
 
     try:
+        _validate_sarif_output(args)
         if args.command == "audit":
             text = cli._run_audit(args)
         else:
@@ -52,6 +73,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error(str(error))
 
     result = CheckerResult.model_validate_json(text)
+    try:
+        if args.sarif_output is not None:
+            render_sarif(result, args.sarif_output)
+    except OSError as error:
+        parser.error(str(error))
     if args.output is None:
         sys.stdout.write(text)
     return 1 if _gate_triggered(result, args.fail_on) else 0

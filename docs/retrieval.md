@@ -70,7 +70,8 @@ palintrace retrieval-audit \
 
 The input observation and output result must be different paths. The command never receives a
 mutation manifest or expected answer text. It also accepts the optional `--fail-on` threshold used
-by static audits, for example `--fail-on error`.
+by static audits, for example `--fail-on error`. Use `--sarif-output PATH` to write a SARIF projection
+alongside the canonical retrieval result.
 
 ## Paired challenges
 

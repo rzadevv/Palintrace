@@ -110,6 +110,23 @@ ordering `info < warning < error`.
 When `--fail-on` is omitted, findings do not change a successful exit status. Gating occurs after
 the result is serialized and does not modify the `CheckerResult` content.
 
+## SARIF reporting
+
+Checker-result JSON schema `0.3` remains the canonical Palintrace result. `--sarif-output` writes a
+deterministic derived representation using SARIF `2.1.0`; it does not replace or modify the canonical
+result.
+
+SARIF rule IDs come from `rule_id`. Severity maps as follows:
+
+| Palintrace severity | SARIF level |
+|---|---|
+| `info` | `note` |
+| `warning` | `warning` |
+| `error` | `error` |
+
+SARIF carries the existing finding ID as its fingerprint. Rendering does not change finding identity
+or `--fail-on` behavior.
+
 ## Deprecation
 
 Published rule IDs are deprecated in place rather than silently renamed or assigned a different

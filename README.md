@@ -113,6 +113,19 @@ palintrace audit \
 Without `--fail-on`, a successful audit returns 0 even when it finds defects. Gated results are
 still written in full before the policy exit status is returned.
 
+Optionally write a SARIF 2.1.0 projection alongside the canonical result:
+
+```bash
+palintrace audit \
+  --store normalized.json \
+  --checker stale_active \
+  --output findings.json \
+  --sarif-output findings.sarif
+```
+
+`findings.json` remains the canonical `CheckerResult`; SARIF is a derived representation for tools
+that consume it and does not alter findings or gating.
+
 Create a controlled mutation and a separate gold manifest:
 
 ```bash
