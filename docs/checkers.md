@@ -157,15 +157,13 @@ not selectable through the CLI, and not enabled by default. Its current readines
 
 ## Running checks
 
-Select one or more checkers explicitly:
+Select one checker explicitly:
 
 ```bash
 palintrace audit \
   --store normalized.json \
   --transcripts transcripts.json \
   --checker orphaned_provenance \
-  --checker redundancy_bloat \
-  --checker stale_active \
   --output findings.json
 ```
 
