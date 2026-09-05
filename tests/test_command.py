@@ -937,13 +937,26 @@ def test_aggregate_audit_file_output_is_quiet_and_deterministic(
     store = Path("examples/mutation-store.json")
     first = tmp_path / "first.json"
     second = tmp_path / "second.json"
+    sarif_output = tmp_path / "report.sarif"
 
     assert command.main(_audit_arguments(store, "all", output=first)) == 0
-    assert command.main(_audit_arguments(store, "all", output=second)) == 0
+    assert (
+        command.main(
+            _audit_arguments(
+                store,
+                "all",
+                output=second,
+                sarif_output=sarif_output,
+            )
+        )
+        == 0
+    )
     captured = capsys.readouterr()
 
     report = AuditReport.model_validate_json(first.read_text(encoding="utf-8"))
+    sarif = json.loads(sarif_output.read_text(encoding="utf-8"))
     assert report.schema_version == "0.1"
+    assert sarif["version"] == "2.1.0"
     assert first.read_bytes() == second.read_bytes()
     assert captured.out == ""
     assert captured.err == ""
@@ -956,6 +969,7 @@ def test_fully_configured_aggregate_loads_inputs_and_constructs_model_once(
 ) -> None:
     store, transcripts, policy = _write_complete_aggregate_inputs(tmp_path)
     output = tmp_path / "report.json"
+    sarif_output = tmp_path / "report.sarif"
     calls = {
         "store": 0,
         "transcripts": 0,
@@ -1005,6 +1019,7 @@ def test_fully_configured_aggregate_loads_inputs_and_constructs_model_once(
                 store,
                 "all",
                 output=output,
+                sarif_output=sarif_output,
                 transcripts=transcripts,
                 scope_policy=policy,
                 semantic_model_id="test/model",
@@ -1015,6 +1030,7 @@ def test_fully_configured_aggregate_loads_inputs_and_constructs_model_once(
     )
     captured = capsys.readouterr()
     report = AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+    sarif = json.loads(sarif_output.read_text(encoding="utf-8"))
 
     assert calls == {
         "store": 1,
@@ -1026,6 +1042,8 @@ def test_fully_configured_aggregate_loads_inputs_and_constructs_model_once(
     assert judge_arguments == [("test/model", "revision-1", "cpu")]
     assert _aggregate_checker_ids(report.results) == cli.CHECKER_NAMES
     assert report.skipped == ()
+    assert len(sarif["runs"][0]["tool"]["driver"]["rules"]) == 5
+    assert sarif["runs"][0]["properties"]["skipped"] == []
     assert captured.out == ""
     assert captured.err == ""
 
@@ -1036,6 +1054,7 @@ def test_complete_semantic_configuration_without_transcripts_does_not_load_model
 ) -> None:
     store, _, policy = _write_complete_aggregate_inputs(tmp_path)
     output = tmp_path / "report.json"
+    sarif_output = tmp_path / "report.sarif"
 
     def fail_model_construction(**_kwargs: object) -> None:
         raise AssertionError("semantic model construction attempted")
@@ -1048,6 +1067,7 @@ def test_complete_semantic_configuration_without_transcripts_does_not_load_model
                 store,
                 "all",
                 output=output,
+                sarif_output=sarif_output,
                 scope_policy=policy,
                 semantic_model_id="test/model",
                 semantic_model_revision="revision-1",
@@ -1056,6 +1076,7 @@ def test_complete_semantic_configuration_without_transcripts_does_not_load_model
         == 0
     )
     report = AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+    sarif = json.loads(sarif_output.read_text(encoding="utf-8"))
     unsupported = next(
         item for item in report.skipped if item.checker_id == "unsupported_claim"
     )
@@ -1066,6 +1087,9 @@ def test_complete_semantic_configuration_without_transcripts_does_not_load_model
         "stale_active",
         "privacy_scope_violation",
     )
+    assert sarif["runs"][0]["properties"]["skipped"] == [
+        item.model_dump(mode="json") for item in report.skipped
+    ]
 
 
 def test_aggregate_without_scope_policy_skips_only_privacy_checker(
@@ -1349,19 +1373,30 @@ def test_aggregate_warning_finding_obeys_threshold(
 ) -> None:
     store = tmp_path / "redundant.json"
     output = tmp_path / "report.json"
+    sarif_output = tmp_path / "report.sarif"
     _write_redundant_store(store)
 
     assert (
         command.main(
-            _audit_arguments(store, "all", fail_on=threshold, output=output)
+            _audit_arguments(
+                store,
+                "all",
+                fail_on=threshold,
+                output=output,
+                sarif_output=sarif_output,
+            )
         )
         == expected
     )
     report = AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+    sarif = json.loads(sarif_output.read_text(encoding="utf-8"))
     redundancy = next(
         result for result in report.results if result.checker_id == "redundancy_bloat"
     )
     assert len(redundancy.findings) == 1
+    assert any(
+        result["ruleId"] == redundancy.rule_id for result in sarif["runs"][0]["results"]
+    )
 
 
 def test_aggregate_error_gate_preserves_complete_stdout(
@@ -1385,19 +1420,28 @@ def test_aggregate_error_gate_preserves_complete_file_output(
 ) -> None:
     store = tmp_path / "stale.json"
     output = tmp_path / "report.json"
+    sarif_output = tmp_path / "report.sarif"
     _write_stale_store(store)
 
     assert (
         command.main(
-            _audit_arguments(store, "all", fail_on="error", output=output)
+            _audit_arguments(
+                store,
+                "all",
+                fail_on="error",
+                output=output,
+                sarif_output=sarif_output,
+            )
         )
         == 1
     )
     captured = capsys.readouterr()
     report = AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+    sarif = json.loads(sarif_output.read_text(encoding="utf-8"))
 
     stale = next(result for result in report.results if result.checker_id == "stale_active")
     assert len(stale.findings) == 1
+    assert any(result["ruleId"] == stale.rule_id for result in sarif["runs"][0]["results"])
     assert captured.out == ""
     assert captured.err == ""
 
@@ -1405,15 +1449,29 @@ def test_aggregate_error_gate_preserves_complete_file_output(
 def test_aggregate_skips_do_not_trigger_info_gate(tmp_path: Path) -> None:
     store = tmp_path / "clean.json"
     output = tmp_path / "report.json"
+    sarif_output = tmp_path / "report.sarif"
     _write_stale_store(store, stale=False)
 
     assert (
-        command.main(_audit_arguments(store, "all", fail_on="info", output=output))
+        command.main(
+            _audit_arguments(
+                store,
+                "all",
+                fail_on="info",
+                output=output,
+                sarif_output=sarif_output,
+            )
+        )
         == 0
     )
     report = AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+    sarif_run = json.loads(sarif_output.read_text(encoding="utf-8"))["runs"][0]
     assert all(not result.findings for result in report.results)
     assert report.skipped
+    assert sarif_run["results"] == []
+    assert sarif_run["properties"]["skipped"] == [
+        item.model_dump(mode="json") for item in report.skipped
+    ]
 
 
 def test_aggregate_gate_does_not_inspect_finding_confidence() -> None:
@@ -1432,32 +1490,51 @@ def test_aggregate_gate_does_not_inspect_finding_confidence() -> None:
     assert command._aggregate_gate_triggered(report, "error") is True
 
 
-def test_aggregate_sarif_is_rejected_before_writing_files(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+def test_aggregate_sarif_writes_from_one_report_and_preserves_stdout(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     store = tmp_path / "store.json"
-    output = tmp_path / "report.json"
     sarif_output = tmp_path / "report.sarif"
     _write_stale_store(store, stale=False)
+    aggregate_calls = 0
+    original_run_aggregate_audit = command.run_aggregate_audit
 
-    with pytest.raises(SystemExit) as raised:
+    def run_once(*args: object, **kwargs: object) -> AuditReport:
+        nonlocal aggregate_calls
+        aggregate_calls += 1
+        return original_run_aggregate_audit(*args, **kwargs)  # type: ignore[arg-type]
+
+    def fail_model_construction(**_kwargs: object) -> None:
+        raise AssertionError("semantic model construction attempted")
+
+    monkeypatch.setattr(command, "run_aggregate_audit", run_once)
+    monkeypatch.setattr(command, "LocalNLISemanticJudge", fail_model_construction)
+
+    assert (
         command.main(
-            _audit_arguments(
-                store,
-                "all",
-                output=output,
-                sarif_output=sarif_output,
-            )
+            _audit_arguments(store, "all", sarif_output=sarif_output)
         )
+        == 0
+    )
 
     captured = capsys.readouterr()
-    assert raised.value.code == 2
-    assert "--sarif-output" in captured.err
-    assert "--checker all" in captured.err
-    assert "Traceback" not in captured.err
-    assert captured.out == ""
-    assert not output.exists()
-    assert not sarif_output.exists()
+    report = AuditReport.model_validate_json(captured.out)
+    sarif = json.loads(sarif_output.read_text(encoding="utf-8"))
+    run = sarif["runs"][0]
+
+    assert aggregate_calls == 1
+    assert sarif["version"] == "2.1.0"
+    assert len(sarif["runs"]) == 1
+    assert [rule["id"] for rule in run["tool"]["driver"]["rules"]] == [
+        result.rule_id for result in report.results
+    ]
+    assert run["properties"]["skipped"] == [
+        item.model_dump(mode="json") for item in report.skipped
+    ]
+    assert captured.out == report.to_json()
+    assert captured.err == ""
 
 
 @pytest.mark.parametrize("collision", ["store", "transcripts", "policy"])
@@ -1488,6 +1565,101 @@ def test_aggregate_output_cannot_overwrite_any_input(
     assert "Traceback" not in captured.err
     assert captured.out == ""
     assert output.read_bytes() == original
+
+
+@pytest.mark.parametrize("collision", ["store", "transcripts", "policy", "output"])
+def test_aggregate_sarif_output_cannot_overwrite_inputs_or_canonical_output(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    collision: str,
+) -> None:
+    store, transcripts, policy = _write_complete_aggregate_inputs(tmp_path)
+    output = tmp_path / "report.json"
+    paths = {
+        "store": store,
+        "transcripts": transcripts,
+        "policy": policy,
+        "output": output,
+    }
+    sarif_output = paths[collision]
+    original = sarif_output.read_bytes() if sarif_output.exists() else None
+    aggregate_calls: list[object] = []
+    model_calls: list[object] = []
+
+    def fail_aggregate(*args: object, **_kwargs: object) -> None:
+        aggregate_calls.extend(args)
+        raise AssertionError("aggregate execution attempted")
+
+    def fail_model_construction(**kwargs: object) -> None:
+        model_calls.append(kwargs)
+        raise AssertionError("semantic model construction attempted")
+
+    monkeypatch.setattr(command, "run_aggregate_audit", fail_aggregate)
+    monkeypatch.setattr(command, "LocalNLISemanticJudge", fail_model_construction)
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _audit_arguments(
+                store,
+                "all",
+                output=output,
+                sarif_output=sarif_output,
+                transcripts=transcripts,
+                scope_policy=policy,
+                semantic_model_id="test/model",
+                semantic_model_revision="revision-1",
+            )
+        )
+
+    captured = capsys.readouterr()
+    assert raised.value.code == 2
+    assert "must not overwrite" in captured.err
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+    assert aggregate_calls == []
+    assert model_calls == []
+    if original is None:
+        assert not sarif_output.exists()
+    else:
+        assert sarif_output.read_bytes() == original
+    if collision != "output":
+        assert not output.exists()
+
+
+def test_aggregate_sarif_write_failure_returns_two_not_gate_exit(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    store = tmp_path / "stale.json"
+    output = tmp_path / "report.json"
+    sarif_output = tmp_path / "report.sarif"
+    _write_stale_store(store)
+
+    def fail_sarif_write(*_args: object, **_kwargs: object) -> None:
+        raise OSError("write failed")
+
+    monkeypatch.setattr(command, "render_audit_report_sarif", fail_sarif_write)
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _audit_arguments(
+                store,
+                "all",
+                fail_on="error",
+                output=output,
+                sarif_output=sarif_output,
+            )
+        )
+
+    captured = capsys.readouterr()
+    assert raised.value.code == 2
+    assert "write failed" in captured.err
+    assert "Traceback" not in captured.err
+    AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+    assert captured.out == ""
+    assert not sarif_output.exists()
 
 
 def test_single_checker_command_still_emits_established_checker_result(

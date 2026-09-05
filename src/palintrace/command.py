@@ -11,7 +11,7 @@ from palintrace import cli
 from palintrace.adapters import AdapterError, adapter_capabilities
 from palintrace.audit import AuditReport, run_aggregate_audit
 from palintrace.checkers import CheckerResult, load_scope_policy
-from palintrace.sarif import render_sarif
+from palintrace.sarif import render_audit_report_sarif, render_sarif
 from palintrace.semantics import (
     LocalNLISemanticJudge,
     SemanticJudge,
@@ -113,8 +113,7 @@ def _validate_aggregate_output(args: argparse.Namespace) -> None:
 
 
 def _run_aggregate_audit(args: argparse.Namespace) -> AuditReport:
-    if args.sarif_output is not None:
-        raise ValueError("--sarif-output is not supported with --checker all")
+    _validate_sarif_output(args)
     semantic_configuration = _validate_aggregate_semantic_options(args)
     _validate_aggregate_output(args)
 
@@ -175,6 +174,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         try:
             report = _run_aggregate_audit(args)
             text = report.to_json(args.output)
+            if args.sarif_output is not None:
+                render_audit_report_sarif(report, args.sarif_output)
         except (AdapterError, OSError, ValueError) as error:
             parser.error(str(error))
         if args.output is None:
