@@ -11,6 +11,7 @@ from palintrace import cli
 from palintrace.adapters import AdapterError, adapter_capabilities
 from palintrace.audit import AuditReport, run_aggregate_audit
 from palintrace.checkers import CheckerResult, load_scope_policy
+from palintrace.preflight import PreflightReport, run_preflight
 from palintrace.sarif import render_audit_report_sarif, render_sarif
 from palintrace.semantics import (
     LocalNLISemanticJudge,
@@ -47,6 +48,15 @@ def build_parser() -> argparse.ArgumentParser:
     capabilities.add_argument(
         "--output", type=Path, help="write capability JSON to this path instead of stdout"
     )
+    preflight = commands.add_parser(
+        "preflight", help="inspect checker assessability for a normalized store"
+    )
+    preflight.add_argument("--store", type=Path, required=True)
+    preflight.add_argument("--transcripts", type=Path)
+    preflight.add_argument("--scope-policy", type=Path)
+    preflight.add_argument("--semantic-model-id")
+    preflight.add_argument("--semantic-model-revision")
+    preflight.add_argument("--output", type=Path)
     for name in ("audit", "retrieval-audit"):
         commands.choices[name].add_argument(
             "--fail-on",
@@ -84,7 +94,7 @@ class _ConfiguredSemanticJudge:
         raise AssertionError("configured semantic judge marker must not be invoked")
 
 
-def _validate_aggregate_semantic_options(
+def _validate_optional_semantic_options(
     args: argparse.Namespace,
 ) -> tuple[str, str] | None:
     model_id = args.semantic_model_id
@@ -92,11 +102,9 @@ def _validate_aggregate_semantic_options(
     if model_id is None and revision is None:
         return None
     if model_id is None or not model_id.strip():
-        raise ValueError("--checker all requires a nonblank --semantic-model-id when configured")
+        raise ValueError("semantic configuration requires a nonblank --semantic-model-id")
     if revision is None or not revision.strip():
-        raise ValueError(
-            "--checker all requires a nonblank --semantic-model-revision when configured"
-        )
+        raise ValueError("semantic configuration requires a nonblank --semantic-model-revision")
     return model_id, revision
 
 
@@ -114,7 +122,7 @@ def _validate_aggregate_output(args: argparse.Namespace) -> None:
 
 def _run_aggregate_audit(args: argparse.Namespace) -> AuditReport:
     _validate_sarif_output(args)
-    semantic_configuration = _validate_aggregate_semantic_options(args)
+    semantic_configuration = _validate_optional_semantic_options(args)
     _validate_aggregate_output(args)
 
     store = load_store(args.store)
@@ -146,6 +154,34 @@ def _run_aggregate_audit(args: argparse.Namespace) -> AuditReport:
     )
 
 
+def _validate_preflight_output(args: argparse.Namespace) -> None:
+    if args.output is None:
+        return
+    input_paths = {args.store.resolve()}
+    if args.transcripts is not None:
+        input_paths.add(args.transcripts.resolve())
+    if args.scope_policy is not None:
+        input_paths.add(args.scope_policy.resolve())
+    if args.output.resolve() in input_paths:
+        raise ValueError("preflight output must not overwrite input files")
+
+
+def _run_preflight(args: argparse.Namespace) -> PreflightReport:
+    semantic_configuration = _validate_optional_semantic_options(args)
+    _validate_preflight_output(args)
+    store = load_store(args.store)
+    transcripts = load_transcripts(args.transcripts) if args.transcripts is not None else None
+    scope_policy = (
+        load_scope_policy(args.scope_policy) if args.scope_policy is not None else None
+    )
+    return run_preflight(
+        store,
+        transcripts=transcripts,
+        scope_policy=scope_policy,
+        semantic_configured=semantic_configuration is not None,
+    )
+
+
 def _validate_sarif_output(args: argparse.Namespace) -> None:
     if args.sarif_output is None:
         return
@@ -170,17 +206,26 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.output is None:
             sys.stdout.write(text)
         return 0
-    if args.command == "audit" and args.checker == "all":
+    if args.command == "preflight":
         try:
-            report = _run_aggregate_audit(args)
-            text = report.to_json(args.output)
-            if args.sarif_output is not None:
-                render_audit_report_sarif(report, args.sarif_output)
+            preflight_report = _run_preflight(args)
+            text = preflight_report.to_json(args.output)
         except (AdapterError, OSError, ValueError) as error:
             parser.error(str(error))
         if args.output is None:
             sys.stdout.write(text)
-        return 1 if _aggregate_gate_triggered(report, args.fail_on) else 0
+        return 0
+    if args.command == "audit" and args.checker == "all":
+        try:
+            aggregate_report = _run_aggregate_audit(args)
+            text = aggregate_report.to_json(args.output)
+            if args.sarif_output is not None:
+                render_audit_report_sarif(aggregate_report, args.sarif_output)
+        except (AdapterError, OSError, ValueError) as error:
+            parser.error(str(error))
+        if args.output is None:
+            sys.stdout.write(text)
+        return 1 if _aggregate_gate_triggered(aggregate_report, args.fail_on) else 0
     if args.command not in {"audit", "retrieval-audit"}:
         return cli.main(argv)
 

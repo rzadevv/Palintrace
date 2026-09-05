@@ -40,6 +40,7 @@ from palintrace.models import (
     TranscriptSet,
     TranscriptTurn,
 )
+from palintrace.preflight import PreflightReport, PreflightStatus
 from palintrace.retrieval import RetrievalHit, RetrievalObservation, RetrievalUsage
 from palintrace.semantics import (
     SemanticJudgeError,
@@ -170,6 +171,29 @@ def _aggregate_checker_ids(
     items: tuple[CheckerResult, ...] | tuple[SkippedChecker, ...],
 ) -> tuple[str, ...]:
     return tuple(item.checker_id for item in items)
+
+
+def _preflight_arguments(
+    store: Path,
+    *,
+    output: Path | None = None,
+    transcripts: Path | None = None,
+    scope_policy: Path | None = None,
+    semantic_model_id: str | None = None,
+    semantic_model_revision: str | None = None,
+) -> list[str]:
+    arguments = ["preflight", "--store", str(store)]
+    if transcripts is not None:
+        arguments.extend(("--transcripts", str(transcripts)))
+    if scope_policy is not None:
+        arguments.extend(("--scope-policy", str(scope_policy)))
+    if semantic_model_id is not None:
+        arguments.extend(("--semantic-model-id", semantic_model_id))
+    if semantic_model_revision is not None:
+        arguments.extend(("--semantic-model-revision", semantic_model_revision))
+    if output is not None:
+        arguments.extend(("--output", str(output)))
+    return arguments
 
 
 def _write_observation(path: Path, *, sufficient: bool) -> None:
@@ -1679,3 +1703,258 @@ def test_single_checker_command_still_emits_established_checker_result(
     assert result.schema_version == "0.3"
     assert captured.out == expected
     assert captured.err == ""
+
+
+def test_preflight_parser_is_visible_and_has_only_the_intended_arguments() -> None:
+    root, parser = _command_parser("preflight")
+    destinations = {action.dest for action in parser._actions}
+
+    assert "preflight" in root.format_help()
+    assert "inspect checker assessability for a normalized store" in root.format_help()
+    assert destinations == {
+        "help",
+        "store",
+        "transcripts",
+        "scope_policy",
+        "semantic_model_id",
+        "semantic_model_revision",
+        "output",
+    }
+    assert next(action for action in parser._actions if action.dest == "store").required
+    help_text = parser.format_help()
+    assert "--fail-on" not in help_text
+    assert "--sarif-output" not in help_text
+    assert "--checker" not in help_text
+
+
+def test_preflight_stdout_is_pure_json_and_blocked_checks_return_zero(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    assert command.main(["preflight", "--store", "examples/mutation-store.json"]) == 0
+    captured = capsys.readouterr()
+    report = PreflightReport.model_validate_json(captured.out)
+
+    assert report.schema_version == "0.1"
+    assert report.adapter == "file"
+    assert len(report.checks) == 5
+    assert any(item.status is PreflightStatus.BLOCKED for item in report.checks)
+    assert captured.out == report.to_json()
+    assert captured.err == ""
+
+
+def test_preflight_file_output_is_quiet_and_deterministic(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    store = Path("examples/mutation-store.json")
+    first = tmp_path / "first.json"
+    second = tmp_path / "second.json"
+
+    assert command.main(_preflight_arguments(store, output=first)) == 0
+    assert command.main(_preflight_arguments(store, output=second)) == 0
+    captured = capsys.readouterr()
+
+    report = PreflightReport.model_validate_json(first.read_text(encoding="utf-8"))
+    assert first.read_bytes() == second.read_bytes() == report.to_json().encode("utf-8")
+    assert captured.out == ""
+    assert captured.err == ""
+
+
+def test_fully_configured_preflight_loads_each_input_and_runs_once_without_model(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    store, transcripts, policy = _write_complete_aggregate_inputs(tmp_path)
+    output = tmp_path / "preflight.json"
+    calls = {"store": 0, "transcripts": 0, "policy": 0, "preflight": 0, "model": 0}
+    original_load_store = command.load_store
+    original_load_transcripts = command.load_transcripts
+    original_load_policy = command.load_scope_policy
+    original_run_preflight = command.run_preflight
+
+    def load_store_once(path: Path) -> NormalizedStore:
+        calls["store"] += 1
+        return original_load_store(path)
+
+    def load_transcripts_once(path: Path) -> TranscriptSet:
+        calls["transcripts"] += 1
+        return original_load_transcripts(path)
+
+    def load_policy_once(path: Path) -> ScopeIsolationPolicy:
+        calls["policy"] += 1
+        return original_load_policy(path)
+
+    def run_once(*args: object, **kwargs: object) -> PreflightReport:
+        calls["preflight"] += 1
+        assert kwargs["semantic_configured"] is True
+        return original_run_preflight(*args, **kwargs)  # type: ignore[arg-type]
+
+    def fail_model_construction(**_kwargs: object) -> None:
+        calls["model"] += 1
+        raise AssertionError("semantic model construction attempted")
+
+    monkeypatch.setattr(command, "load_store", load_store_once)
+    monkeypatch.setattr(command, "load_transcripts", load_transcripts_once)
+    monkeypatch.setattr(command, "load_scope_policy", load_policy_once)
+    monkeypatch.setattr(command, "run_preflight", run_once)
+    monkeypatch.setattr(command, "LocalNLISemanticJudge", fail_model_construction)
+
+    assert (
+        command.main(
+            _preflight_arguments(
+                store,
+                output=output,
+                transcripts=transcripts,
+                scope_policy=policy,
+                semantic_model_id="test/configured-model",
+                semantic_model_revision="revision-test",
+            )
+        )
+        == 0
+    )
+    captured = capsys.readouterr()
+    report = PreflightReport.model_validate_json(output.read_text(encoding="utf-8"))
+
+    assert calls == {
+        "store": 1,
+        "transcripts": 1,
+        "policy": 1,
+        "preflight": 1,
+        "model": 0,
+    }
+    assert all(item.status is PreflightStatus.READY for item in report.checks)
+    assert captured.out == ""
+    assert captured.err == ""
+
+
+@pytest.mark.parametrize(
+    ("model_id", "revision", "expected_option"),
+    [
+        ("test/model", None, "--semantic-model-revision"),
+        (None, "revision-1", "--semantic-model-id"),
+        ("", "revision-1", "--semantic-model-id"),
+        ("test/model", "", "--semantic-model-revision"),
+    ],
+)
+def test_preflight_rejects_partial_or_blank_semantic_configuration(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    model_id: str | None,
+    revision: str | None,
+    expected_option: str,
+) -> None:
+    store = tmp_path / "store.json"
+    output = tmp_path / "preflight.json"
+    _write_stale_store(store, stale=False)
+
+    def fail_model_construction(**_kwargs: object) -> None:
+        raise AssertionError("semantic model construction attempted")
+
+    monkeypatch.setattr(command, "LocalNLISemanticJudge", fail_model_construction)
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _preflight_arguments(
+                store,
+                output=output,
+                semantic_model_id=model_id,
+                semantic_model_revision=revision,
+            )
+        )
+    captured = capsys.readouterr()
+
+    assert raised.value.code == 2
+    assert expected_option in captured.err
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+    assert not output.exists()
+
+
+@pytest.mark.parametrize("malformed_input", ["store", "transcripts", "policy"])
+def test_preflight_rejects_malformed_supplied_inputs(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    malformed_input: str,
+) -> None:
+    store, transcripts, policy = _write_complete_aggregate_inputs(tmp_path)
+    output = tmp_path / "preflight.json"
+    paths = {"store": store, "transcripts": transcripts, "policy": policy}
+    paths[malformed_input].write_text("{", encoding="utf-8")
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _preflight_arguments(
+                store,
+                output=output,
+                transcripts=transcripts if malformed_input == "transcripts" else None,
+                scope_policy=policy if malformed_input == "policy" else None,
+            )
+        )
+    captured = capsys.readouterr()
+
+    assert raised.value.code == 2
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+    assert not output.exists()
+
+
+@pytest.mark.parametrize("collision", ["store", "transcripts", "policy"])
+def test_preflight_output_cannot_overwrite_inputs_before_execution(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    collision: str,
+) -> None:
+    store, transcripts, policy = _write_complete_aggregate_inputs(tmp_path)
+    paths = {"store": store, "transcripts": transcripts, "policy": policy}
+    output = paths[collision]
+    original = output.read_bytes()
+    calls: list[object] = []
+
+    def fail_preflight(*args: object, **_kwargs: object) -> None:
+        calls.extend(args)
+        raise AssertionError("preflight execution attempted")
+
+    def fail_model_construction(**_kwargs: object) -> None:
+        raise AssertionError("semantic model construction attempted")
+
+    monkeypatch.setattr(command, "run_preflight", fail_preflight)
+    monkeypatch.setattr(command, "LocalNLISemanticJudge", fail_model_construction)
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _preflight_arguments(
+                store,
+                output=output,
+                transcripts=transcripts,
+                scope_policy=policy,
+            )
+        )
+    captured = capsys.readouterr()
+
+    assert raised.value.code == 2
+    assert "must not overwrite input files" in captured.err
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+    assert calls == []
+    assert output.read_bytes() == original
+
+
+def test_preflight_output_filesystem_error_returns_two(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    store = tmp_path / "store.json"
+    output = tmp_path / "missing" / "preflight.json"
+    _write_stale_store(store, stale=False)
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(_preflight_arguments(store, output=output))
+    captured = capsys.readouterr()
+
+    assert raised.value.code == 2
+    assert "No such file or directory" in captured.err
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+    assert not output.exists()
