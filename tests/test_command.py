@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
 import tomllib
 from collections.abc import Sequence
 from pathlib import Path
@@ -19,9 +20,33 @@ from palintrace.adapters import (
     Mem0Adapter,
     adapter_capabilities,
 )
-from palintrace.checkers import CheckerResult, CheckerStats, EvidenceItem, Finding
-from palintrace.models import MemoryScope, NormalizedMemory, NormalizedStore
+from palintrace.audit import AuditReport, SkippedChecker, SkipReason
+from palintrace.checkers import (
+    CheckerResult,
+    CheckerStats,
+    EvidenceItem,
+    Finding,
+    PrincipalBoundaryRule,
+    ScopeDimension,
+    ScopeIsolationPolicy,
+)
+from palintrace.models import (
+    MemoryScope,
+    NormalizedMemory,
+    NormalizedStore,
+    ProvenanceStatus,
+    SourceRef,
+    Transcript,
+    TranscriptSet,
+    TranscriptTurn,
+)
 from palintrace.retrieval import RetrievalHit, RetrievalObservation, RetrievalUsage
+from palintrace.semantics import (
+    SemanticJudgeError,
+    SemanticJudgment,
+    SemanticRelation,
+)
+from palintrace.serialization import dumps_transcripts
 from palintrace.taxonomy import DefectClass
 
 
@@ -67,8 +92,20 @@ def _audit_arguments(
     fail_on: str | None = None,
     output: Path | None = None,
     sarif_output: Path | None = None,
+    transcripts: Path | None = None,
+    scope_policy: Path | None = None,
+    semantic_model_id: str | None = None,
+    semantic_model_revision: str | None = None,
 ) -> list[str]:
     arguments = ["audit", "--store", str(store), "--checker", checker]
+    if transcripts is not None:
+        arguments.extend(("--transcripts", str(transcripts)))
+    if scope_policy is not None:
+        arguments.extend(("--scope-policy", str(scope_policy)))
+    if semantic_model_id is not None:
+        arguments.extend(("--semantic-model-id", semantic_model_id))
+    if semantic_model_revision is not None:
+        arguments.extend(("--semantic-model-revision", semantic_model_revision))
     if fail_on is not None:
         arguments.extend(("--fail-on", fail_on))
     if output is not None:
@@ -76,6 +113,63 @@ def _audit_arguments(
     if sarif_output is not None:
         arguments.extend(("--sarif-output", str(sarif_output)))
     return arguments
+
+
+class _FakeAggregateJudge:
+    def __init__(self, model_id: str, revision: str) -> None:
+        self.judge_id = f"hf-nli:{model_id}"
+        self.judge_version = revision
+        self.calls: list[tuple[str, str]] = []
+
+    def judge(self, *, premise: str, hypothesis: str) -> SemanticJudgment:
+        self.calls.append((premise, hypothesis))
+        return SemanticJudgment(relation=SemanticRelation.ENTAILMENT, score=1.0)
+
+
+def _write_complete_aggregate_inputs(tmp_path: Path) -> tuple[Path, Path, Path]:
+    store_path = tmp_path / "store.json"
+    transcripts_path = tmp_path / "transcripts.json"
+    policy_path = tmp_path / "scope-policy.json"
+    NormalizedStore(
+        adapter="test",
+        memories=(
+            NormalizedMemory(
+                id="m1",
+                content="User prefers Python.",
+                source_refs=(SourceRef(transcript_id="t1", turn_idx=0),),
+                provenance_status=ProvenanceStatus.DECLARED,
+                scope=MemoryScope(user_id="user-a"),
+                active=True,
+            ),
+        ),
+    ).to_json(store_path)
+    transcripts = TranscriptSet(
+        transcripts=(
+            Transcript(
+                id="t1",
+                turns=(
+                    TranscriptTurn(index=0, role="user", content="User prefers Python."),
+                ),
+            ),
+        )
+    )
+    transcripts_path.write_text(dumps_transcripts(transcripts), encoding="utf-8")
+    ScopeIsolationPolicy(
+        rules=(
+            PrincipalBoundaryRule(
+                dimension=ScopeDimension.USER_ID,
+                authoritative_source_principal="user-a",
+                prohibited_destination_principals=("user-b",),
+            ),
+        )
+    ).to_json(policy_path)
+    return store_path, transcripts_path, policy_path
+
+
+def _aggregate_checker_ids(
+    items: tuple[CheckerResult, ...] | tuple[SkippedChecker, ...],
+) -> tuple[str, ...]:
+    return tuple(item.checker_id for item in items)
 
 
 def _write_observation(path: Path, *, sufficient: bool) -> None:
@@ -748,3 +842,668 @@ def test_sarif_filesystem_error_returns_two(
     assert "Traceback" not in error
     CheckerResult.model_validate_json(output.read_text(encoding="utf-8"))
     assert not sarif_output.exists()
+
+
+def test_command_audit_parser_accepts_all_and_preserves_single_choices() -> None:
+    parser, audit_parser = _command_parser("audit")
+    checker_action = next(
+        action for action in audit_parser._actions if action.dest == "checker"
+    )
+
+    for checker_id in (*cli.CHECKER_NAMES, "all"):
+        args = parser.parse_args(
+            ["audit", "--store", "store.json", "--checker", checker_id]
+        )
+        assert args.checker == checker_id
+
+    assert tuple(checker_action.choices) == (*cli.CHECKER_NAMES, "all")
+    assert cli.CHECKER_NAMES == (
+        "orphaned_provenance",
+        "redundancy_bloat",
+        "stale_active",
+        "privacy_scope_violation",
+        "unsupported_claim",
+    )
+    frozen_parser = cli.build_parser()
+    frozen_commands = next(
+        action
+        for action in frozen_parser._actions
+        if isinstance(action, argparse._SubParsersAction)
+    )
+    frozen_checker_action = next(
+        action
+        for action in frozen_commands.choices["audit"]._actions
+        if action.dest == "checker"
+    )
+    assert "all" not in frozen_checker_action.choices
+
+
+def test_command_audit_help_describes_and_displays_all() -> None:
+    parser, audit_parser = _command_parser("audit")
+
+    assert "run one checker or all checkers on normalized data" in parser.format_help()
+    assert "run one checker or all checkers on normalized data" in audit_parser.format_help()
+    assert "unsupported_claim,all" in audit_parser.format_help()
+
+
+def test_command_audit_parser_still_rejects_unknown_checker(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    parser = command.build_parser()
+
+    with pytest.raises(SystemExit) as raised:
+        parser.parse_args(
+            ["audit", "--store", "store.json", "--checker", "unknown_checker"]
+        )
+
+    error = capsys.readouterr().err
+    assert raised.value.code == 2
+    assert "invalid choice" in error
+    assert "Traceback" not in error
+
+
+def test_aggregate_audit_writes_canonical_json_stdout(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    store = Path("examples/mutation-store.json")
+
+    assert command.main(_audit_arguments(store, "all")) == 0
+    captured = capsys.readouterr()
+    report = AuditReport.model_validate_json(captured.out)
+
+    assert report.schema_version == "0.1"
+    assert _aggregate_checker_ids(report.results) == (
+        "redundancy_bloat",
+        "stale_active",
+    )
+    assert _aggregate_checker_ids(report.skipped) == (
+        "orphaned_provenance",
+        "privacy_scope_violation",
+        "unsupported_claim",
+    )
+    assert report.skipped[0].reasons == (SkipReason.MISSING_TRANSCRIPTS,)
+    assert report.skipped[1].reasons == (SkipReason.MISSING_SCOPE_POLICY,)
+    assert report.skipped[2].reasons == (
+        SkipReason.MISSING_TRANSCRIPTS,
+        SkipReason.MISSING_SEMANTIC_CONFIGURATION,
+    )
+    assert captured.out == report.to_json()
+    assert captured.err == ""
+
+
+def test_aggregate_audit_file_output_is_quiet_and_deterministic(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = Path("examples/mutation-store.json")
+    first = tmp_path / "first.json"
+    second = tmp_path / "second.json"
+
+    assert command.main(_audit_arguments(store, "all", output=first)) == 0
+    assert command.main(_audit_arguments(store, "all", output=second)) == 0
+    captured = capsys.readouterr()
+
+    report = AuditReport.model_validate_json(first.read_text(encoding="utf-8"))
+    assert report.schema_version == "0.1"
+    assert first.read_bytes() == second.read_bytes()
+    assert captured.out == ""
+    assert captured.err == ""
+
+
+def test_fully_configured_aggregate_loads_inputs_and_constructs_model_once(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    store, transcripts, policy = _write_complete_aggregate_inputs(tmp_path)
+    output = tmp_path / "report.json"
+    calls = {
+        "store": 0,
+        "transcripts": 0,
+        "policy": 0,
+        "judge": 0,
+        "aggregate": 0,
+    }
+    judge_arguments: list[tuple[str, str, str]] = []
+    original_load_store = command.load_store
+    original_load_transcripts = command.load_transcripts
+    original_load_scope_policy = command.load_scope_policy
+    original_run_aggregate_audit = command.run_aggregate_audit
+
+    def load_store_once(path: Path) -> NormalizedStore:
+        calls["store"] += 1
+        return original_load_store(path)
+
+    def load_transcripts_once(path: Path) -> TranscriptSet:
+        calls["transcripts"] += 1
+        return original_load_transcripts(path)
+
+    def load_policy_once(path: Path) -> ScopeIsolationPolicy:
+        calls["policy"] += 1
+        return original_load_scope_policy(path)
+
+    def build_judge(*, model_id: str, revision: str, device: str) -> _FakeAggregateJudge:
+        calls["judge"] += 1
+        judge_arguments.append((model_id, revision, device))
+        return _FakeAggregateJudge(model_id, revision)
+
+    def run_once(
+        store_value: NormalizedStore,
+        **kwargs: object,
+    ) -> AuditReport:
+        calls["aggregate"] += 1
+        return original_run_aggregate_audit(store_value, **kwargs)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(command, "load_store", load_store_once)
+    monkeypatch.setattr(command, "load_transcripts", load_transcripts_once)
+    monkeypatch.setattr(command, "load_scope_policy", load_policy_once)
+    monkeypatch.setattr(command, "LocalNLISemanticJudge", build_judge)
+    monkeypatch.setattr(command, "run_aggregate_audit", run_once)
+
+    assert (
+        command.main(
+            _audit_arguments(
+                store,
+                "all",
+                output=output,
+                transcripts=transcripts,
+                scope_policy=policy,
+                semantic_model_id="test/model",
+                semantic_model_revision="revision-1",
+            )
+        )
+        == 0
+    )
+    captured = capsys.readouterr()
+    report = AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+
+    assert calls == {
+        "store": 1,
+        "transcripts": 1,
+        "policy": 1,
+        "judge": 1,
+        "aggregate": 1,
+    }
+    assert judge_arguments == [("test/model", "revision-1", "cpu")]
+    assert _aggregate_checker_ids(report.results) == cli.CHECKER_NAMES
+    assert report.skipped == ()
+    assert captured.out == ""
+    assert captured.err == ""
+
+
+def test_complete_semantic_configuration_without_transcripts_does_not_load_model(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    store, _, policy = _write_complete_aggregate_inputs(tmp_path)
+    output = tmp_path / "report.json"
+
+    def fail_model_construction(**_kwargs: object) -> None:
+        raise AssertionError("semantic model construction attempted")
+
+    monkeypatch.setattr(command, "LocalNLISemanticJudge", fail_model_construction)
+
+    assert (
+        command.main(
+            _audit_arguments(
+                store,
+                "all",
+                output=output,
+                scope_policy=policy,
+                semantic_model_id="test/model",
+                semantic_model_revision="revision-1",
+            )
+        )
+        == 0
+    )
+    report = AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+    unsupported = next(
+        item for item in report.skipped if item.checker_id == "unsupported_claim"
+    )
+
+    assert unsupported.reasons == (SkipReason.MISSING_TRANSCRIPTS,)
+    assert _aggregate_checker_ids(report.results) == (
+        "redundancy_bloat",
+        "stale_active",
+        "privacy_scope_violation",
+    )
+
+
+def test_aggregate_without_scope_policy_skips_only_privacy_checker(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    store, transcripts, _ = _write_complete_aggregate_inputs(tmp_path)
+    output = tmp_path / "report.json"
+
+    def build_judge(*, model_id: str, revision: str, device: str) -> _FakeAggregateJudge:
+        assert device == "cpu"
+        return _FakeAggregateJudge(model_id, revision)
+
+    monkeypatch.setattr(command, "LocalNLISemanticJudge", build_judge)
+
+    assert (
+        command.main(
+            _audit_arguments(
+                store,
+                "all",
+                output=output,
+                transcripts=transcripts,
+                semantic_model_id="test/model",
+                semantic_model_revision="revision-1",
+            )
+        )
+        == 0
+    )
+    report = AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+
+    assert _aggregate_checker_ids(report.results) == tuple(
+        checker_id
+        for checker_id in cli.CHECKER_NAMES
+        if checker_id != "privacy_scope_violation"
+    )
+    assert _aggregate_checker_ids(report.skipped) == ("privacy_scope_violation",)
+    assert report.skipped[0].reasons == (SkipReason.MISSING_SCOPE_POLICY,)
+
+
+def test_aggregate_without_semantic_config_skips_only_unsupported_checker(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    store, transcripts, policy = _write_complete_aggregate_inputs(tmp_path)
+    output = tmp_path / "report.json"
+
+    def fail_model_construction(**_kwargs: object) -> None:
+        raise AssertionError("semantic model construction attempted")
+
+    monkeypatch.setattr(command, "LocalNLISemanticJudge", fail_model_construction)
+
+    assert (
+        command.main(
+            _audit_arguments(
+                store,
+                "all",
+                output=output,
+                transcripts=transcripts,
+                scope_policy=policy,
+            )
+        )
+        == 0
+    )
+    report = AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+
+    assert _aggregate_checker_ids(report.results) == cli.CHECKER_NAMES[:-1]
+    assert _aggregate_checker_ids(report.skipped) == ("unsupported_claim",)
+    assert report.skipped[0].reasons == (
+        SkipReason.MISSING_SEMANTIC_CONFIGURATION,
+    )
+
+
+def test_configured_semantic_judge_marker_has_real_identity_and_fails_if_called() -> None:
+    marker = command._ConfiguredSemanticJudge(
+        model_id="test/model",
+        revision="revision-1",
+    )
+
+    assert marker.judge_id == "hf-nli:test/model"
+    assert marker.judge_version == "revision-1"
+    with pytest.raises(AssertionError, match="must not be invoked"):
+        marker.judge(premise="Evidence.", hypothesis="Claim.")
+
+
+@pytest.mark.parametrize(
+    ("model_id", "revision", "expected_option"),
+    [
+        ("test/model", None, "--semantic-model-revision"),
+        (None, "revision-1", "--semantic-model-id"),
+        ("", "revision-1", "--semantic-model-id"),
+        ("test/model", "", "--semantic-model-revision"),
+    ],
+)
+def test_aggregate_rejects_partial_or_blank_semantic_configuration(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    model_id: str | None,
+    revision: str | None,
+    expected_option: str,
+) -> None:
+    store = tmp_path / "store.json"
+    output = tmp_path / "report.json"
+    _write_stale_store(store, stale=False)
+
+    def fail_model_construction(**_kwargs: object) -> None:
+        raise AssertionError("semantic model construction attempted")
+
+    monkeypatch.setattr(command, "LocalNLISemanticJudge", fail_model_construction)
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _audit_arguments(
+                store,
+                "all",
+                output=output,
+                semantic_model_id=model_id,
+                semantic_model_revision=revision,
+            )
+        )
+
+    captured = capsys.readouterr()
+    assert raised.value.code == 2
+    assert expected_option in captured.err
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+    assert not output.exists()
+
+
+def test_aggregate_without_semantic_configuration_does_not_load_optional_model(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    store = tmp_path / "store.json"
+    output = tmp_path / "report.json"
+    _write_stale_store(store, stale=False)
+    modules_before = {name: sys.modules.get(name) for name in ("torch", "transformers")}
+
+    def fail_model_construction(**_kwargs: object) -> None:
+        raise AssertionError("semantic model construction attempted")
+
+    monkeypatch.setattr(command, "LocalNLISemanticJudge", fail_model_construction)
+
+    assert command.main(_audit_arguments(store, "all", output=output)) == 0
+    report = AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+
+    unsupported = next(
+        item for item in report.skipped if item.checker_id == "unsupported_claim"
+    )
+    assert unsupported.reasons == (
+        SkipReason.MISSING_TRANSCRIPTS,
+        SkipReason.MISSING_SEMANTIC_CONFIGURATION,
+    )
+    assert {name: sys.modules.get(name) for name in modules_before} == modules_before
+
+
+@pytest.mark.parametrize("malformed_input", ["store", "transcripts", "policy"])
+def test_aggregate_rejects_malformed_supplied_inputs(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    malformed_input: str,
+) -> None:
+    store = tmp_path / "store.json"
+    transcripts = tmp_path / "transcripts.json"
+    policy = tmp_path / "scope-policy.json"
+    output = tmp_path / "report.json"
+    _write_stale_store(store, stale=False)
+    transcripts.write_text("{", encoding="utf-8")
+    policy.write_text("{", encoding="utf-8")
+    if malformed_input == "store":
+        store.write_text("{", encoding="utf-8")
+        transcripts_argument = None
+        policy_argument = None
+    else:
+        transcripts_argument = transcripts if malformed_input == "transcripts" else None
+        policy_argument = policy if malformed_input == "policy" else None
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _audit_arguments(
+                store,
+                "all",
+                output=output,
+                transcripts=transcripts_argument,
+                scope_policy=policy_argument,
+            )
+        )
+
+    captured = capsys.readouterr()
+    assert raised.value.code == 2
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+    assert not output.exists()
+
+
+def test_aggregate_semantic_model_error_is_a_handled_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    store, transcripts, policy = _write_complete_aggregate_inputs(tmp_path)
+    output = tmp_path / "report.json"
+
+    def fail_model_construction(**_kwargs: object) -> None:
+        raise SemanticJudgeError("semantic model unavailable")
+
+    monkeypatch.setattr(command, "LocalNLISemanticJudge", fail_model_construction)
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _audit_arguments(
+                store,
+                "all",
+                output=output,
+                transcripts=transcripts,
+                scope_policy=policy,
+                semantic_model_id="test/model",
+                semantic_model_revision="revision-1",
+            )
+        )
+
+    captured = capsys.readouterr()
+    assert raised.value.code == 2
+    assert "semantic model unavailable" in captured.err
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+    assert not output.exists()
+
+
+def test_aggregate_checker_failure_is_not_serialized_as_partial_success(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    store = tmp_path / "store.json"
+    output = tmp_path / "report.json"
+    _write_stale_store(store, stale=False)
+
+    def fail_aggregate(*_args: object, **_kwargs: object) -> None:
+        raise ValueError("checker failed")
+
+    monkeypatch.setattr(command, "run_aggregate_audit", fail_aggregate)
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(_audit_arguments(store, "all", output=output))
+
+    captured = capsys.readouterr()
+    assert raised.value.code == 2
+    assert "checker failed" in captured.err
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+    assert not output.exists()
+
+
+def test_aggregate_output_filesystem_error_returns_two(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = tmp_path / "store.json"
+    output = tmp_path / "missing" / "report.json"
+    _write_stale_store(store, stale=False)
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(_audit_arguments(store, "all", output=output))
+
+    captured = capsys.readouterr()
+    assert raised.value.code == 2
+    assert "No such file or directory" in captured.err
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+    assert not output.exists()
+
+
+@pytest.mark.parametrize(
+    ("threshold", "expected"),
+    [(None, 0), ("info", 1), ("warning", 1), ("error", 0)],
+)
+def test_aggregate_warning_finding_obeys_threshold(
+    tmp_path: Path,
+    threshold: str | None,
+    expected: int,
+) -> None:
+    store = tmp_path / "redundant.json"
+    output = tmp_path / "report.json"
+    _write_redundant_store(store)
+
+    assert (
+        command.main(
+            _audit_arguments(store, "all", fail_on=threshold, output=output)
+        )
+        == expected
+    )
+    report = AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+    redundancy = next(
+        result for result in report.results if result.checker_id == "redundancy_bloat"
+    )
+    assert len(redundancy.findings) == 1
+
+
+def test_aggregate_error_gate_preserves_complete_stdout(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = tmp_path / "stale.json"
+    _write_stale_store(store)
+
+    assert command.main(_audit_arguments(store, "all", fail_on="error")) == 1
+    captured = capsys.readouterr()
+    report = AuditReport.model_validate_json(captured.out)
+
+    stale = next(result for result in report.results if result.checker_id == "stale_active")
+    assert len(stale.findings) == 1
+    assert captured.out == report.to_json()
+    assert captured.err == ""
+
+
+def test_aggregate_error_gate_preserves_complete_file_output(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = tmp_path / "stale.json"
+    output = tmp_path / "report.json"
+    _write_stale_store(store)
+
+    assert (
+        command.main(
+            _audit_arguments(store, "all", fail_on="error", output=output)
+        )
+        == 1
+    )
+    captured = capsys.readouterr()
+    report = AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+
+    stale = next(result for result in report.results if result.checker_id == "stale_active")
+    assert len(stale.findings) == 1
+    assert captured.out == ""
+    assert captured.err == ""
+
+
+def test_aggregate_skips_do_not_trigger_info_gate(tmp_path: Path) -> None:
+    store = tmp_path / "clean.json"
+    output = tmp_path / "report.json"
+    _write_stale_store(store, stale=False)
+
+    assert (
+        command.main(_audit_arguments(store, "all", fail_on="info", output=output))
+        == 0
+    )
+    report = AuditReport.model_validate_json(output.read_text(encoding="utf-8"))
+    assert all(not result.findings for result in report.results)
+    assert report.skipped
+
+
+def test_aggregate_gate_does_not_inspect_finding_confidence() -> None:
+    report = AuditReport(
+        results=(_result_with_confidence(0.0),),
+        skipped=tuple(
+            SkippedChecker(
+                checker_id=checker_id,
+                reasons=(SkipReason.MISSING_TRANSCRIPTS,),
+            )
+            for checker_id in cli.CHECKER_NAMES
+            if checker_id != "stale_active"
+        ),
+    )
+
+    assert command._aggregate_gate_triggered(report, "error") is True
+
+
+def test_aggregate_sarif_is_rejected_before_writing_files(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = tmp_path / "store.json"
+    output = tmp_path / "report.json"
+    sarif_output = tmp_path / "report.sarif"
+    _write_stale_store(store, stale=False)
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _audit_arguments(
+                store,
+                "all",
+                output=output,
+                sarif_output=sarif_output,
+            )
+        )
+
+    captured = capsys.readouterr()
+    assert raised.value.code == 2
+    assert "--sarif-output" in captured.err
+    assert "--checker all" in captured.err
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+    assert not output.exists()
+    assert not sarif_output.exists()
+
+
+@pytest.mark.parametrize("collision", ["store", "transcripts", "policy"])
+def test_aggregate_output_cannot_overwrite_any_input(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    collision: str,
+) -> None:
+    store, transcripts, policy = _write_complete_aggregate_inputs(tmp_path)
+    paths = {"store": store, "transcripts": transcripts, "policy": policy}
+    output = paths[collision]
+    original = output.read_bytes()
+
+    with pytest.raises(SystemExit) as raised:
+        command.main(
+            _audit_arguments(
+                store,
+                "all",
+                output=output,
+                transcripts=transcripts,
+                scope_policy=policy,
+            )
+        )
+
+    captured = capsys.readouterr()
+    assert raised.value.code == 2
+    assert "must not overwrite input files" in captured.err
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+    assert output.read_bytes() == original
+
+
+def test_single_checker_command_still_emits_established_checker_result(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = tmp_path / "stale.json"
+    _write_stale_store(store)
+    frozen_args = cli.build_parser().parse_args(
+        ["audit", "--store", str(store), "--checker", "stale_active"]
+    )
+    expected = cli._run_audit(frozen_args)
+
+    assert command.main(_audit_arguments(store, "stale_active")) == 0
+    captured = capsys.readouterr()
+    result = CheckerResult.model_validate_json(captured.out)
+
+    assert result.schema_version == "0.3"
+    assert captured.out == expected
+    assert captured.err == ""
