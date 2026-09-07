@@ -35,11 +35,29 @@ def test_evaluation_package_contains_frozen_accounting_and_execution_layers() ->
         "models.py",
         "mutation.py",
         "preflight.py",
+        "redundancy_v0_1.py",
         "retrieval.py",
         "retrieval_negation_confirmatory.py",
         "retrieval_strong_probe.py",
         "semantic_selectivity.py",
     }
+
+
+def test_benchmark_redundancy_v1_is_private_and_independent_of_production_v2() -> None:
+    historical_path = EVALUATION_ROOT / "redundancy_v0_1.py"
+
+    assert "palintrace.checkers.redundancy_bloat" not in _absolute_imports(
+        historical_path
+    )
+    assert "BenchmarkRedundancyBloatCheckerV1" not in (
+        SOURCE_ROOT / "evaluation" / "__init__.py"
+    ).read_text(encoding="utf-8")
+    assert "BenchmarkRedundancyBloatCheckerV1" not in (
+        SOURCE_ROOT / "__init__.py"
+    ).read_text(encoding="utf-8")
+    assert "BenchmarkRedundancyBloatCheckerV1" not in (
+        SOURCE_ROOT / "checkers" / "__init__.py"
+    ).read_text(encoding="utf-8")
 
 
 def test_detector_and_runtime_packages_do_not_import_evaluation() -> None:

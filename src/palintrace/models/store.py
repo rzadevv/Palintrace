@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
 from pathlib import Path
 from typing import cast
 
@@ -42,9 +43,11 @@ class NormalizedStore(BaseModel):
     def memory_ids_must_be_unique(
         cls, value: tuple[NormalizedMemory, ...]
     ) -> tuple[NormalizedMemory, ...]:
-        ids = [memory.id for memory in value]
-        if len(set(ids)) != len(ids):
-            duplicates = sorted({memory_id for memory_id in ids if ids.count(memory_id) > 1})
+        id_counts = Counter(memory.id for memory in value)
+        if any(count > 1 for count in id_counts.values()):
+            duplicates = sorted(
+                memory_id for memory_id, count in id_counts.items() if count > 1
+            )
             raise ValueError(f"duplicate normalized memory IDs: {duplicates}")
         return value
 

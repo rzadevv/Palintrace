@@ -32,6 +32,13 @@ class OrphanedProvenanceChecker:
         if transcripts is None:
             raise CheckerInputError("orphaned_provenance checker requires a TranscriptSet")
 
+        transcripts_by_id = {
+            transcript.id: transcript for transcript in transcripts.transcripts
+        }
+        turns_by_transcript_id = {
+            transcript.id: {turn.index: turn for turn in transcript.turns}
+            for transcript in transcripts.transcripts
+        }
         findings: list[Finding] = []
         source_refs_scanned = 0
         for memory in store.memories:
@@ -40,7 +47,7 @@ class OrphanedProvenanceChecker:
             keyed_evidence: list[tuple[int, str, EvidenceItem]] = []
             for source_ref_index, source_ref in enumerate(memory.source_refs):
                 source_refs_scanned += 1
-                transcript = transcripts.get(source_ref.transcript_id)
+                transcript = transcripts_by_id.get(source_ref.transcript_id)
                 if transcript is None:
                     item = EvidenceItem(
                         kind="missing_transcript",
@@ -54,9 +61,8 @@ class OrphanedProvenanceChecker:
                     continue
                 if source_ref.turn_idx is None:
                     continue
-                turn = next(
-                    (item for item in transcript.turns if item.index == source_ref.turn_idx),
-                    None,
+                turn = turns_by_transcript_id[source_ref.transcript_id].get(
+                    source_ref.turn_idx
                 )
                 if turn is None:
                     item = EvidenceItem(

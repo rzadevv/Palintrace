@@ -1,8 +1,9 @@
-"""Deterministic structural checker for exact same-scope duplicates."""
+"""Private historical redundancy checker for benchmark v0.1 reproducibility."""
 
 from __future__ import annotations
 
 import hashlib
+from itertools import combinations
 
 from palintrace.checkers.base import deterministic_finding_id
 from palintrace.checkers.models import (
@@ -19,11 +20,11 @@ ScopeKey = tuple[str | None, str | None, str | None]
 GroupKey = tuple[str, ScopeKey]
 
 
-class RedundancyBloatChecker:
-    """Find exact-content duplicate groups in the same observable scope."""
+class BenchmarkRedundancyBloatCheckerV1:
+    """Preserve pair-level exact-duplicate findings for benchmark v0.1."""
 
     checker_id = "redundancy_bloat"
-    checker_version = "2.0"
+    checker_version = "1.0"
     defect_class = DefectClass.REDUNDANCY_BLOAT
 
     def check(
@@ -32,7 +33,7 @@ class RedundancyBloatChecker:
         *,
         transcripts: TranscriptSet | None = None,
     ) -> CheckerResult:
-        """Group exact claims by observable scope and emit one finding per group."""
+        """Group exact claims by observable normalized scope and emit duplicate pairs."""
 
         groups: dict[GroupKey, list[NormalizedMemory]] = {}
         unscoped_memories_skipped = 0
@@ -47,17 +48,12 @@ class RedundancyBloatChecker:
                 continue
             groups.setdefault((memory.content, scope_key), []).append(memory)
 
-        grouped_duplicates: list[tuple[tuple[str, ...], str, ScopeKey]] = []
+        findings: list[Finding] = []
+        duplicate_groups = 0
         for (content, scope_key), memories in groups.items():
             if len(memories) < 2:
                 continue
-            memory_ids = tuple(sorted(memory.id for memory in memories))
-            grouped_duplicates.append((memory_ids, content, scope_key))
-
-        findings: list[Finding] = []
-        for memory_ids, content, scope_key in sorted(
-            grouped_duplicates, key=lambda group: group[0]
-        ):
+            duplicate_groups += 1
             evidence = (
                 EvidenceItem(
                     kind="exact_duplicate",
@@ -73,21 +69,24 @@ class RedundancyBloatChecker:
                     },
                 ),
             )
-            findings.append(
-                Finding(
-                    finding_id=deterministic_finding_id(
-                        checker_id=self.checker_id,
-                        checker_version=self.checker_version,
+            ordered_memories = sorted(memories, key=lambda memory: memory.id)
+            for first, second in combinations(ordered_memories, 2):
+                memory_ids = (first.id, second.id)
+                findings.append(
+                    Finding(
+                        finding_id=deterministic_finding_id(
+                            checker_id=self.checker_id,
+                            checker_version=self.checker_version,
+                            defect_class=self.defect_class,
+                            memory_ids=memory_ids,
+                            evidence=evidence,
+                        ),
                         defect_class=self.defect_class,
                         memory_ids=memory_ids,
+                        confidence=1.0,
                         evidence=evidence,
-                    ),
-                    defect_class=self.defect_class,
-                    memory_ids=memory_ids,
-                    confidence=1.0,
-                    evidence=evidence,
+                    )
                 )
-            )
 
         return CheckerResult(
             checker_id=self.checker_id,
@@ -101,7 +100,7 @@ class RedundancyBloatChecker:
                 details={
                     "eligible_memories": len(store.memories) - unscoped_memories_skipped,
                     "unscoped_memories_skipped": unscoped_memories_skipped,
-                    "duplicate_groups": len(grouped_duplicates),
+                    "duplicate_groups": duplicate_groups,
                 },
             ),
         )

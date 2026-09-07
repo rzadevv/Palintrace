@@ -8,7 +8,7 @@ import pytest
 
 import palintrace.evaluation.execution as execution
 import palintrace.evaluation.preflight as preflight
-from palintrace.checkers import load_scope_policy
+from palintrace.checkers import RedundancyBloatChecker, load_scope_policy
 from palintrace.evaluation import (
     BENCHMARK_SPEC_SHA256,
     BenchmarkCaseKind,
@@ -164,6 +164,57 @@ def test_static_dispatch_uses_exact_checker_and_injected_dependencies(
     assert result.checker_result.defect_class is defect_class
     assert result.trial_evaluation.injected_positive_detected is True
     assert bool(judge.calls) is (defect_class is DefectClass.UNSUPPORTED_CLAIM)
+
+
+def test_redundancy_benchmark_preserves_v1_pair_behavior_beside_production_v2() -> None:
+    scope = MemoryScope(user_id="user-a")
+    store = NormalizedStore(
+        adapter="test",
+        memories=tuple(
+            NormalizedMemory(id=memory_id, content="Same", scope=scope)
+            for memory_id in ("c", "a", "b")
+        ),
+    )
+    production = RedundancyBloatChecker().check(store)
+    historical_checker = execution._build_checker(
+        DefectClass.REDUNDANCY_BLOAT,
+        semantic_judge=None,
+        scope_policy=None,
+    )
+    historical = historical_checker.check(store)
+    frozen_spec = load_benchmark_spec(BENCHMARK_PATH)
+    frozen_identity = next(
+        identity
+        for identity in frozen_spec.checker_identities
+        if identity.defect_class is DefectClass.REDUNDANCY_BLOAT
+    )
+
+    assert RedundancyBloatChecker().checker_version == "2.0"
+    assert production.checker_version == "2.0"
+    assert len(production.findings) == 1
+    assert production.findings[0].memory_ids == ("a", "b", "c")
+    assert historical_checker.checker_version == "1.0"
+    assert tuple(finding.memory_ids for finding in historical.findings) == (
+        ("a", "b"),
+        ("a", "c"),
+        ("b", "c"),
+    )
+    execution.validate_checker_result_identity(
+        result=historical,
+        expected=frozen_identity,
+    )
+
+    orchestrated = run_static_benchmark_case(
+        case=_static_case(DefectClass.REDUNDANCY_BLOAT),
+        fixture=_fixture(),
+        store=load_store("examples/mutation-store.json"),
+        transcripts=load_transcripts("examples/mutation-transcripts.json"),
+        expected_checker=frozen_identity,
+    )
+    assert orchestrated.checker_result.checker_id == "redundancy_bloat"
+    assert orchestrated.checker_result.checker_version == "1.0"
+    assert len(orchestrated.checker_result.findings) == 1
+    assert len(orchestrated.checker_result.findings[0].memory_ids) == 2
 
 
 def test_static_dispatch_rejects_checker_identity_mismatch() -> None:

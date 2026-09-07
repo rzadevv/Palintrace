@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from palintrace.checkers import Checker, CheckerResult, RedundancyBloatChecker
+from palintrace.checkers.base import deterministic_finding_id
 from palintrace.cli import main
 from palintrace.models import (
     NormalizedMemory,
@@ -44,14 +45,17 @@ def _store(*memories: NormalizedMemory) -> NormalizedStore:
     return NormalizedStore(adapter="test", memories=memories)
 
 
-def test_exact_same_scope_duplicate_emits_structural_pair_finding() -> None:
+def test_two_exact_same_scope_duplicates_emit_one_group_finding() -> None:
     content = "User prefers Python."
     checker: Checker = RedundancyBloatChecker()
     result = checker.check(_store(_memory("m2", content), _memory("m1", content)))
 
     assert checker.checker_id == "redundancy_bloat"
-    assert checker.checker_version == "1.0"
+    assert checker.checker_version == "2.0"
     assert checker.defect_class is DefectClass.REDUNDANCY_BLOAT
+    assert result.rule_id == "memory.duplication.exact"
+    assert result.rule_version == "1.0.0"
+    assert result.severity == "warning"
     assert len(result.findings) == 1
     finding = result.findings[0]
     assert finding.defect_class is DefectClass.REDUNDANCY_BLOAT
@@ -81,8 +85,8 @@ def test_exact_same_scope_duplicate_emits_structural_pair_finding() -> None:
     }
 
 
-def test_three_duplicates_emit_every_unique_pair_and_ignore_input_order() -> None:
-    memories = (_memory("m3"), _memory("m1"), _memory("m2"))
+def test_three_duplicates_emit_one_complete_group_with_deterministic_identity() -> None:
+    memories = (_memory("c"), _memory("a"), _memory("b"))
     checker = RedundancyBloatChecker()
 
     first = checker.check(_store(*memories))
@@ -91,11 +95,71 @@ def test_three_duplicates_emit_every_unique_pair_and_ignore_input_order() -> Non
         transcripts=TranscriptSet(),
     )
 
-    expected_pairs = (("m1", "m2"), ("m1", "m3"), ("m2", "m3"))
-    assert tuple(finding.memory_ids for finding in first.findings) == expected_pairs
-    assert len(first.findings) == 3
+    assert len(first.findings) == 1
+    finding = first.findings[0]
+    assert finding.memory_ids == ("a", "b", "c")
     assert first.stats.details["duplicate_groups"] == 1
+    assert finding.finding_id == deterministic_finding_id(
+        checker_id="redundancy_bloat",
+        checker_version="2.0",
+        defect_class=DefectClass.REDUNDANCY_BLOAT,
+        memory_ids=("a", "b", "c"),
+        evidence=finding.evidence,
+    )
+    assert finding.finding_id != deterministic_finding_id(
+        checker_id="redundancy_bloat",
+        checker_version="1.0",
+        defect_class=DefectClass.REDUNDANCY_BLOAT,
+        memory_ids=("a", "b"),
+        evidence=finding.evidence,
+    )
     assert first.to_json() == second.to_json()
+
+
+def test_no_duplicates_emit_no_findings_or_duplicate_groups() -> None:
+    result = RedundancyBloatChecker().check(
+        _store(_memory("a", "First"), _memory("b", "Second"))
+    )
+
+    assert result.findings == ()
+    assert result.stats.findings_emitted == 0
+    assert result.stats.details["duplicate_groups"] == 0
+
+
+def test_two_duplicate_groups_emit_once_each_in_memory_id_order() -> None:
+    memories = (
+        _memory("z2", "Z group"),
+        _memory("a2", "A group"),
+        _memory("z1", "Z group"),
+        _memory("a1", "A group"),
+    )
+
+    first = RedundancyBloatChecker().check(_store(*memories))
+    second = RedundancyBloatChecker().check(_store(*reversed(memories)))
+
+    assert tuple(finding.memory_ids for finding in first.findings) == (
+        ("a1", "a2"),
+        ("z1", "z2"),
+    )
+    assert first.stats.findings_emitted == 2
+    assert first.stats.details["duplicate_groups"] == 2
+    assert first.to_json() == second.to_json()
+
+
+def test_completely_unscoped_memories_remain_skipped() -> None:
+    result = RedundancyBloatChecker().check(
+        _store(
+            _memory("a", scope=(None, None, None)),
+            _memory("b", scope=(None, None, None)),
+        )
+    )
+
+    assert result.findings == ()
+    assert result.stats.details == {
+        "eligible_memories": 0,
+        "unscoped_memories_skipped": 2,
+        "duplicate_groups": 0,
+    }
 
 
 @pytest.mark.parametrize(

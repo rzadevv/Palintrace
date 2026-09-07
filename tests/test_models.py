@@ -119,6 +119,18 @@ def test_store_rejects_duplicate_ids_and_supports_lookup() -> None:
         NormalizedStore(adapter="file", memories=(memory, memory))
 
 
+def test_store_duplicate_error_lists_each_repeated_id_once_in_sorted_order() -> None:
+    memories = tuple(
+        NormalizedMemory(id=memory_id, content=f"Memory {index}")
+        for index, memory_id in enumerate(("z", "a", "z", "a", "z"))
+    )
+
+    with pytest.raises(ValidationError) as raised:
+        NormalizedStore(adapter="file", memories=memories)
+
+    assert "duplicate normalized memory IDs: ['a', 'z']" in str(raised.value)
+
+
 def test_transcript_models_enforce_order_and_connect_to_source_ref() -> None:
     transcript = Transcript(
         id="conversation-1",

@@ -11,7 +11,6 @@ from palintrace.checkers import (
     CheckerResult,
     OrphanedProvenanceChecker,
     PrivacyScopeViolationChecker,
-    RedundancyBloatChecker,
     ScopeIsolationPolicy,
     StaleActiveChecker,
     UnsupportedClaimChecker,
@@ -42,6 +41,7 @@ from palintrace.evaluation.execution_models import (
 from palintrace.evaluation.experimental_lexical import ExperimentalLexicalRetriever
 from palintrace.evaluation.models import EvaluationInputError
 from palintrace.evaluation.mutation import evaluate_mutation_trial
+from palintrace.evaluation.redundancy_v0_1 import BenchmarkRedundancyBloatCheckerV1
 from palintrace.evaluation.retrieval import summarize_retrieval_challenges
 from palintrace.models import NormalizedStore, TranscriptSet
 from palintrace.mutations import BaseStoreStatus, mutate
@@ -87,7 +87,7 @@ def _build_checker(
     if defect_class is DefectClass.ORPHANED_PROVENANCE:
         return OrphanedProvenanceChecker()
     if defect_class is DefectClass.REDUNDANCY_BLOAT:
-        return RedundancyBloatChecker()
+        return BenchmarkRedundancyBloatCheckerV1()
     if defect_class is DefectClass.STALE_ACTIVE:
         return StaleActiveChecker()
     if defect_class is DefectClass.PRIVACY_SCOPE_VIOLATION:

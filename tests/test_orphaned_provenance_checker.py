@@ -168,6 +168,91 @@ def test_multiple_broken_refs_produce_one_finding_with_sorted_evidence() -> None
     assert result.stats.details == {"source_refs_scanned": 2}
 
 
+def test_indexed_resolution_preserves_complete_output_across_transcript_order() -> None:
+    store = _store(
+        _memory("m3", SourceRef(transcript_id="t2", turn_idx=9)),
+        _memory(
+            "m2",
+            SourceRef(transcript_id="t1", turn_idx=0, span=(0, 99)),
+            SourceRef(transcript_id="t1", turn_idx=0, span=(1, 98)),
+        ),
+        _memory("m1", SourceRef(transcript_id="absent", turn_idx=0)),
+    )
+    first_transcript = Transcript(
+        id="t1",
+        turns=(TranscriptTurn(index=0, role="user", content="Short"),),
+    )
+    second_transcript = Transcript(
+        id="t2",
+        turns=(TranscriptTurn(index=2, role="assistant", content="Other"),),
+    )
+    forward = TranscriptSet(transcripts=(first_transcript, second_transcript))
+    reverse = TranscriptSet(transcripts=(second_transcript, first_transcript))
+
+    first = OrphanedProvenanceChecker().check(store, transcripts=forward)
+    second = OrphanedProvenanceChecker().check(store, transcripts=reverse)
+
+    assert first.to_json() == second.to_json()
+    assert tuple(finding.memory_ids for finding in first.findings) == (
+        ("m1",),
+        ("m2",),
+        ("m3",),
+    )
+    evidence_by_memory = {
+        finding.memory_ids[0]: tuple(
+            item.model_dump(mode="json") for item in finding.evidence
+        )
+        for finding in first.findings
+    }
+    assert evidence_by_memory == {
+        "m1": (
+            {
+                "kind": "missing_transcript",
+                "message": "Referenced transcript does not exist.",
+                "data": {"source_ref_index": 0, "transcript_id": "absent"},
+            },
+        ),
+        "m2": (
+            {
+                "kind": "invalid_span",
+                "message": "Referenced character span exceeds the transcript turn.",
+                "data": {
+                    "source_ref_index": 0,
+                    "transcript_id": "t1",
+                    "turn_idx": 0,
+                    "span": [0, 99],
+                    "turn_length": 5,
+                },
+            },
+            {
+                "kind": "invalid_span",
+                "message": "Referenced character span exceeds the transcript turn.",
+                "data": {
+                    "source_ref_index": 1,
+                    "transcript_id": "t1",
+                    "turn_idx": 0,
+                    "span": [1, 98],
+                    "turn_length": 5,
+                },
+            },
+        ),
+        "m3": (
+            {
+                "kind": "missing_turn",
+                "message": "Referenced transcript turn does not exist.",
+                "data": {
+                    "source_ref_index": 0,
+                    "transcript_id": "t2",
+                    "turn_idx": 9,
+                },
+            },
+        ),
+    }
+    assert first.stats.memories_scanned == 3
+    assert first.stats.findings_emitted == 3
+    assert first.stats.details == {"source_refs_scanned": 4}
+
+
 def test_multiple_memories_are_sorted_and_results_are_deterministic() -> None:
     store = _store(
         _memory("m2", SourceRef(transcript_id="t1", turn_idx=9)),
