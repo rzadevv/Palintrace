@@ -241,6 +241,360 @@ def test_public_entrypoints_use_command_main() -> None:
     assert module_entrypoint.main is command.main
 
 
+def test_dump_parser_adds_include_raw_only_at_command_layer(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    parser, dump_parser = _command_parser("dump")
+    include_raw_actions = [
+        action for action in dump_parser._actions if action.dest == "include_raw"
+    ]
+    frozen_parser = cli.build_parser()
+    frozen_commands = next(
+        action
+        for action in frozen_parser._actions
+        if isinstance(action, argparse._SubParsersAction)
+    )
+    frozen_dump_parser = frozen_commands.choices["dump"]
+
+    assert len(include_raw_actions) == 1
+    assert isinstance(include_raw_actions[0], argparse._StoreTrueAction)
+    assert include_raw_actions[0].default is False
+    assert (
+        include_raw_actions[0].help
+        == "include backend-specific raw payloads in normalized output"
+    )
+    assert parser.parse_args(
+        ["dump", "--adapter", "file", "--source", "store.json"]
+    ).include_raw is False
+    assert parser.parse_args(
+        [
+            "dump",
+            "--adapter",
+            "file",
+            "--source",
+            "store.json",
+            "--include-raw",
+        ]
+    ).include_raw is True
+    assert {action.dest for action in dump_parser._actions} == {
+        action.dest for action in frozen_dump_parser._actions
+    } | {"include_raw"}
+
+    with pytest.raises(SystemExit) as help_exit:
+        command.main(["dump", "--help"])
+    help_output = capsys.readouterr()
+
+    assert help_exit.value.code == 0
+    assert "--include-raw" in help_output.out
+    assert " ".join(help_output.out.split()).count(
+        "include backend-specific raw payloads in normalized output"
+    ) == 1
+    assert help_output.err == ""
+    assert all(action.dest != "include_raw" for action in frozen_dump_parser._actions)
+
+    with pytest.raises(SystemExit) as frozen_exit:
+        frozen_parser.parse_args(
+            [
+                "dump",
+                "--adapter",
+                "file",
+                "--source",
+                "store.json",
+                "--include-raw",
+            ]
+        )
+    frozen_error = capsys.readouterr()
+
+    assert frozen_exit.value.code == 2
+    assert "unrecognized arguments: --include-raw" in frozen_error.err
+    assert frozen_error.out == ""
+
+
+def test_dump_default_stdout_omits_only_raw_and_is_deterministic(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    arguments = [
+        "dump",
+        "--adapter",
+        "file",
+        "--source",
+        "examples/store.yaml",
+    ]
+    source_store = cli._build_store(command.build_parser().parse_args(arguments))
+
+    assert any(memory.raw for memory in source_store.memories)
+    assert command.main(arguments) == 0
+    first = capsys.readouterr()
+    assert command.main(arguments) == 0
+    second = capsys.readouterr()
+    payload = json.loads(first.out)
+    reloaded = NormalizedStore.model_validate(payload)
+
+    assert all("raw" not in memory for memory in payload["memories"])
+    assert all(memory.raw == {} for memory in reloaded.memories)
+    assert tuple(memory.semantic_dict() for memory in reloaded.memories) == tuple(
+        memory.semantic_dict() for memory in source_store.memories
+    )
+    assert reloaded.memories[0].content == source_store.memories[0].content
+    assert reloaded.memories[0].embedding == source_store.memories[0].embedding
+    assert reloaded.memories[0].scope == source_store.memories[0].scope
+    assert first.out == second.out
+    assert first.err == second.err == ""
+
+
+def test_dump_default_file_omits_raw_and_is_quiet_and_deterministic(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    first = tmp_path / "first.json"
+    second = tmp_path / "second.json"
+    base = ["dump", "--adapter", "file", "--source", "examples/store.yaml"]
+
+    assert command.main([*base, "--output", str(first)]) == 0
+    assert command.main([*base, "--output", str(second)]) == 0
+    captured = capsys.readouterr()
+    payload = json.loads(first.read_text(encoding="utf-8"))
+
+    NormalizedStore.model_validate(payload)
+    assert all("raw" not in memory for memory in payload["memories"])
+    assert first.read_bytes() == second.read_bytes()
+    assert captured.out == ""
+    assert captured.err == ""
+
+
+def test_dump_include_raw_stdout_preserves_adapter_payload_and_is_deterministic(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    arguments = [
+        "dump",
+        "--adapter",
+        "file",
+        "--source",
+        "examples/store.yaml",
+        "--include-raw",
+    ]
+    source_store = cli._build_store(command.build_parser().parse_args(arguments))
+
+    assert command.main(arguments) == 0
+    first = capsys.readouterr()
+    assert command.main(arguments) == 0
+    second = capsys.readouterr()
+    payload = json.loads(first.out)
+    reloaded = NormalizedStore.model_validate(payload)
+
+    assert payload["memories"][0]["raw"] == source_store.memories[0].raw
+    assert payload["memories"][0]["raw"]["file_format"] == "yaml"
+    assert reloaded.memories[0].raw == source_store.memories[0].raw
+    assert first.out == second.out
+    assert first.err == second.err == ""
+
+
+def test_dump_include_raw_file_preserves_payload_and_is_quiet(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    output = tmp_path / "normalized.json"
+
+    assert (
+        command.main(
+            [
+                "dump",
+                "--adapter",
+                "file",
+                "--source",
+                "examples/store.yaml",
+                "--include-raw",
+                "--output",
+                str(output),
+            ]
+        )
+        == 0
+    )
+    captured = capsys.readouterr()
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    reloaded = NormalizedStore.model_validate(payload)
+
+    assert payload["memories"][0]["raw"]["file_format"] == "yaml"
+    assert reloaded.memories[0].raw["file_format"] == "yaml"
+    assert captured.out == ""
+    assert captured.err == ""
+
+
+@pytest.mark.parametrize(
+    ("adapter", "source", "extra"),
+    [
+        ("mem0", "tests/fixtures/mem0.json", []),
+        (
+            "graphiti",
+            "tests/fixtures/graphiti.json",
+            ["--user-id", "user-123", "--include-embeddings"],
+        ),
+        ("letta", "tests/fixtures/letta.json", ["--agent-id", "agent-1"]),
+    ],
+)
+def test_dump_external_fixtures_omit_raw_and_preserve_portable_fields(
+    adapter: str,
+    source: str,
+    extra: list[str],
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    arguments = ["dump", "--adapter", adapter, "--source", source, *extra]
+    source_store = cli._build_store(command.build_parser().parse_args(arguments))
+
+    assert command.main(arguments) == 0
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    reloaded = NormalizedStore.model_validate(payload)
+
+    assert all(memory.raw for memory in source_store.memories)
+    assert all("raw" not in memory for memory in payload["memories"])
+    assert tuple(memory.semantic_dict() for memory in reloaded.memories) == tuple(
+        memory.semantic_dict() for memory in source_store.memories
+    )
+    if adapter == "graphiti":
+        assert reloaded.memories[0].embedding == (0.1, 0.2)
+    assert captured.err == ""
+
+
+def test_dump_non_file_adapter_raw_can_be_explicitly_included(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    arguments = [
+        "dump",
+        "--adapter",
+        "mem0",
+        "--source",
+        "tests/fixtures/mem0.json",
+        "--include-raw",
+    ]
+    source_store = cli._build_store(command.build_parser().parse_args(arguments))
+
+    assert command.main(arguments) == 0
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    reloaded = NormalizedStore.model_validate(payload)
+
+    assert payload["memories"][0]["raw"] == source_store.memories[0].raw
+    assert payload["memories"][0]["raw"]["metadata"]["category"] == "preference"
+    assert reloaded.memories[0].raw == source_store.memories[0].raw
+    assert captured.err == ""
+
+
+def test_dump_uses_frozen_store_builder_without_mutating_raw(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    store = NormalizedStore(
+        adapter="file",
+        memories=(
+            NormalizedMemory(id="m1", content="Memory", raw={"native": "value"}),
+        ),
+    )
+    calls: list[argparse.Namespace] = []
+
+    def build_store(args: argparse.Namespace) -> NormalizedStore:
+        calls.append(args)
+        return store
+
+    def fail_frozen_main(_argv: Sequence[str] | None = None) -> int:
+        raise AssertionError("frozen CLI delegation attempted")
+
+    monkeypatch.setattr(cli, "_build_store", build_store)
+    monkeypatch.setattr(cli, "main", fail_frozen_main)
+
+    assert (
+        command.main(
+            ["dump", "--adapter", "file", "--source", "ignored.json"]
+        )
+        == 0
+    )
+    captured = capsys.readouterr()
+
+    assert len(calls) == 1
+    assert calls[0].include_raw is False
+    assert "raw" not in json.loads(captured.out)["memories"][0]
+    assert store.memories[0].raw == {"native": "value"}
+    assert captured.err == ""
+
+
+def test_dump_errors_remain_handled_without_tracebacks(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    malformed = tmp_path / "malformed.json"
+    malformed.write_text("{", encoding="utf-8")
+    missing_parent_output = tmp_path / "missing" / "normalized.json"
+    cases = (
+        (["dump", "--adapter", "file"], "--source is required"),
+        (
+            ["dump", "--adapter", "file", "--source", str(malformed)],
+            "could not parse",
+        ),
+        (
+            [
+                "dump",
+                "--adapter",
+                "file",
+                "--source",
+                "examples/store.yaml",
+                "--output",
+                str(missing_parent_output),
+            ],
+            "No such file or directory",
+        ),
+    )
+
+    for arguments, expected_error in cases:
+        with pytest.raises(SystemExit) as raised:
+            command.main(arguments)
+        captured = capsys.readouterr()
+
+        assert raised.value.code == 2
+        assert expected_error in captured.err
+        assert "Traceback" not in captured.err
+        assert captured.out == ""
+
+
+def test_audit_and_preflight_accept_default_raw_free_dump(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    store = tmp_path / "normalized.json"
+    audit_output = tmp_path / "audit.json"
+    preflight_output = tmp_path / "preflight.json"
+
+    assert (
+        command.main(
+            [
+                "dump",
+                "--adapter",
+                "file",
+                "--source",
+                "examples/store.yaml",
+                "--output",
+                str(store),
+            ]
+        )
+        == 0
+    )
+    assert command.main(_audit_arguments(store, "all", output=audit_output)) == 0
+    assert command.main(_preflight_arguments(store, output=preflight_output)) == 0
+    captured = capsys.readouterr()
+    serialized_store = json.loads(store.read_text(encoding="utf-8"))
+    audit_report = AuditReport.model_validate_json(
+        audit_output.read_text(encoding="utf-8")
+    )
+    preflight_report = PreflightReport.model_validate_json(
+        preflight_output.read_text(encoding="utf-8")
+    )
+
+    assert all("raw" not in memory for memory in serialized_store["memories"])
+    assert audit_report.schema_version == "0.1"
+    assert preflight_report.schema_version == "0.1"
+    assert captured.out == ""
+    assert captured.err == ""
+
+
 @pytest.mark.parametrize("adapter", ["file", "mem0", "graphiti", "letta"])
 def test_capabilities_parser_accepts_builtin_adapters(adapter: str) -> None:
     parser, command_parser = _command_parser("capabilities")
@@ -460,26 +814,18 @@ def test_non_audit_parsers_reject_sarif_output(
     assert "unrecognized arguments: --sarif-output result.sarif" in capsys.readouterr().err
 
 
-@pytest.mark.parametrize(
-    "arguments",
-    [
-        ["dump", "--adapter", "file", "--source", "store.json"],
-        [
-            "mutate",
-            "--store",
-            "store.json",
-            "--defect",
-            "stale_active",
-            "--output",
-            "mutated.json",
-            "--manifest",
-            "manifest.json",
-        ],
-    ],
-)
-def test_non_audit_commands_delegate_to_frozen_cli(
-    arguments: list[str], monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_mutate_still_delegates_to_frozen_cli(monkeypatch: pytest.MonkeyPatch) -> None:
+    arguments = [
+        "mutate",
+        "--store",
+        "store.json",
+        "--defect",
+        "stale_active",
+        "--output",
+        "mutated.json",
+        "--manifest",
+        "manifest.json",
+    ]
     calls: list[Sequence[str] | None] = []
 
     def run_frozen_cli(argv: Sequence[str] | None = None) -> int:

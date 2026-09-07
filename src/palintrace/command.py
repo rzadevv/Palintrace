@@ -39,6 +39,11 @@ def build_parser() -> argparse.ArgumentParser:
     next(action for action in commands._choices_actions if action.dest == "audit").help = (
         audit_help
     )
+    commands.choices["dump"].add_argument(
+        "--include-raw",
+        action="store_true",
+        help="include backend-specific raw payloads in normalized output",
+    )
     capabilities = commands.add_parser(
         "capabilities", help="show the normalized field support for one adapter"
     )
@@ -210,6 +215,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         try:
             preflight_report = _run_preflight(args)
             text = preflight_report.to_json(args.output)
+        except (AdapterError, OSError, ValueError) as error:
+            parser.error(str(error))
+        if args.output is None:
+            sys.stdout.write(text)
+        return 0
+    if args.command == "dump":
+        try:
+            store = cli._build_store(args)
+            text = store.to_json(args.output, include_raw=args.include_raw)
         except (AdapterError, OSError, ValueError) as error:
             parser.error(str(error))
         if args.output is None:
