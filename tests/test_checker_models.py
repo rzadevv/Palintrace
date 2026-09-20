@@ -140,20 +140,22 @@ def test_checker_result_rejects_wrong_schema_and_blank_identity() -> None:
 
 
 @pytest.mark.parametrize(
-    ("checker_id", "checker_version", "defect_class", "rule_id", "severity"),
+    ("checker_id", "checker_version", "defect_class", "rule_id", "rule_version", "severity"),
     [
         (
             "orphaned_provenance",
             "1.0",
             DefectClass.ORPHANED_PROVENANCE,
             "memory.provenance.orphaned",
+            "1.0.0",
             "error",
         ),
         (
             "redundancy_bloat",
-            "1.0",
+            "3.0",
             DefectClass.REDUNDANCY_BLOAT,
             "memory.duplication.exact",
+            "2.0.0",
             "warning",
         ),
         (
@@ -161,13 +163,15 @@ def test_checker_result_rejects_wrong_schema_and_blank_identity() -> None:
             "1.0",
             DefectClass.STALE_ACTIVE,
             "memory.state.explicit-stale",
+            "1.0.0",
             "error",
         ),
         (
             "privacy_scope_violation",
-            "1.0",
+            "2.0",
             DefectClass.PRIVACY_SCOPE_VIOLATION,
             "memory.scope.prohibited-exact-replica",
+            "2.0.0",
             "error",
         ),
         (
@@ -175,6 +179,7 @@ def test_checker_result_rejects_wrong_schema_and_blank_identity() -> None:
             "1.0",
             DefectClass.UNSUPPORTED_CLAIM,
             "memory.claim.unsupported",
+            "1.0.0",
             "error",
         ),
         (
@@ -182,6 +187,7 @@ def test_checker_result_rejects_wrong_schema_and_blank_identity() -> None:
             "0.1",
             DefectClass.UNSUPPORTED_CLAIM,
             "memory.claim.unsupported",
+            "1.0.0",
             "error",
         ),
         (
@@ -189,6 +195,7 @@ def test_checker_result_rejects_wrong_schema_and_blank_identity() -> None:
             "1.0",
             DefectClass.RETRIEVAL_SHADOWING,
             "memory.retrieval.shadowing",
+            "1.0.0",
             "error",
         ),
     ],
@@ -198,6 +205,7 @@ def test_builtin_checker_results_receive_canonical_rule_metadata(
     checker_version: str,
     defect_class: DefectClass,
     rule_id: str,
+    rule_version: str,
     severity: str,
 ) -> None:
     result = CheckerResult(
@@ -208,7 +216,7 @@ def test_builtin_checker_results_receive_canonical_rule_metadata(
     )
 
     assert result.rule_id == rule_id
-    assert result.rule_version == "1.0.0"
+    assert result.rule_version == rule_version
     assert result.severity == severity
 
 

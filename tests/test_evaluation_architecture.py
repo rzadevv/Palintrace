@@ -35,6 +35,7 @@ def test_evaluation_package_contains_frozen_accounting_and_execution_layers() ->
         "models.py",
         "mutation.py",
         "preflight.py",
+        "privacy_scope_v0_1.py",
         "redundancy_v0_1.py",
         "retrieval.py",
         "retrieval_negation_confirmatory.py",
@@ -58,6 +59,22 @@ def test_benchmark_redundancy_v1_is_private_and_independent_of_production_v2() -
     assert "BenchmarkRedundancyBloatCheckerV1" not in (
         SOURCE_ROOT / "checkers" / "__init__.py"
     ).read_text(encoding="utf-8")
+
+
+def test_benchmark_privacy_v1_is_private_and_independent_of_production_v2() -> None:
+    historical_path = EVALUATION_ROOT / "privacy_scope_v0_1.py"
+
+    assert "palintrace.checkers.privacy_scope_violation" not in _absolute_imports(
+        historical_path
+    )
+    for module in (
+        EVALUATION_ROOT / "__init__.py",
+        SOURCE_ROOT / "__init__.py",
+        SOURCE_ROOT / "checkers" / "__init__.py",
+    ):
+        assert "BenchmarkPrivacyScopeViolationCheckerV1" not in module.read_text(
+            encoding="utf-8"
+        )
 
 
 def test_detector_and_runtime_packages_do_not_import_evaluation() -> None:

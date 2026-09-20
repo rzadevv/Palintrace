@@ -55,13 +55,21 @@ reported as orphaned. The checker requires transcripts and fails explicitly when
 
 ## Redundancy bloat
 
-`RedundancyBloatChecker` finds exact-content duplicates within the same observable normalized scope.
-The scope key contains `user_id`, `agent_id`, and `session_id`. Completely unscoped memories are
-skipped because their intended boundary is unknown.
+`RedundancyBloatChecker` finds duplicate claims within the same observable normalized scope. The
+scope key contains `user_id`, `agent_id`, and `session_id`. Completely unscoped memories are skipped
+because their intended boundary is unknown.
 
-Each duplicate group emits one finding for every distinct pair of memory IDs. Evidence contains a
-content hash, content length, and scope—not the duplicated text. This checker does not attempt
-paraphrase or semantic-equivalence detection.
+Memories are grouped by normalized content and scope. Normalization applies NFKC, case folding,
+whitespace collapsing, and trailing-punctuation removal, so `User likes Python`,
+`User likes Python.`, and `User likes Python ` fall into one group. Content consisting only of
+punctuation is left unfolded so it stays distinguishable.
+
+Each group emits one finding. Evidence reports `match_kind` as `exact` when every member stores
+byte-identical content and `normalized` otherwise, alongside the normalized content hash, its
+length, and the scope—not the duplicated text. The evidence kind is `exact_duplicate` or
+`normalized_duplicate` to match. Statistics split `duplicate_groups` into `exact_duplicate_groups`
+and `normalized_duplicate_groups`. This checker does not attempt paraphrase, embedding, or
+semantic-equivalence detection.
 
 ## Stale active
 
@@ -79,10 +87,17 @@ supersession from dates, wording, or conflicting values.
 principal dimension (`user_id` or `agent_id`), an authoritative source principal, and prohibited
 destination principals.
 
-The checker compares portable normalized records after excluding the selected principal dimension
-and the memory ID. A destination is reported only when it is an exact portable replica of a record
-under the authoritative principal. Ordinary cross-scope differences are not violations without a
-policy rule, and session isolation is not inferred.
+A destination is reported when its normalized content matches a record under the authoritative
+principal and the scope dimensions the rule does not vary are equal. Content normalization is the
+same as for [redundancy bloat](#redundancy-bloat), so timestamps, provenance, source references,
+embeddings, supersession, and active state no longer decide whether a leak is found. Ordinary
+cross-scope differences are not violations without a policy rule, and session isolation is not
+inferred.
+
+Evidence uses kind `prohibited_scope_replica` and reports the authoritative memory ID, the scope
+dimension and both principals, the normalized content hash, `match_kind` (`exact` or `normalized`),
+and `differing_fields`—the portable field names other than the ID and scope whose values differ
+between the two records. Field names are reported, never their values.
 
 Example policy:
 

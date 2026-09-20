@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from palintrace.checkers import Checker, CheckerResult, RedundancyBloatChecker
-from palintrace.checkers.base import deterministic_finding_id
+from palintrace.checkers.base import deterministic_finding_id, normalized_content
 from palintrace.cli import main
 from palintrace.models import (
     NormalizedMemory,
@@ -45,16 +45,39 @@ def _store(*memories: NormalizedMemory) -> NormalizedStore:
     return NormalizedStore(adapter="test", memories=memories)
 
 
+def _normalized_digest(content: str) -> str:
+    return hashlib.sha256(normalized_content(content).encode("utf-8")).hexdigest()
+
+
+@pytest.mark.parametrize(
+    ("content", "expected"),
+    [
+        ("User likes Python", "user likes python"),
+        ("User likes Python.", "user likes python"),
+        ("User likes Python ", "user likes python"),
+        ("  User   likes\n likes  ", "user likes likes"),
+        ("USER LIKES PYTHON!!!", "user likes python"),
+        ("\ufb01le size", "file size"),
+        ("caf\u00e9", "caf\u00e9"),
+        ("...", "..."),
+    ],
+)
+def test_normalized_content_folds_case_whitespace_and_trailing_punctuation(
+    content: str, expected: str
+) -> None:
+    assert normalized_content(content) == expected
+
+
 def test_two_exact_same_scope_duplicates_emit_one_group_finding() -> None:
     content = "User prefers Python."
     checker: Checker = RedundancyBloatChecker()
     result = checker.check(_store(_memory("m2", content), _memory("m1", content)))
 
     assert checker.checker_id == "redundancy_bloat"
-    assert checker.checker_version == "2.0"
+    assert checker.checker_version == "3.0"
     assert checker.defect_class is DefectClass.REDUNDANCY_BLOAT
     assert result.rule_id == "memory.duplication.exact"
-    assert result.rule_version == "1.0.0"
+    assert result.rule_version == "2.0.0"
     assert result.severity == "warning"
     assert len(result.findings) == 1
     finding = result.findings[0]
@@ -64,8 +87,9 @@ def test_two_exact_same_scope_duplicates_emit_one_group_finding() -> None:
     assert len(finding.evidence) == 1
     assert finding.evidence[0].kind == "exact_duplicate"
     assert finding.evidence[0].model_dump(mode="json")["data"] == {
-        "content_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
-        "content_length": len(content),
+        "match_kind": "exact",
+        "normalized_content_sha256": _normalized_digest(content),
+        "normalized_content_length": len(normalized_content(content)),
         "scope": {
             "user_id": "user-a",
             "agent_id": None,
@@ -82,6 +106,8 @@ def test_two_exact_same_scope_duplicates_emit_one_group_finding() -> None:
         "eligible_memories": 2,
         "unscoped_memories_skipped": 0,
         "duplicate_groups": 1,
+        "exact_duplicate_groups": 1,
+        "normalized_duplicate_groups": 0,
     }
 
 
@@ -101,7 +127,7 @@ def test_three_duplicates_emit_one_complete_group_with_deterministic_identity() 
     assert first.stats.details["duplicate_groups"] == 1
     assert finding.finding_id == deterministic_finding_id(
         checker_id="redundancy_bloat",
-        checker_version="2.0",
+        checker_version="3.0",
         defect_class=DefectClass.REDUNDANCY_BLOAT,
         memory_ids=("a", "b", "c"),
         evidence=finding.evidence,
@@ -159,6 +185,8 @@ def test_completely_unscoped_memories_remain_skipped() -> None:
         "eligible_memories": 0,
         "unscoped_memories_skipped": 2,
         "duplicate_groups": 0,
+        "exact_duplicate_groups": 0,
+        "normalized_duplicate_groups": 0,
     }
 
 
@@ -173,19 +201,13 @@ def test_completely_unscoped_memories_remain_skipped() -> None:
         ("Same", "Same", (None, None, None), (None, None, None)),
         (
             "User prefers Python.",
-            "user prefers python.",
-            ("user-a", None, None),
-            ("user-a", None, None),
-        ),
-        (
-            "User prefers Python.",
-            "User prefers Python. ",
-            ("user-a", None, None),
-            ("user-a", None, None),
-        ),
-        (
-            "User prefers Python.",
             "User uses Python.",
+            ("user-a", None, None),
+            ("user-a", None, None),
+        ),
+        (
+            "User prefers Python.",
+            "User prefers Python 3.",
             ("user-a", None, None),
             ("user-a", None, None),
         ),
@@ -203,13 +225,12 @@ def test_completely_unscoped_memories_remain_skipped() -> None:
         "different_session",
         "scoped_and_unscoped",
         "both_unscoped",
-        "case_difference",
-        "whitespace_difference",
         "semantic_only",
+        "extra_token",
         "unknown_vs_known_dimension",
     ),
 )
-def test_non_exact_or_non_shared_scope_pairs_are_not_flagged(
+def test_non_equivalent_or_non_shared_scope_pairs_are_not_flagged(
     first_content: str,
     second_content: str,
     first_scope: ScopeValues,
@@ -223,6 +244,72 @@ def test_non_exact_or_non_shared_scope_pairs_are_not_flagged(
     )
 
     assert result.findings == ()
+
+
+def test_punctuation_case_and_whitespace_variants_form_one_group() -> None:
+    result = RedundancyBloatChecker().check(
+        _store(
+            _memory("m3", "User likes Python "),
+            _memory("m1", "User likes Python"),
+            _memory("m2", "User likes Python."),
+        )
+    )
+
+    assert len(result.findings) == 1
+    finding = result.findings[0]
+    assert finding.memory_ids == ("m1", "m2", "m3")
+    assert finding.evidence[0].kind == "normalized_duplicate"
+    assert finding.evidence[0].model_dump(mode="json")["data"] == {
+        "match_kind": "normalized",
+        "normalized_content_sha256": _normalized_digest("User likes Python"),
+        "normalized_content_length": len("user likes python"),
+        "scope": {
+            "user_id": "user-a",
+            "agent_id": None,
+            "session_id": None,
+        },
+    }
+    assert result.stats.details == {
+        "eligible_memories": 3,
+        "unscoped_memories_skipped": 0,
+        "duplicate_groups": 1,
+        "exact_duplicate_groups": 0,
+        "normalized_duplicate_groups": 1,
+    }
+
+
+def test_exact_and_normalized_groups_are_labelled_separately() -> None:
+    result = RedundancyBloatChecker().check(
+        _store(
+            _memory("a1", "User likes Python"),
+            _memory("a2", "User likes Python"),
+            _memory("z1", "User likes Rust"),
+            _memory("z2", "user likes rust."),
+        )
+    )
+
+    assert tuple(
+        (finding.memory_ids, finding.evidence[0].kind, finding.evidence[0].data["match_kind"])
+        for finding in result.findings
+    ) == (
+        (("a1", "a2"), "exact_duplicate", "exact"),
+        (("z1", "z2"), "normalized_duplicate", "normalized"),
+    )
+    assert result.stats.details["exact_duplicate_groups"] == 1
+    assert result.stats.details["normalized_duplicate_groups"] == 1
+
+
+def test_normalized_grouping_still_respects_scope() -> None:
+    result = RedundancyBloatChecker().check(
+        _store(
+            _memory("m1", "User likes Python", scope=("user-a", None, None)),
+            _memory("m2", "user likes python.", scope=("user-b", None, None)),
+            _memory("m3", "User likes Python ", scope=(None, None, None)),
+        )
+    )
+
+    assert result.findings == ()
+    assert result.stats.details["unscoped_memories_skipped"] == 1
 
 
 def test_equal_partially_known_scope_is_sufficient() -> None:
