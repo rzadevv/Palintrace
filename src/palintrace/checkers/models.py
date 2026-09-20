@@ -46,7 +46,7 @@ _BUILTIN_RULE_METADATA: Mapping[
         "stale_active": (
             DefectClass.STALE_ACTIVE,
             "memory.state.explicit-stale",
-            "1.0.0",
+            "2.0.0",
             "error",
         ),
         "privacy_scope_violation": (
@@ -81,6 +81,7 @@ _SUPERSEDED_RULE_VERSIONS: Mapping[tuple[str, str], str] = MappingProxyType(
     {
         ("privacy_scope_violation", "1.0"): "1.0.0",
         ("redundancy_bloat", "1.0"): "1.0.0",
+        ("stale_active", "1.0"): "1.0.0",
     }
 )
 
@@ -237,6 +238,10 @@ class CheckerCost(BaseModel):
     output_tokens: NonNegativeInt = 0
 
 
+# a stat detail is a count, or a listing of identifier-only records such as unresolved links
+StatDetail = NonNegativeInt | tuple[Mapping[str, str], ...]
+
+
 class CheckerStats(BaseModel):
     """Deterministic structural work and output counts."""
 
@@ -244,20 +249,31 @@ class CheckerStats(BaseModel):
 
     memories_scanned: NonNegativeInt
     findings_emitted: NonNegativeInt
-    details: Mapping[str, NonNegativeInt] = Field(default_factory=dict, validate_default=True)
+    details: Mapping[str, StatDetail] = Field(default_factory=dict, validate_default=True)
 
     @field_validator("details")
     @classmethod
     def detail_keys_must_not_be_blank(
-        cls, value: Mapping[str, NonNegativeInt]
-    ) -> Mapping[str, NonNegativeInt]:
+        cls, value: Mapping[str, StatDetail]
+    ) -> Mapping[str, StatDetail]:
         if any(not key.strip() for key in value):
             raise ValueError("checker stat detail keys must not be blank")
-        return MappingProxyType(dict(value))
+        frozen: dict[str, StatDetail] = {}
+        for key, item in value.items():
+            if isinstance(item, int):
+                frozen[key] = item
+                continue
+            frozen[key] = tuple(MappingProxyType(dict(record)) for record in item)
+        return MappingProxyType(frozen)
 
     @field_serializer("details")
-    def serialize_details(self, value: Mapping[str, NonNegativeInt]) -> dict[str, int]:
-        return dict(value)
+    def serialize_details(
+        self, value: Mapping[str, StatDetail]
+    ) -> dict[str, int | list[dict[str, str]]]:
+        return {
+            key: item if isinstance(item, int) else [dict(record) for record in item]
+            for key, item in value.items()
+        }
 
 
 class CheckerResult(BaseModel):
