@@ -1,10 +1,10 @@
-"""Deterministic structural checker for exact same-scope duplicates."""
+"""Deterministic structural checker for same-scope duplicate claims."""
 
 from __future__ import annotations
 
 import hashlib
 
-from palintrace.checkers.base import deterministic_finding_id
+from palintrace.checkers.base import deterministic_finding_id, normalized_content
 from palintrace.checkers.models import (
     CheckerCost,
     CheckerResult,
@@ -20,10 +20,10 @@ GroupKey = tuple[str, ScopeKey]
 
 
 class RedundancyBloatChecker:
-    """Find exact-content duplicate groups in the same observable scope."""
+    """Find exact and normalized duplicate groups in the same observable scope."""
 
     checker_id = "redundancy_bloat"
-    checker_version = "2.0"
+    checker_version = "3.0"
     defect_class = DefectClass.REDUNDANCY_BLOAT
 
     def check(
@@ -32,7 +32,7 @@ class RedundancyBloatChecker:
         *,
         transcripts: TranscriptSet | None = None,
     ) -> CheckerResult:
-        """Group exact claims by observable scope and emit one finding per group."""
+        """Group normalized claims by observable scope and emit one finding per group."""
 
         groups: dict[GroupKey, list[NormalizedMemory]] = {}
         unscoped_memories_skipped = 0
@@ -45,26 +45,38 @@ class RedundancyBloatChecker:
             if all(value is None for value in scope_key):
                 unscoped_memories_skipped += 1
                 continue
-            groups.setdefault((memory.content, scope_key), []).append(memory)
+            groups.setdefault((normalized_content(memory.content), scope_key), []).append(memory)
 
-        grouped_duplicates: list[tuple[tuple[str, ...], str, ScopeKey]] = []
-        for (content, scope_key), memories in groups.items():
+        grouped_duplicates: list[tuple[tuple[str, ...], str, bool, ScopeKey]] = []
+        exact_groups = 0
+        for (normalized, scope_key), memories in groups.items():
             if len(memories) < 2:
                 continue
             memory_ids = tuple(sorted(memory.id for memory in memories))
-            grouped_duplicates.append((memory_ids, content, scope_key))
+            is_exact = len({memory.content for memory in memories}) == 1
+            if is_exact:
+                exact_groups += 1
+            grouped_duplicates.append((memory_ids, normalized, is_exact, scope_key))
 
         findings: list[Finding] = []
-        for memory_ids, content, scope_key in sorted(
+        for memory_ids, normalized, is_exact, scope_key in sorted(
             grouped_duplicates, key=lambda group: group[0]
         ):
             evidence = (
                 EvidenceItem(
-                    kind="exact_duplicate",
-                    message="Memories contain identical content in the same observable scope.",
+                    kind="exact_duplicate" if is_exact else "normalized_duplicate",
+                    message=(
+                        "Memories contain identical content in the same observable scope."
+                        if is_exact
+                        else "Memories contain equivalent content once normalized "
+                        "in the same observable scope."
+                    ),
                     data={
-                        "content_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
-                        "content_length": len(content),
+                        "match_kind": "exact" if is_exact else "normalized",
+                        "normalized_content_sha256": hashlib.sha256(
+                            normalized.encode("utf-8")
+                        ).hexdigest(),
+                        "normalized_content_length": len(normalized),
                         "scope": {
                             "user_id": scope_key[0],
                             "agent_id": scope_key[1],
@@ -102,6 +114,8 @@ class RedundancyBloatChecker:
                     "eligible_memories": len(store.memories) - unscoped_memories_skipped,
                     "unscoped_memories_skipped": unscoped_memories_skipped,
                     "duplicate_groups": len(grouped_duplicates),
+                    "exact_duplicate_groups": exact_groups,
+                    "normalized_duplicate_groups": len(grouped_duplicates) - exact_groups,
                 },
             ),
         )
