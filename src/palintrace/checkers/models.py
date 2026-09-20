@@ -40,7 +40,7 @@ _BUILTIN_RULE_METADATA: Mapping[
         "redundancy_bloat": (
             DefectClass.REDUNDANCY_BLOAT,
             "memory.duplication.exact",
-            "1.0.0",
+            "2.0.0",
             "warning",
         ),
         "stale_active": (
@@ -52,7 +52,7 @@ _BUILTIN_RULE_METADATA: Mapping[
         "privacy_scope_violation": (
             DefectClass.PRIVACY_SCOPE_VIOLATION,
             "memory.scope.prohibited-exact-replica",
-            "1.0.0",
+            "2.0.0",
             "error",
         ),
         "unsupported_claim": (

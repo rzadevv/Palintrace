@@ -4,12 +4,25 @@ from __future__ import annotations
 
 import hashlib
 import json
+import unicodedata
 from collections.abc import Sequence
 from typing import Protocol
 
 from palintrace.checkers.models import CheckerResult, EvidenceItem, _evidence_identity
 from palintrace.models import NormalizedStore, TranscriptSet
 from palintrace.taxonomy import DefectClass
+
+
+def normalized_content(content: str) -> str:
+    """Fold memory content for duplicate and replica matching."""
+
+    collapsed = " ".join(unicodedata.normalize("NFKC", content).casefold().split())
+    folded = collapsed
+    # ignore trailing punctuation when matching
+    while folded and unicodedata.category(folded[-1]).startswith("P"):
+        folded = folded[:-1].rstrip()
+    # content that is only punctuation stays distinguishable instead of folding to ""
+    return folded or collapsed
 
 
 class CheckerError(ValueError):
