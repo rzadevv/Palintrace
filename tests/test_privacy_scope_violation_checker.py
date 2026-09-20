@@ -414,34 +414,71 @@ def test_unknown_agent_principals_are_skipped() -> None:
     assert checker.check(_store(source, unknown_destination)).findings == ()
 
 
-def test_nonconfigured_scope_dimensions_must_match() -> None:
-    source = _memory("source")
-    user_destination = _replica(source, "user-destination", user_id="user-b").model_copy(
-        update={
-            "scope": source.scope.model_copy(
-                update={"user_id": "user-b", "agent_id": "agent-b"}
-            )
-        }
-    )
-    agent_destination = _replica(
-        source, "agent-destination", agent_id="agent-b"
-    ).model_copy(
-        update={
-            "scope": source.scope.model_copy(
-                update={"user_id": "user-b", "agent_id": "agent-b"}
-            )
-        }
+def test_leak_is_found_across_a_different_session() -> None:
+    source = _memory("source", session_id="session-1")
+    destination = _replica(source, "destination", user_id="user-b").model_copy(
+        update={"scope": source.scope.model_copy(
+            update={"user_id": "user-b", "session_id": "session-9"}
+        )}
     )
 
-    user_result = PrivacyScopeViolationChecker(
+    result = PrivacyScopeViolationChecker(
         _policy(ScopeDimension.USER_ID, "user-a", "user-b")
-    ).check(_store(source, user_destination))
-    agent_result = PrivacyScopeViolationChecker(
-        _policy(ScopeDimension.AGENT_ID, "agent-a", "agent-b")
-    ).check(_store(source, agent_destination))
+    ).check(_store(source, destination))
 
-    assert user_result.findings == ()
-    assert agent_result.findings == ()
+    assert tuple(finding.memory_ids for finding in result.findings) == (("destination",),)
+    assert result.findings[0].evidence[0].data["differing_fields"] == ("scope.session_id",)
+
+
+def test_leak_is_found_across_a_different_agent_for_a_user_rule() -> None:
+    source = _memory("source", agent_id="agent-a")
+    destination = _replica(source, "destination", user_id="user-b").model_copy(
+        update={"scope": source.scope.model_copy(
+            update={"user_id": "user-b", "agent_id": "agent-b", "session_id": "session-9"}
+        )}
+    )
+
+    result = PrivacyScopeViolationChecker(
+        _policy(ScopeDimension.USER_ID, "user-a", "user-b")
+    ).check(_store(source, destination))
+
+    assert tuple(finding.memory_ids for finding in result.findings) == (("destination",),)
+    assert result.findings[0].evidence[0].data["differing_fields"] == (
+        "scope.agent_id",
+        "scope.session_id",
+    )
+
+
+def test_agent_rule_ignores_a_differing_user_dimension() -> None:
+    source = _memory("source")
+    destination = _replica(source, "destination", agent_id="agent-b").model_copy(
+        update={"scope": source.scope.model_copy(
+            update={"user_id": "user-b", "agent_id": "agent-b"}
+        )}
+    )
+
+    result = PrivacyScopeViolationChecker(
+        _policy(ScopeDimension.AGENT_ID, "agent-a", "agent-b")
+    ).check(_store(source, destination))
+
+    assert tuple(finding.memory_ids for finding in result.findings) == (("destination",),)
+    assert result.findings[0].evidence[0].data["differing_fields"] == ("scope.user_id",)
+
+
+def test_same_content_under_a_non_prohibited_principal_is_not_flagged() -> None:
+    source = _memory("source")
+    elsewhere = _replica(source, "elsewhere", user_id="user-z").model_copy(
+        update={"scope": source.scope.model_copy(
+            update={"user_id": "user-z", "agent_id": "agent-b", "session_id": "session-9"}
+        )}
+    )
+
+    result = PrivacyScopeViolationChecker(
+        _policy(ScopeDimension.USER_ID, "user-a", "user-b")
+    ).check(_store(source, elsewhere))
+
+    assert result.findings == ()
+    assert result.stats.details["destination_candidates"] == 0
 
 
 def test_policy_is_required_by_checker_constructor() -> None:

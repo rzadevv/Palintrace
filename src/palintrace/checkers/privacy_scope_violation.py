@@ -145,31 +145,25 @@ def load_scope_policy(path: str | Path) -> ScopeIsolationPolicy:
 _SCOPE_FIELDS = ("user_id", "agent_id", "session_id")
 
 
-def _replica_match_key(
-    memory: NormalizedMemory, dimension: ScopeDimension
-) -> tuple[str | None, ...]:
-    """Normalized content plus the scope fields the policy rule does not vary."""
-
-    held_scope = tuple(
-        getattr(memory.scope, field) for field in _SCOPE_FIELDS if field != dimension.value
-    )
-    return (normalized_content(memory.content), *held_scope)
-
-
 def _differing_fields(
-    source: NormalizedMemory, destination: NormalizedMemory
+    source: NormalizedMemory,
+    destination: NormalizedMemory,
+    dimension: ScopeDimension,
 ) -> tuple[str, ...]:
-    """Portable fields other than the ID and scope whose values are not identical."""
+    """Portable field names that differ, excluding the ID and the rule's own dimension."""
 
     left = source.semantic_dict()
     right = destination.semantic_dict()
-    return tuple(
-        sorted(
-            field
-            for field in left
-            if field not in ("id", "scope") and left[field] != right[field]
-        )
+    differing = {
+        field for field in left if field not in ("id", "scope") and left[field] != right[field]
+    }
+    differing.update(
+        f"scope.{field}"
+        for field in _SCOPE_FIELDS
+        if field != dimension.value
+        and getattr(source.scope, field) != getattr(destination.scope, field)
     )
+    return tuple(sorted(differing))
 
 
 class PrivacyScopeViolationChecker:
@@ -196,28 +190,29 @@ class PrivacyScopeViolationChecker:
         replica_matches = 0
 
         for rule in self.policy.rules:
-            authoritative_by_key: dict[tuple[str | None, ...], list[NormalizedMemory]] = {}
+            authoritative_by_content: dict[str, list[NormalizedMemory]] = {}
             destinations: list[NormalizedMemory] = []
             prohibited_destinations = set(rule.prohibited_destination_principals)
             for memory in store.memories:
                 principal = getattr(memory.scope, rule.dimension.value)
                 if principal == rule.authoritative_source_principal:
                     authoritative_candidates += 1
-                    key = _replica_match_key(memory, rule.dimension)
-                    authoritative_by_key.setdefault(key, []).append(memory)
+                    key = normalized_content(memory.content)
+                    authoritative_by_content.setdefault(key, []).append(memory)
                 elif principal in prohibited_destinations:
                     destination_candidates += 1
                     destinations.append(memory)
 
             for destination in destinations:
-                key = _replica_match_key(destination, rule.dimension)
-                matching_sources = authoritative_by_key.get(key, ())
                 normalized = normalized_content(destination.content)
+                matching_sources = authoritative_by_content.get(normalized, ())
                 content_sha256 = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
                 destination_principal = getattr(destination.scope, rule.dimension.value)
                 for authoritative_memory in matching_sources:
                     replica_matches += 1
-                    differing = _differing_fields(authoritative_memory, destination)
+                    differing = _differing_fields(
+                        authoritative_memory, destination, rule.dimension
+                    )
                     evidence_by_destination.setdefault(destination.id, []).append(
                         EvidenceItem(
                             kind="prohibited_scope_replica",
