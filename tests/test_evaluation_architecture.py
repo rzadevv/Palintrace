@@ -2,6 +2,17 @@ import ast
 from pathlib import Path
 
 import palintrace.cli as cli
+from palintrace.checkers import (
+    CheckerResult,
+    PrincipalBoundaryRule,
+    PrivacyScopeViolationChecker,
+    RedundancyBloatChecker,
+    ScopeDimension,
+    ScopeIsolationPolicy,
+)
+from palintrace.evaluation.privacy_scope_v0_1 import BenchmarkPrivacyScopeViolationCheckerV1
+from palintrace.evaluation.redundancy_v0_1 import BenchmarkRedundancyBloatCheckerV1
+from palintrace.models import MemoryScope, NormalizedMemory, NormalizedStore
 
 SOURCE_ROOT = Path("src/palintrace")
 EVALUATION_ROOT = SOURCE_ROOT / "evaluation"
@@ -75,6 +86,51 @@ def test_benchmark_privacy_v1_is_private_and_independent_of_production_v2() -> N
         assert "BenchmarkPrivacyScopeViolationCheckerV1" not in module.read_text(
             encoding="utf-8"
         )
+
+
+def test_frozen_benchmark_checkers_report_their_own_rule_version() -> None:
+    scope = MemoryScope(user_id="user-a")
+    store = NormalizedStore(
+        adapter="test",
+        memories=(
+            NormalizedMemory(id="m1", content="Same", scope=scope),
+            NormalizedMemory(id="m2", content="Same", scope=scope),
+        ),
+    )
+    policy = ScopeIsolationPolicy(
+        rules=(
+            PrincipalBoundaryRule(
+                dimension=ScopeDimension.USER_ID,
+                authoritative_source_principal="user-a",
+                prohibited_destination_principals=("user-b",),
+            ),
+        )
+    )
+
+    frozen_redundancy = BenchmarkRedundancyBloatCheckerV1().check(store)
+    frozen_privacy = BenchmarkPrivacyScopeViolationCheckerV1(policy).check(store)
+    production_redundancy = RedundancyBloatChecker().check(store)
+    production_privacy = PrivacyScopeViolationChecker(policy).check(store)
+
+    assert (frozen_redundancy.checker_version, frozen_redundancy.rule_version) == (
+        "1.0",
+        "1.0.0",
+    )
+    assert (frozen_privacy.checker_version, frozen_privacy.rule_version) == ("1.0", "1.0.0")
+    assert (production_redundancy.checker_version, production_redundancy.rule_version) == (
+        "3.0",
+        "2.0.0",
+    )
+    assert (production_privacy.checker_version, production_privacy.rule_version) == (
+        "2.0",
+        "2.0.0",
+    )
+    for result, expected in (
+        (frozen_redundancy, "1.0.0"),
+        (frozen_privacy, "1.0.0"),
+    ):
+        reloaded = CheckerResult.model_validate_json(result.to_json())
+        assert reloaded.rule_version == expected
 
 
 def test_detector_and_runtime_packages_do_not_import_evaluation() -> None:

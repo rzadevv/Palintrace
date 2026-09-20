@@ -76,6 +76,29 @@ _BUILTIN_RULE_METADATA: Mapping[
     }
 )
 
+# frozen benchmark implementations keep the rule version their semantics shipped with
+_SUPERSEDED_RULE_VERSIONS: Mapping[tuple[str, str], str] = MappingProxyType(
+    {
+        ("privacy_scope_violation", "1.0"): "1.0.0",
+        ("redundancy_bloat", "1.0"): "1.0.0",
+    }
+)
+
+
+def _rule_metadata(
+    checker_id: str, checker_version: object
+) -> tuple[DefectClass, str, str, Severity] | None:
+    """Return canonical rule metadata, honouring superseded frozen rule versions."""
+
+    metadata = _BUILTIN_RULE_METADATA.get(checker_id)
+    if metadata is None:
+        return None
+    defect_class, rule_id, rule_version, severity = metadata
+    if isinstance(checker_version, str):
+        rule_version = _SUPERSEDED_RULE_VERSIONS.get((checker_id, checker_version), rule_version)
+    return (defect_class, rule_id, rule_version, severity)
+
+
 _RULE_ID_PATTERN = re.compile(
     r"memory\.[a-z0-9]+(?:-[a-z0-9]+)*\.[a-z0-9]+(?:-[a-z0-9]+)*"
 )
@@ -261,7 +284,7 @@ class CheckerResult(BaseModel):
         checker_id = data.get("checker_id")
         if not isinstance(checker_id, str):
             return data
-        metadata = _BUILTIN_RULE_METADATA.get(checker_id)
+        metadata = _rule_metadata(checker_id, data.get("checker_version"))
         if metadata is None:
             if any(field not in data for field in ("rule_id", "rule_version", "severity")):
                 raise ValueError("custom checkers must supply explicit rule metadata")
@@ -308,7 +331,7 @@ class CheckerResult(BaseModel):
 
     @model_validator(mode="after")
     def findings_match_result(self) -> CheckerResult:
-        metadata = _BUILTIN_RULE_METADATA.get(self.checker_id)
+        metadata = _rule_metadata(self.checker_id, self.checker_version)
         if metadata is not None:
             expected_defect, rule_id, rule_version, severity = metadata
             if self.defect_class is not expected_defect:
