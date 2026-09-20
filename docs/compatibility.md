@@ -55,6 +55,11 @@ punctuation—rather than on byte-identical values, so each widened its public m
 are not renamed; the `exact` segment records the original release, not the current matching rule.
 All other public rules remain at `1.0.0`.
 
+Rule version follows the semantics an implementation actually evaluates, so the frozen benchmark
+v0.1 checkers continue to report `1.0.0` while the current implementations report `2.0.0` under the
+same rule ID. A `CheckerResult` resolves its rule version from the `checker_id` and `checker_version`
+pair.
+
 The experimental `unsupported_claim_identity_grounded` checker also uses
 `memory.claim.unsupported`. It is an alternate implementation of the same semantic rule and remains
 nondefault.

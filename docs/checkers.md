@@ -88,16 +88,18 @@ principal dimension (`user_id` or `agent_id`), an authoritative source principal
 destination principals.
 
 A destination is reported when its normalized content matches a record under the authoritative
-principal and the scope dimensions the rule does not vary are equal. Content normalization is the
-same as for [redundancy bloat](#redundancy-bloat), so timestamps, provenance, source references,
-embeddings, supersession, and active state no longer decide whether a leak is found. Ordinary
-cross-scope differences are not violations without a policy rule, and session isolation is not
-inferred.
+principal. Content normalization is the same as for [redundancy bloat](#redundancy-bloat), so
+timestamps, provenance, source references, embeddings, supersession, and active state do not decide
+whether a leak is found. The scope dimensions the rule does not name are not part of the match
+either: a record leaking from one principal to a prohibited one is reported even when its
+`agent_id` or `session_id` also differs. Ordinary cross-scope differences are still not violations
+without a policy rule, and session isolation is not inferred.
 
 Evidence uses kind `prohibited_scope_replica` and reports the authoritative memory ID, the scope
 dimension and both principals, the normalized content hash, `match_kind` (`exact` or `normalized`),
-and `differing_fields`—the portable field names other than the ID and scope whose values differ
-between the two records. Field names are reported, never their values.
+and `differing_fields`. That list names the portable fields whose values differ, excluding the
+memory ID and the rule's own dimension; differing scope dimensions appear as `scope.agent_id` or
+`scope.session_id`. Field names are reported, never their values.
 
 Example policy:
 
