@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from palintrace.checkers import Checker, CheckerResult, StaleActiveChecker
 from palintrace.cli import main
@@ -49,7 +50,7 @@ def test_explicit_supersession_of_active_memory_emits_structural_finding() -> No
     )
 
     assert checker.checker_id == "stale_active"
-    assert checker.checker_version == "1.0"
+    assert checker.checker_version == "2.0"
     assert checker.defect_class is DefectClass.STALE_ACTIVE
     assert len(result.findings) == 1
     finding = result.findings[0]
@@ -73,7 +74,9 @@ def test_explicit_supersession_of_active_memory_emits_structural_finding() -> No
         "supersession_links_scanned": 1,
         "resolved_supersession_links": 1,
         "missing_targets_skipped": 0,
+        "dangling_supersession_targets": (),
         "self_links_skipped": 0,
+        "supersession_cycles": 0,
     }
 
 
@@ -146,6 +149,11 @@ def test_explicit_chain_reports_each_directly_superseded_active_memory() -> None
     assert tuple(finding.memory_ids for finding in middle_inactive.findings) == (("m1",),)
 
 
+def test_normalized_memory_rejects_a_validated_self_link() -> None:
+    with pytest.raises(ValidationError, match="cannot supersede itself"):
+        _memory("m1", supersedes=("m1",))
+
+
 def test_missing_target_and_self_link_do_not_create_findings() -> None:
     self_link = _memory("m1", active=True).model_copy(update={"supersedes": ("m1",)})
     malformed_store = NormalizedStore.model_construct(
@@ -161,8 +169,128 @@ def test_missing_target_and_self_link_do_not_create_findings() -> None:
         "supersession_links_scanned": 2,
         "resolved_supersession_links": 0,
         "missing_targets_skipped": 1,
+        "dangling_supersession_targets": (
+            {"superseder_id": "m2", "missing_target_id": "missing-id"},
+        ),
         "self_links_skipped": 1,
+        "supersession_cycles": 0,
     }
+
+
+def test_dangling_targets_are_listed_in_sorted_order() -> None:
+    result = StaleActiveChecker().check(
+        NormalizedStore.model_construct(
+            adapter="test",
+            memories=(
+                _memory("z1", supersedes=("gone-b", "gone-a")),
+                _memory("a1", supersedes=("gone-c",)),
+                _memory("m1", active=True),
+                _memory("m2", supersedes=("m1",)),
+            ),
+        )
+    )
+
+    assert result.stats.details["missing_targets_skipped"] == 3
+    assert result.stats.details["dangling_supersession_targets"] == (
+        {"superseder_id": "a1", "missing_target_id": "gone-c"},
+        {"superseder_id": "z1", "missing_target_id": "gone-a"},
+        {"superseder_id": "z1", "missing_target_id": "gone-b"},
+    )
+    assert tuple(finding.memory_ids for finding in result.findings) == (("m1",),)
+
+
+def test_two_node_cycle_emits_one_relational_finding() -> None:
+    memories = (
+        _memory("b", active=True, supersedes=("a",)),
+        _memory("a", active=True, supersedes=("b",)),
+    )
+    checker = StaleActiveChecker()
+
+    first = checker.check(_store(*memories))
+    second = checker.check(_store(*reversed(memories)), transcripts=TranscriptSet())
+
+    assert len(first.findings) == 1
+    finding = first.findings[0]
+    assert finding.memory_ids == ("a", "b")
+    assert len(finding.evidence) == 1
+    assert finding.evidence[0].kind == "supersession_cycle"
+    assert finding.evidence[0].model_dump(mode="json")["data"] == {
+        "members": ["a", "b"],
+        "active_members": ["a", "b"],
+    }
+    assert first.stats.details["supersession_cycles"] == 1
+    assert first.stats.details["resolved_supersession_links"] == 2
+    assert first.to_json() == second.to_json()
+
+
+def test_three_node_cycle_reports_every_member_once() -> None:
+    result = StaleActiveChecker().check(
+        _store(
+            _memory("c", active=False, supersedes=("b",)),
+            _memory("a", active=True, supersedes=("c",)),
+            _memory("b", active=True, supersedes=("a",)),
+        )
+    )
+
+    assert len(result.findings) == 1
+    finding = result.findings[0]
+    assert finding.memory_ids == ("a", "b", "c")
+    assert finding.evidence[0].model_dump(mode="json")["data"] == {
+        "members": ["a", "b", "c"],
+        "active_members": ["a", "b"],
+    }
+
+
+def test_cycle_with_no_active_member_is_not_reported() -> None:
+    result = StaleActiveChecker().check(
+        _store(
+            _memory("a", active=False, supersedes=("b",)),
+            _memory("b", active=None, supersedes=("a",)),
+        )
+    )
+
+    assert result.findings == ()
+    assert result.stats.details["supersession_cycles"] == 1
+
+
+def test_chain_feeding_into_a_cycle_keeps_direct_reporting_outside_the_cycle() -> None:
+    result = StaleActiveChecker().check(
+        _store(
+            _memory("outside", active=True),
+            _memory("a", active=True, supersedes=("b", "outside")),
+            _memory("b", active=True, supersedes=("a",)),
+            _memory("entry", active=True, supersedes=("a",)),
+        )
+    )
+
+    assert tuple(finding.memory_ids for finding in result.findings) == (
+        ("a", "b"),
+        ("outside",),
+    )
+    assert tuple(finding.evidence[0].kind for finding in result.findings) == (
+        "supersession_cycle",
+        "active_superseded",
+    )
+    assert result.stats.details["supersession_cycles"] == 1
+
+
+def test_two_disjoint_cycles_are_reported_separately_and_deterministically() -> None:
+    memories = (
+        _memory("y", active=True, supersedes=("z",)),
+        _memory("b", active=True, supersedes=("a",)),
+        _memory("z", active=True, supersedes=("y",)),
+        _memory("a", active=True, supersedes=("b",)),
+    )
+
+    first = StaleActiveChecker().check(_store(*memories))
+    second = StaleActiveChecker().check(_store(*reversed(memories)))
+
+    assert tuple(finding.memory_ids for finding in first.findings) == (
+        ("a", "b"),
+        ("y", "z"),
+    )
+    assert first.stats.details["supersession_cycles"] == 2
+    assert first.to_json() == second.to_json()
 
 
 def test_content_and_timestamps_without_explicit_link_do_not_infer_staleness() -> None:
