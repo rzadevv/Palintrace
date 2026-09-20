@@ -73,13 +73,24 @@ semantic-equivalence detection.
 
 ## Stale active
 
-`StaleActiveChecker` follows explicit `supersedes` links. It reports an older memory only when:
+`StaleActiveChecker` follows explicit `supersedes` links. It reports an older memory when:
 
 1. another memory explicitly names it in `supersedes`; and
 2. the older memory has `active: true`.
 
-Self-links and links to absent memories are skipped and counted. The checker does not infer
-supersession from dates, wording, or conflicting values.
+Resolved links also form a directed graph, from each superseder to the memory it supersedes. A
+cyclic component means no record is the unambiguous replacement, so the checker reports the whole
+cycle as one relational finding with evidence kind `supersession_cycle` and data listing `members`
+and `active_members`, both sorted. A cycle with no active member is not reported. Cycle members do
+not additionally receive the per-memory `active_superseded` finding, because the cycle already
+describes their state. Memories outside every cycle are unaffected, including one that a cycle
+member supersedes and one whose supersession chain leads into a cycle.
+
+Links to absent memories produce no finding and no defect class of their own. They are counted in
+`missing_targets_skipped` and listed by ID in the `dangling_supersession_targets` stat, a sorted
+list of `superseder_id` and `missing_target_id` pairs. Self-links are skipped and counted;
+`NormalizedMemory` rejects them, so they only arise from unvalidated input. The checker does not
+infer supersession from dates, wording, or conflicting values.
 
 ## Privacy scope violation
 

@@ -55,6 +55,10 @@ punctuation—rather than on byte-identical values, so each widened its public m
 are not renamed; the `exact` segment records the original release, not the current matching rule.
 All other public rules remain at `1.0.0`.
 
+`memory.state.explicit-stale` is also at rule version `2.0.0`. It now reports supersession cycles as
+one relational finding covering every member, so a cycle no longer appears as several independent
+stale memories.
+
 Rule version follows the semantics an implementation actually evaluates, so the frozen benchmark
 v0.1 checkers continue to report `1.0.0` while the current implementations report `2.0.0` under the
 same rule ID. A `CheckerResult` resolves its rule version from the `checker_id` and `checker_version`
