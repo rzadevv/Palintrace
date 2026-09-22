@@ -190,7 +190,11 @@ or set `group_scope` to `user_id`, `agent_id`, or `session_id` to map each recor
 that dimension. The dimension is always the caller's choice; it is never inferred from the
 `group_id` value. With `group_scope` set, a record whose `group_id` is missing or blank is an error
 rather than an unscoped record, and a caller scope that sets the same dimension to a different value
-is rejected.
+is rejected. `palintrace dump` exposes the same option:
+
+```bash
+palintrace dump --adapter graphiti --source edges.json --graphiti-group-scope user_id
+```
 
 Inspect the machine-readable contract without contacting a backend:
 
