@@ -189,8 +189,8 @@ def test_redundancy_benchmark_preserves_v1_pair_behavior_beside_production_v2() 
         if identity.defect_class is DefectClass.REDUNDANCY_BLOAT
     )
 
-    assert RedundancyBloatChecker().checker_version == "2.0"
-    assert production.checker_version == "2.0"
+    assert RedundancyBloatChecker().checker_version == "3.0"
+    assert production.checker_version == "3.0"
     assert len(production.findings) == 1
     assert production.findings[0].memory_ids == ("a", "b", "c")
     assert historical_checker.checker_version == "1.0"

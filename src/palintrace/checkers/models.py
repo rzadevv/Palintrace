@@ -40,19 +40,19 @@ _BUILTIN_RULE_METADATA: Mapping[
         "redundancy_bloat": (
             DefectClass.REDUNDANCY_BLOAT,
             "memory.duplication.exact",
-            "1.0.0",
+            "2.0.0",
             "warning",
         ),
         "stale_active": (
             DefectClass.STALE_ACTIVE,
             "memory.state.explicit-stale",
-            "1.0.0",
+            "2.0.0",
             "error",
         ),
         "privacy_scope_violation": (
             DefectClass.PRIVACY_SCOPE_VIOLATION,
             "memory.scope.prohibited-exact-replica",
-            "1.0.0",
+            "2.0.0",
             "error",
         ),
         "unsupported_claim": (
@@ -75,6 +75,30 @@ _BUILTIN_RULE_METADATA: Mapping[
         ),
     }
 )
+
+# frozen benchmark implementations keep the rule version their semantics shipped with
+_SUPERSEDED_RULE_VERSIONS: Mapping[tuple[str, str], str] = MappingProxyType(
+    {
+        ("privacy_scope_violation", "1.0"): "1.0.0",
+        ("redundancy_bloat", "1.0"): "1.0.0",
+        ("stale_active", "1.0"): "1.0.0",
+    }
+)
+
+
+def _rule_metadata(
+    checker_id: str, checker_version: object
+) -> tuple[DefectClass, str, str, Severity] | None:
+    """Return canonical rule metadata, honouring superseded frozen rule versions."""
+
+    metadata = _BUILTIN_RULE_METADATA.get(checker_id)
+    if metadata is None:
+        return None
+    defect_class, rule_id, rule_version, severity = metadata
+    if isinstance(checker_version, str):
+        rule_version = _SUPERSEDED_RULE_VERSIONS.get((checker_id, checker_version), rule_version)
+    return (defect_class, rule_id, rule_version, severity)
+
 
 _RULE_ID_PATTERN = re.compile(
     r"memory\.[a-z0-9]+(?:-[a-z0-9]+)*\.[a-z0-9]+(?:-[a-z0-9]+)*"
@@ -214,6 +238,10 @@ class CheckerCost(BaseModel):
     output_tokens: NonNegativeInt = 0
 
 
+# a stat detail is a count, or a listing of identifier-only records such as unresolved links
+StatDetail = NonNegativeInt | tuple[Mapping[str, str], ...]
+
+
 class CheckerStats(BaseModel):
     """Deterministic structural work and output counts."""
 
@@ -221,20 +249,31 @@ class CheckerStats(BaseModel):
 
     memories_scanned: NonNegativeInt
     findings_emitted: NonNegativeInt
-    details: Mapping[str, NonNegativeInt] = Field(default_factory=dict, validate_default=True)
+    details: Mapping[str, StatDetail] = Field(default_factory=dict, validate_default=True)
 
     @field_validator("details")
     @classmethod
     def detail_keys_must_not_be_blank(
-        cls, value: Mapping[str, NonNegativeInt]
-    ) -> Mapping[str, NonNegativeInt]:
+        cls, value: Mapping[str, StatDetail]
+    ) -> Mapping[str, StatDetail]:
         if any(not key.strip() for key in value):
             raise ValueError("checker stat detail keys must not be blank")
-        return MappingProxyType(dict(value))
+        frozen: dict[str, StatDetail] = {}
+        for key, item in value.items():
+            if isinstance(item, int):
+                frozen[key] = item
+                continue
+            frozen[key] = tuple(MappingProxyType(dict(record)) for record in item)
+        return MappingProxyType(frozen)
 
     @field_serializer("details")
-    def serialize_details(self, value: Mapping[str, NonNegativeInt]) -> dict[str, int]:
-        return dict(value)
+    def serialize_details(
+        self, value: Mapping[str, StatDetail]
+    ) -> dict[str, int | list[dict[str, str]]]:
+        return {
+            key: item if isinstance(item, int) else [dict(record) for record in item]
+            for key, item in value.items()
+        }
 
 
 class CheckerResult(BaseModel):
@@ -261,7 +300,7 @@ class CheckerResult(BaseModel):
         checker_id = data.get("checker_id")
         if not isinstance(checker_id, str):
             return data
-        metadata = _BUILTIN_RULE_METADATA.get(checker_id)
+        metadata = _rule_metadata(checker_id, data.get("checker_version"))
         if metadata is None:
             if any(field not in data for field in ("rule_id", "rule_version", "severity")):
                 raise ValueError("custom checkers must supply explicit rule metadata")
@@ -308,7 +347,7 @@ class CheckerResult(BaseModel):
 
     @model_validator(mode="after")
     def findings_match_result(self) -> CheckerResult:
-        metadata = _BUILTIN_RULE_METADATA.get(self.checker_id)
+        metadata = _rule_metadata(self.checker_id, self.checker_version)
         if metadata is not None:
             expected_defect, rule_id, rule_version, severity = metadata
             if self.defect_class is not expected_defect:

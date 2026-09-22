@@ -2,6 +2,19 @@ import ast
 from pathlib import Path
 
 import palintrace.cli as cli
+from palintrace.checkers import (
+    CheckerResult,
+    PrincipalBoundaryRule,
+    PrivacyScopeViolationChecker,
+    RedundancyBloatChecker,
+    ScopeDimension,
+    ScopeIsolationPolicy,
+    StaleActiveChecker,
+)
+from palintrace.evaluation.privacy_scope_v0_1 import BenchmarkPrivacyScopeViolationCheckerV1
+from palintrace.evaluation.redundancy_v0_1 import BenchmarkRedundancyBloatCheckerV1
+from palintrace.evaluation.stale_active_v0_1 import BenchmarkStaleActiveCheckerV1
+from palintrace.models import MemoryScope, NormalizedMemory, NormalizedStore
 
 SOURCE_ROOT = Path("src/palintrace")
 EVALUATION_ROOT = SOURCE_ROOT / "evaluation"
@@ -35,11 +48,13 @@ def test_evaluation_package_contains_frozen_accounting_and_execution_layers() ->
         "models.py",
         "mutation.py",
         "preflight.py",
+        "privacy_scope_v0_1.py",
         "redundancy_v0_1.py",
         "retrieval.py",
         "retrieval_negation_confirmatory.py",
         "retrieval_strong_probe.py",
         "semantic_selectivity.py",
+        "stale_active_v0_1.py",
     }
 
 
@@ -58,6 +73,84 @@ def test_benchmark_redundancy_v1_is_private_and_independent_of_production_v2() -
     assert "BenchmarkRedundancyBloatCheckerV1" not in (
         SOURCE_ROOT / "checkers" / "__init__.py"
     ).read_text(encoding="utf-8")
+
+
+def test_benchmark_privacy_v1_is_private_and_independent_of_production_v2() -> None:
+    historical_path = EVALUATION_ROOT / "privacy_scope_v0_1.py"
+
+    assert "palintrace.checkers.privacy_scope_violation" not in _absolute_imports(
+        historical_path
+    )
+    for module in (
+        EVALUATION_ROOT / "__init__.py",
+        SOURCE_ROOT / "__init__.py",
+        SOURCE_ROOT / "checkers" / "__init__.py",
+    ):
+        assert "BenchmarkPrivacyScopeViolationCheckerV1" not in module.read_text(
+            encoding="utf-8"
+        )
+
+
+def test_frozen_benchmark_checkers_report_their_own_rule_version() -> None:
+    scope = MemoryScope(user_id="user-a")
+    store = NormalizedStore(
+        adapter="test",
+        memories=(
+            NormalizedMemory(id="m1", content="Same", scope=scope),
+            NormalizedMemory(id="m2", content="Same", scope=scope),
+        ),
+    )
+    policy = ScopeIsolationPolicy(
+        rules=(
+            PrincipalBoundaryRule(
+                dimension=ScopeDimension.USER_ID,
+                authoritative_source_principal="user-a",
+                prohibited_destination_principals=("user-b",),
+            ),
+        )
+    )
+
+    frozen_redundancy = BenchmarkRedundancyBloatCheckerV1().check(store)
+    frozen_privacy = BenchmarkPrivacyScopeViolationCheckerV1(policy).check(store)
+    frozen_stale = BenchmarkStaleActiveCheckerV1().check(store)
+    production_redundancy = RedundancyBloatChecker().check(store)
+    production_privacy = PrivacyScopeViolationChecker(policy).check(store)
+    production_stale = StaleActiveChecker().check(store)
+
+    assert (frozen_redundancy.checker_version, frozen_redundancy.rule_version) == (
+        "1.0",
+        "1.0.0",
+    )
+    assert (frozen_privacy.checker_version, frozen_privacy.rule_version) == ("1.0", "1.0.0")
+    assert (frozen_stale.checker_version, frozen_stale.rule_version) == ("1.0", "1.0.0")
+    assert (production_redundancy.checker_version, production_redundancy.rule_version) == (
+        "3.0",
+        "2.0.0",
+    )
+    assert (production_privacy.checker_version, production_privacy.rule_version) == (
+        "2.0",
+        "2.0.0",
+    )
+    assert (production_stale.checker_version, production_stale.rule_version) == ("2.0", "2.0.0")
+    for result, expected in (
+        (frozen_redundancy, "1.0.0"),
+        (frozen_privacy, "1.0.0"),
+        (frozen_stale, "1.0.0"),
+    ):
+        reloaded = CheckerResult.model_validate_json(result.to_json())
+        assert reloaded.rule_version == expected
+
+
+def test_benchmark_stale_active_v1_is_private_and_independent_of_production_v2() -> None:
+    historical_path = EVALUATION_ROOT / "stale_active_v0_1.py"
+
+    assert "palintrace.checkers.stale_active" not in _absolute_imports(historical_path)
+    for module in (
+        EVALUATION_ROOT / "__init__.py",
+        SOURCE_ROOT / "__init__.py",
+        SOURCE_ROOT / "checkers" / "__init__.py",
+    ):
+        assert "BenchmarkStaleActiveCheckerV1" not in module.read_text(encoding="utf-8")
 
 
 def test_detector_and_runtime_packages_do_not_import_evaluation() -> None:

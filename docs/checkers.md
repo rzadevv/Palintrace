@@ -55,23 +55,42 @@ reported as orphaned. The checker requires transcripts and fails explicitly when
 
 ## Redundancy bloat
 
-`RedundancyBloatChecker` finds exact-content duplicates within the same observable normalized scope.
-The scope key contains `user_id`, `agent_id`, and `session_id`. Completely unscoped memories are
-skipped because their intended boundary is unknown.
+`RedundancyBloatChecker` finds duplicate claims within the same observable normalized scope. The
+scope key contains `user_id`, `agent_id`, and `session_id`. Completely unscoped memories are skipped
+because their intended boundary is unknown.
 
-Each duplicate group emits one finding for every distinct pair of memory IDs. Evidence contains a
-content hash, content length, and scope—not the duplicated text. This checker does not attempt
-paraphrase or semantic-equivalence detection.
+Memories are grouped by normalized content and scope. Normalization applies NFKC, case folding,
+whitespace collapsing, and trailing-punctuation removal, so `User likes Python`,
+`User likes Python.`, and `User likes Python ` fall into one group. Content consisting only of
+punctuation is left unfolded so it stays distinguishable.
+
+Each group emits one finding. Evidence reports `match_kind` as `exact` when every member stores
+byte-identical content and `normalized` otherwise, alongside the normalized content hash, its
+length, and the scope—not the duplicated text. The evidence kind is `exact_duplicate` or
+`normalized_duplicate` to match. Statistics split `duplicate_groups` into `exact_duplicate_groups`
+and `normalized_duplicate_groups`. This checker does not attempt paraphrase, embedding, or
+semantic-equivalence detection.
 
 ## Stale active
 
-`StaleActiveChecker` follows explicit `supersedes` links. It reports an older memory only when:
+`StaleActiveChecker` follows explicit `supersedes` links. It reports an older memory when:
 
 1. another memory explicitly names it in `supersedes`; and
 2. the older memory has `active: true`.
 
-Self-links and links to absent memories are skipped and counted. The checker does not infer
-supersession from dates, wording, or conflicting values.
+Resolved links also form a directed graph, from each superseder to the memory it supersedes. A
+cyclic component means no record is the unambiguous replacement, so the checker reports the whole
+cycle as one relational finding with evidence kind `supersession_cycle` and data listing `members`
+and `active_members`, both sorted. A cycle with no active member is not reported. Cycle members do
+not additionally receive the per-memory `active_superseded` finding, because the cycle already
+describes their state. Memories outside every cycle are unaffected, including one that a cycle
+member supersedes and one whose supersession chain leads into a cycle.
+
+Links to absent memories produce no finding and no defect class of their own. They are counted in
+`missing_targets_skipped` and listed by ID in the `dangling_supersession_targets` stat, a sorted
+list of `superseder_id` and `missing_target_id` pairs. Self-links are skipped and counted;
+`NormalizedMemory` rejects them, so they only arise from unvalidated input. The checker does not
+infer supersession from dates, wording, or conflicting values.
 
 ## Privacy scope violation
 
@@ -79,10 +98,19 @@ supersession from dates, wording, or conflicting values.
 principal dimension (`user_id` or `agent_id`), an authoritative source principal, and prohibited
 destination principals.
 
-The checker compares portable normalized records after excluding the selected principal dimension
-and the memory ID. A destination is reported only when it is an exact portable replica of a record
-under the authoritative principal. Ordinary cross-scope differences are not violations without a
-policy rule, and session isolation is not inferred.
+A destination is reported when its normalized content matches a record under the authoritative
+principal. Content normalization is the same as for [redundancy bloat](#redundancy-bloat), so
+timestamps, provenance, source references, embeddings, supersession, and active state do not decide
+whether a leak is found. The scope dimensions the rule does not name are not part of the match
+either: a record leaking from one principal to a prohibited one is reported even when its
+`agent_id` or `session_id` also differs. Ordinary cross-scope differences are still not violations
+without a policy rule, and session isolation is not inferred.
+
+Evidence uses kind `prohibited_scope_replica` and reports the authoritative memory ID, the scope
+dimension and both principals, the normalized content hash, `match_kind` (`exact` or `normalized`),
+and `differing_fields`. That list names the portable fields whose values differ, excluding the
+memory ID and the rule's own dimension; differing scope dimensions appear as `scope.agent_id` or
+`scope.session_id`. Field names are reported, never their values.
 
 Example policy:
 

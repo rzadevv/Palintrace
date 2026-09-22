@@ -1,4 +1,4 @@
-"""Policy-directed checker for prohibited exact replicas across principal scopes."""
+"""Policy-directed checker for prohibited content replicas across principal scopes."""
 
 from __future__ import annotations
 
@@ -6,18 +6,20 @@ import hashlib
 import json
 from enum import StrEnum
 from pathlib import Path
-from typing import cast
 
 from pydantic import (
     BaseModel,
     ConfigDict,
-    JsonValue,
     ValidationError,
     field_validator,
     model_validator,
 )
 
-from palintrace.checkers.base import CheckerInputError, deterministic_finding_id
+from palintrace.checkers.base import (
+    CheckerInputError,
+    deterministic_finding_id,
+    normalized_content,
+)
 from palintrace.checkers.models import (
     CheckerCost,
     CheckerResult,
@@ -140,25 +142,35 @@ def load_scope_policy(path: str | Path) -> ScopeIsolationPolicy:
         raise CheckerInputError(f"invalid scope policy {policy_path}: {error}") from error
 
 
-def _portable_replica_identity(memory: NormalizedMemory, dimension: ScopeDimension) -> str:
-    payload = memory.semantic_dict()
-    payload.pop("id")
-    scope = cast(dict[str, JsonValue], payload["scope"])
-    scope.pop(dimension.value)
-    return json.dumps(
-        payload,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-        allow_nan=False,
+_SCOPE_FIELDS = ("user_id", "agent_id", "session_id")
+
+
+def _differing_fields(
+    source: NormalizedMemory,
+    destination: NormalizedMemory,
+    dimension: ScopeDimension,
+) -> tuple[str, ...]:
+    """Portable field names that differ, excluding the ID and the rule's own dimension."""
+
+    left = source.semantic_dict()
+    right = destination.semantic_dict()
+    differing = {
+        field for field in left if field not in ("id", "scope") and left[field] != right[field]
+    }
+    differing.update(
+        f"scope.{field}"
+        for field in _SCOPE_FIELDS
+        if field != dimension.value
+        and getattr(source.scope, field) != getattr(destination.scope, field)
     )
+    return tuple(sorted(differing))
 
 
 class PrivacyScopeViolationChecker:
-    """Find prohibited exact replicas relative to authoritative principals."""
+    """Find prohibited content replicas relative to authoritative principals."""
 
     checker_id = "privacy_scope_violation"
-    checker_version = "1.0"
+    checker_version = "2.0"
     defect_class = DefectClass.PRIVACY_SCOPE_VIOLATION
 
     def __init__(self, policy: ScopeIsolationPolicy) -> None:
@@ -170,40 +182,43 @@ class PrivacyScopeViolationChecker:
         *,
         transcripts: TranscriptSet | None = None,
     ) -> CheckerResult:
-        """Match authoritative and prohibited records by exact portable identity."""
+        """Match authoritative and prohibited records by normalized content."""
 
         evidence_by_destination: dict[str, list[EvidenceItem]] = {}
         authoritative_candidates = 0
         destination_candidates = 0
-        exact_replica_matches = 0
+        replica_matches = 0
 
         for rule in self.policy.rules:
-            authoritative_by_identity: dict[str, list[NormalizedMemory]] = {}
+            authoritative_by_content: dict[str, list[NormalizedMemory]] = {}
             destinations: list[NormalizedMemory] = []
             prohibited_destinations = set(rule.prohibited_destination_principals)
             for memory in store.memories:
                 principal = getattr(memory.scope, rule.dimension.value)
                 if principal == rule.authoritative_source_principal:
                     authoritative_candidates += 1
-                    identity = _portable_replica_identity(memory, rule.dimension)
-                    authoritative_by_identity.setdefault(identity, []).append(memory)
+                    key = normalized_content(memory.content)
+                    authoritative_by_content.setdefault(key, []).append(memory)
                 elif principal in prohibited_destinations:
                     destination_candidates += 1
                     destinations.append(memory)
 
             for destination in destinations:
-                identity = _portable_replica_identity(destination, rule.dimension)
-                matching_sources = authoritative_by_identity.get(identity, ())
-                replica_sha256 = hashlib.sha256(identity.encode("utf-8")).hexdigest()
+                normalized = normalized_content(destination.content)
+                matching_sources = authoritative_by_content.get(normalized, ())
+                content_sha256 = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
                 destination_principal = getattr(destination.scope, rule.dimension.value)
                 for authoritative_memory in matching_sources:
-                    exact_replica_matches += 1
+                    replica_matches += 1
+                    differing = _differing_fields(
+                        authoritative_memory, destination, rule.dimension
+                    )
                     evidence_by_destination.setdefault(destination.id, []).append(
                         EvidenceItem(
-                            kind="prohibited_exact_replica",
+                            kind="prohibited_scope_replica",
                             message=(
-                                "An exact portable replica of an authoritative-source memory "
-                                "exists in a prohibited principal scope."
+                                "A replica of an authoritative-source memory claim exists in a "
+                                "prohibited principal scope."
                             ),
                             data={
                                 "authoritative_source_memory_id": authoritative_memory.id,
@@ -212,7 +227,13 @@ class PrivacyScopeViolationChecker:
                                     rule.authoritative_source_principal
                                 ),
                                 "destination_principal": destination_principal,
-                                "replica_sha256": replica_sha256,
+                                "normalized_content_sha256": content_sha256,
+                                "match_kind": (
+                                    "exact"
+                                    if authoritative_memory.content == destination.content
+                                    else "normalized"
+                                ),
+                                "differing_fields": list(differing),
                             },
                         )
                     )
@@ -250,7 +271,7 @@ class PrivacyScopeViolationChecker:
                     "policy_rules_scanned": len(self.policy.rules),
                     "authoritative_candidates": authoritative_candidates,
                     "destination_candidates": destination_candidates,
-                    "exact_replica_matches": exact_replica_matches,
+                    "replica_matches": replica_matches,
                 },
             ),
         )

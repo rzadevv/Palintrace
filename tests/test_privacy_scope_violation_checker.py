@@ -1,5 +1,4 @@
 import hashlib
-import json
 from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
@@ -17,6 +16,7 @@ from palintrace.checkers import (
     ScopeIsolationPolicy,
     load_scope_policy,
 )
+from palintrace.checkers.base import normalized_content
 from palintrace.cli import main
 from palintrace.models import (
     NormalizedMemory,
@@ -105,20 +105,10 @@ def _policy(
     return ScopeIsolationPolicy(rules=(_rule(dimension, authoritative, *destinations),))
 
 
-def _expected_replica_digest(memory: NormalizedMemory, dimension: str) -> str:
-    payload = memory.semantic_dict()
-    payload.pop("id")
-    scope = payload["scope"]
-    assert isinstance(scope, dict)
-    scope.pop(dimension)
-    canonical = json.dumps(
-        payload,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-        allow_nan=False,
-    )
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+def _expected_content_digest(memory: NormalizedMemory) -> str:
+    return hashlib.sha256(
+        normalized_content(memory.content).encode("utf-8")
+    ).hexdigest()
 
 
 def test_user_policy_emits_destination_only_structural_finding() -> None:
@@ -131,7 +121,7 @@ def test_user_policy_emits_destination_only_structural_finding() -> None:
     result = checker.check(_store(authoritative, destination))
 
     assert checker.checker_id == "privacy_scope_violation"
-    assert checker.checker_version == "1.0"
+    assert checker.checker_version == "2.0"
     assert checker.defect_class is DefectClass.PRIVACY_SCOPE_VIOLATION
     assert len(result.findings) == 1
     finding = result.findings[0]
@@ -140,13 +130,15 @@ def test_user_policy_emits_destination_only_structural_finding() -> None:
     assert finding.confidence == 1.0
     assert len(finding.evidence) == 1
     evidence = finding.evidence[0]
-    assert evidence.kind == "prohibited_exact_replica"
+    assert evidence.kind == "prohibited_scope_replica"
     assert evidence.model_dump(mode="json")["data"] == {
         "authoritative_source_memory_id": "authoritative",
         "scope_dimension": "user_id",
         "authoritative_source_principal": "user-a",
         "destination_principal": "user-b",
-        "replica_sha256": _expected_replica_digest(authoritative, "user_id"),
+        "normalized_content_sha256": _expected_content_digest(authoritative),
+        "match_kind": "exact",
+        "differing_fields": [],
     }
     assert authoritative.content not in result.to_json()
     assert result.cost.model_calls == 0
@@ -158,7 +150,7 @@ def test_user_policy_emits_destination_only_structural_finding() -> None:
         "policy_rules_scanned": 1,
         "authoritative_candidates": 1,
         "destination_candidates": 1,
-        "exact_replica_matches": 1,
+        "replica_matches": 1,
     }
 
 
@@ -205,7 +197,7 @@ def test_multiple_authoritative_matches_aggregate_for_one_destination() -> None:
         item.data["authoritative_source_memory_id"]
         for item in result.findings[0].evidence
     ) == ("source-1", "source-2")
-    assert result.stats.details["exact_replica_matches"] == 2
+    assert result.stats.details["replica_matches"] == 2
 
 
 def test_multiple_prohibited_destinations_get_separate_findings() -> None:
@@ -247,7 +239,6 @@ def test_store_policy_and_destination_order_do_not_affect_output() -> None:
 @pytest.mark.parametrize(
     ("change", "value"),
     [
-        ("content", "User prefers Rust."),
         ("created_at", datetime(2026, 8, 3, 10, 0, tzinfo=UTC)),
         ("updated_at", datetime(2026, 8, 4, 10, 0, tzinfo=UTC)),
         ("source_refs", (SourceRef(transcript_id="other", turn_idx=0),)),
@@ -256,7 +247,7 @@ def test_store_policy_and_destination_order_do_not_affect_output() -> None:
         ("embedding", (0.1, 0.3)),
     ],
 )
-def test_other_portable_fields_must_match_exactly(change: str, value: object) -> None:
+def test_differing_metadata_does_not_hide_a_replica(change: str, value: object) -> None:
     source = _memory("source")
     destination = _replica(source, "destination", user_id="user-b").model_copy(
         update={change: value}
@@ -266,10 +257,13 @@ def test_other_portable_fields_must_match_exactly(change: str, value: object) ->
         _policy(ScopeDimension.USER_ID, "user-a", "user-b")
     ).check(_store(source, destination))
 
-    assert result.findings == ()
+    assert tuple(finding.memory_ids for finding in result.findings) == (("destination",),)
+    evidence = result.findings[0].evidence[0]
+    assert evidence.data["match_kind"] == "exact"
+    assert evidence.data["differing_fields"] == (change,)
 
 
-def test_same_content_with_different_provenance_is_not_a_replica() -> None:
+def test_same_content_with_different_provenance_is_a_replica() -> None:
     source = _memory("source")
     destination = _memory(
         "destination",
@@ -282,7 +276,11 @@ def test_same_content_with_different_provenance_is_not_a_replica() -> None:
         _policy(ScopeDimension.USER_ID, "user-a", "user-b")
     ).check(_store(source, destination))
 
-    assert result.findings == ()
+    assert tuple(finding.memory_ids for finding in result.findings) == (("destination",),)
+    assert result.findings[0].evidence[0].data["differing_fields"] == (
+        "provenance_status",
+        "source_refs",
+    )
 
 
 @pytest.mark.parametrize(
@@ -290,11 +288,38 @@ def test_same_content_with_different_provenance_is_not_a_replica() -> None:
     [
         "user prefers python.",
         "User prefers Python. ",
-        "Python is the user's preferred language.",
+        "  User   prefers\tPython  ",
+        "USER PREFERS PYTHON",
     ],
-    ids=("case", "whitespace", "paraphrase"),
+    ids=("case", "trailing_space", "inner_whitespace", "case_and_missing_period"),
 )
-def test_content_is_not_normalized_or_compared_semantically(content: str) -> None:
+def test_normalized_content_still_matches_a_replica(content: str) -> None:
+    source = _memory("source")
+    destination = _replica(source, "destination", user_id="user-b").model_copy(
+        update={"content": content}
+    )
+
+    result = PrivacyScopeViolationChecker(
+        _policy(ScopeDimension.USER_ID, "user-a", "user-b")
+    ).check(_store(source, destination))
+
+    assert tuple(finding.memory_ids for finding in result.findings) == (("destination",),)
+    evidence = result.findings[0].evidence[0]
+    assert evidence.data["match_kind"] == "normalized"
+    assert evidence.data["differing_fields"] == ("content",)
+    assert content not in result.to_json()
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "User prefers Rust.",
+        "Python is the user's preferred language.",
+        "User prefers Python much of the time.",
+    ],
+    ids=("substitution", "paraphrase", "extension"),
+)
+def test_unrelated_content_is_not_a_replica(content: str) -> None:
     source = _memory("source")
     destination = _replica(source, "destination", user_id="user-b").model_copy(
         update={"content": content}
@@ -305,6 +330,46 @@ def test_content_is_not_normalized_or_compared_semantically(content: str) -> Non
     ).check(_store(source, destination))
 
     assert result.findings == ()
+
+
+def test_replica_is_found_despite_a_different_created_at() -> None:
+    source = _memory("source", created_at=datetime(2026, 1, 1, tzinfo=UTC))
+    destination = _replica(source, "destination", user_id="user-b").model_copy(
+        update={"created_at": datetime(2026, 9, 9, tzinfo=UTC)}
+    )
+
+    result = PrivacyScopeViolationChecker(
+        _policy(ScopeDimension.USER_ID, "user-a", "user-b")
+    ).check(_store(source, destination))
+
+    assert tuple(finding.memory_ids for finding in result.findings) == (("destination",),)
+    assert result.findings[0].evidence[0].data["differing_fields"] == ("created_at",)
+
+
+def test_replica_is_found_despite_casing_whitespace_and_unrelated_metadata() -> None:
+    source = _memory("source")
+    destination = _replica(source, "destination", user_id="user-b").model_copy(
+        update={
+            "content": "  user  PREFERS   python  ",
+            "created_at": datetime(2026, 9, 9, tzinfo=UTC),
+            "embedding": (0.9,),
+            "source_refs": (SourceRef(transcript_id="other", turn_idx=3),),
+        }
+    )
+
+    result = PrivacyScopeViolationChecker(
+        _policy(ScopeDimension.USER_ID, "user-a", "user-b")
+    ).check(_store(source, destination))
+
+    assert tuple(finding.memory_ids for finding in result.findings) == (("destination",),)
+    evidence = result.findings[0].evidence[0]
+    assert evidence.data["match_kind"] == "normalized"
+    assert evidence.data["differing_fields"] == (
+        "content",
+        "created_at",
+        "embedding",
+        "source_refs",
+    )
 
 
 def test_nonapplicable_unknown_and_same_principals_are_skipped() -> None:
@@ -349,34 +414,71 @@ def test_unknown_agent_principals_are_skipped() -> None:
     assert checker.check(_store(source, unknown_destination)).findings == ()
 
 
-def test_nonconfigured_scope_dimensions_must_match() -> None:
-    source = _memory("source")
-    user_destination = _replica(source, "user-destination", user_id="user-b").model_copy(
-        update={
-            "scope": source.scope.model_copy(
-                update={"user_id": "user-b", "agent_id": "agent-b"}
-            )
-        }
-    )
-    agent_destination = _replica(
-        source, "agent-destination", agent_id="agent-b"
-    ).model_copy(
-        update={
-            "scope": source.scope.model_copy(
-                update={"user_id": "user-b", "agent_id": "agent-b"}
-            )
-        }
+def test_leak_is_found_across_a_different_session() -> None:
+    source = _memory("source", session_id="session-1")
+    destination = _replica(source, "destination", user_id="user-b").model_copy(
+        update={"scope": source.scope.model_copy(
+            update={"user_id": "user-b", "session_id": "session-9"}
+        )}
     )
 
-    user_result = PrivacyScopeViolationChecker(
+    result = PrivacyScopeViolationChecker(
         _policy(ScopeDimension.USER_ID, "user-a", "user-b")
-    ).check(_store(source, user_destination))
-    agent_result = PrivacyScopeViolationChecker(
-        _policy(ScopeDimension.AGENT_ID, "agent-a", "agent-b")
-    ).check(_store(source, agent_destination))
+    ).check(_store(source, destination))
 
-    assert user_result.findings == ()
-    assert agent_result.findings == ()
+    assert tuple(finding.memory_ids for finding in result.findings) == (("destination",),)
+    assert result.findings[0].evidence[0].data["differing_fields"] == ("scope.session_id",)
+
+
+def test_leak_is_found_across_a_different_agent_for_a_user_rule() -> None:
+    source = _memory("source", agent_id="agent-a")
+    destination = _replica(source, "destination", user_id="user-b").model_copy(
+        update={"scope": source.scope.model_copy(
+            update={"user_id": "user-b", "agent_id": "agent-b", "session_id": "session-9"}
+        )}
+    )
+
+    result = PrivacyScopeViolationChecker(
+        _policy(ScopeDimension.USER_ID, "user-a", "user-b")
+    ).check(_store(source, destination))
+
+    assert tuple(finding.memory_ids for finding in result.findings) == (("destination",),)
+    assert result.findings[0].evidence[0].data["differing_fields"] == (
+        "scope.agent_id",
+        "scope.session_id",
+    )
+
+
+def test_agent_rule_ignores_a_differing_user_dimension() -> None:
+    source = _memory("source")
+    destination = _replica(source, "destination", agent_id="agent-b").model_copy(
+        update={"scope": source.scope.model_copy(
+            update={"user_id": "user-b", "agent_id": "agent-b"}
+        )}
+    )
+
+    result = PrivacyScopeViolationChecker(
+        _policy(ScopeDimension.AGENT_ID, "agent-a", "agent-b")
+    ).check(_store(source, destination))
+
+    assert tuple(finding.memory_ids for finding in result.findings) == (("destination",),)
+    assert result.findings[0].evidence[0].data["differing_fields"] == ("scope.user_id",)
+
+
+def test_same_content_under_a_non_prohibited_principal_is_not_flagged() -> None:
+    source = _memory("source")
+    elsewhere = _replica(source, "elsewhere", user_id="user-z").model_copy(
+        update={"scope": source.scope.model_copy(
+            update={"user_id": "user-z", "agent_id": "agent-b", "session_id": "session-9"}
+        )}
+    )
+
+    result = PrivacyScopeViolationChecker(
+        _policy(ScopeDimension.USER_ID, "user-a", "user-b")
+    ).check(_store(source, elsewhere))
+
+    assert result.findings == ()
+    assert result.stats.details["destination_candidates"] == 0
 
 
 def test_policy_is_required_by_checker_constructor() -> None:

@@ -10,9 +10,7 @@ from palintrace.checkers import (
     Checker,
     CheckerResult,
     OrphanedProvenanceChecker,
-    PrivacyScopeViolationChecker,
     ScopeIsolationPolicy,
-    StaleActiveChecker,
     UnsupportedClaimChecker,
     load_scope_policy,
 )
@@ -41,8 +39,10 @@ from palintrace.evaluation.execution_models import (
 from palintrace.evaluation.experimental_lexical import ExperimentalLexicalRetriever
 from palintrace.evaluation.models import EvaluationInputError
 from palintrace.evaluation.mutation import evaluate_mutation_trial
+from palintrace.evaluation.privacy_scope_v0_1 import BenchmarkPrivacyScopeViolationCheckerV1
 from palintrace.evaluation.redundancy_v0_1 import BenchmarkRedundancyBloatCheckerV1
 from palintrace.evaluation.retrieval import summarize_retrieval_challenges
+from palintrace.evaluation.stale_active_v0_1 import BenchmarkStaleActiveCheckerV1
 from palintrace.models import NormalizedStore, TranscriptSet
 from palintrace.mutations import BaseStoreStatus, mutate
 from palintrace.mutations.base import semantic_store_digest, transcript_set_digest
@@ -89,11 +89,11 @@ def _build_checker(
     if defect_class is DefectClass.REDUNDANCY_BLOAT:
         return BenchmarkRedundancyBloatCheckerV1()
     if defect_class is DefectClass.STALE_ACTIVE:
-        return StaleActiveChecker()
+        return BenchmarkStaleActiveCheckerV1()
     if defect_class is DefectClass.PRIVACY_SCOPE_VIOLATION:
         if scope_policy is None:
             raise EvaluationInputError("privacy benchmark cases require a scope policy")
-        return PrivacyScopeViolationChecker(scope_policy)
+        return BenchmarkPrivacyScopeViolationCheckerV1(scope_policy)
     if defect_class is DefectClass.UNSUPPORTED_CLAIM:
         if semantic_judge is None:
             raise EvaluationInputError("unsupported benchmark cases require a semantic judge")
