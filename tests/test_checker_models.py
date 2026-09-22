@@ -12,6 +12,7 @@ from palintrace.checkers import (
     Finding,
     deterministic_finding_id,
 )
+from palintrace.checkers.models import _BUILTIN_RULE_METADATA, RETIRED_RULE_IDS
 from palintrace.taxonomy import DefectClass
 
 
@@ -154,8 +155,8 @@ def test_checker_result_rejects_wrong_schema_and_blank_identity() -> None:
             "redundancy_bloat",
             "3.0",
             DefectClass.REDUNDANCY_BLOAT,
-            "memory.duplication.exact",
-            "2.0.0",
+            "memory.duplication.equivalent-content",
+            "1.0.0",
             "warning",
         ),
         (
@@ -170,8 +171,8 @@ def test_checker_result_rejects_wrong_schema_and_blank_identity() -> None:
             "privacy_scope_violation",
             "2.0",
             DefectClass.PRIVACY_SCOPE_VIOLATION,
-            "memory.scope.prohibited-exact-replica",
-            "2.0.0",
+            "memory.scope.prohibited-replica",
+            "1.0.0",
             "error",
         ),
         (
@@ -218,6 +219,19 @@ def test_builtin_checker_results_receive_canonical_rule_metadata(
     assert result.rule_id == rule_id
     assert result.rule_version == rule_version
     assert result.severity == severity
+
+
+def test_retired_rule_ids_are_reserved_and_never_reused_by_a_current_rule() -> None:
+    assert dict(RETIRED_RULE_IDS) == {
+        "memory.duplication.exact": "memory.duplication.equivalent-content",
+        "memory.scope.prohibited-exact-replica": "memory.scope.prohibited-replica",
+    }
+
+    current_rule_ids = {
+        metadata[1] for metadata in _BUILTIN_RULE_METADATA.values()
+    }
+    assert current_rule_ids.isdisjoint(RETIRED_RULE_IDS)
+    assert set(RETIRED_RULE_IDS.values()) <= current_rule_ids
 
 
 def test_alternate_checker_implementations_can_share_a_rule() -> None:

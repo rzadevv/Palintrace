@@ -117,28 +117,44 @@ def test_frozen_benchmark_checkers_report_their_own_rule_version() -> None:
     production_privacy = PrivacyScopeViolationChecker(policy).check(store)
     production_stale = StaleActiveChecker().check(store)
 
-    assert (frozen_redundancy.checker_version, frozen_redundancy.rule_version) == (
-        "1.0",
-        "1.0.0",
-    )
-    assert (frozen_privacy.checker_version, frozen_privacy.rule_version) == ("1.0", "1.0.0")
-    assert (frozen_stale.checker_version, frozen_stale.rule_version) == ("1.0", "1.0.0")
-    assert (production_redundancy.checker_version, production_redundancy.rule_version) == (
-        "3.0",
-        "2.0.0",
-    )
-    assert (production_privacy.checker_version, production_privacy.rule_version) == (
-        "2.0",
-        "2.0.0",
-    )
-    assert (production_stale.checker_version, production_stale.rule_version) == ("2.0", "2.0.0")
-    for result, expected in (
-        (frozen_redundancy, "1.0.0"),
-        (frozen_privacy, "1.0.0"),
-        (frozen_stale, "1.0.0"),
+    # the frozen checkers still evaluate exact matching, so they keep the retired rule IDs
+    assert (
+        frozen_redundancy.checker_version,
+        frozen_redundancy.rule_id,
+        frozen_redundancy.rule_version,
+    ) == ("1.0", "memory.duplication.exact", "1.0.0")
+    assert (
+        frozen_privacy.checker_version,
+        frozen_privacy.rule_id,
+        frozen_privacy.rule_version,
+    ) == ("1.0", "memory.scope.prohibited-exact-replica", "1.0.0")
+    assert (
+        frozen_stale.checker_version,
+        frozen_stale.rule_id,
+        frozen_stale.rule_version,
+    ) == ("1.0", "memory.state.explicit-stale", "1.0.0")
+    assert (
+        production_redundancy.checker_version,
+        production_redundancy.rule_id,
+        production_redundancy.rule_version,
+    ) == ("3.0", "memory.duplication.equivalent-content", "1.0.0")
+    assert (
+        production_privacy.checker_version,
+        production_privacy.rule_id,
+        production_privacy.rule_version,
+    ) == ("2.0", "memory.scope.prohibited-replica", "1.0.0")
+    assert (
+        production_stale.checker_version,
+        production_stale.rule_id,
+        production_stale.rule_version,
+    ) == ("2.0", "memory.state.explicit-stale", "2.0.0")
+    for result, expected_id in (
+        (frozen_redundancy, "memory.duplication.exact"),
+        (frozen_privacy, "memory.scope.prohibited-exact-replica"),
+        (frozen_stale, "memory.state.explicit-stale"),
     ):
         reloaded = CheckerResult.model_validate_json(result.to_json())
-        assert reloaded.rule_version == expected
+        assert (reloaded.rule_id, reloaded.rule_version) == (expected_id, "1.0.0")
 
 
 def test_benchmark_stale_active_v1_is_private_and_independent_of_production_v2() -> None:

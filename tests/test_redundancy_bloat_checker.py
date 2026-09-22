@@ -76,8 +76,8 @@ def test_two_exact_same_scope_duplicates_emit_one_group_finding() -> None:
     assert checker.checker_id == "redundancy_bloat"
     assert checker.checker_version == "3.0"
     assert checker.defect_class is DefectClass.REDUNDANCY_BLOAT
-    assert result.rule_id == "memory.duplication.exact"
-    assert result.rule_version == "2.0.0"
+    assert result.rule_id == "memory.duplication.equivalent-content"
+    assert result.rule_version == "1.0.0"
     assert result.severity == "warning"
     assert len(result.findings) == 1
     finding = result.findings[0]

@@ -39,8 +39,8 @@ _BUILTIN_RULE_METADATA: Mapping[
         ),
         "redundancy_bloat": (
             DefectClass.REDUNDANCY_BLOAT,
-            "memory.duplication.exact",
-            "2.0.0",
+            "memory.duplication.equivalent-content",
+            "1.0.0",
             "warning",
         ),
         "stale_active": (
@@ -51,8 +51,8 @@ _BUILTIN_RULE_METADATA: Mapping[
         ),
         "privacy_scope_violation": (
             DefectClass.PRIVACY_SCOPE_VIOLATION,
-            "memory.scope.prohibited-exact-replica",
-            "2.0.0",
+            "memory.scope.prohibited-replica",
+            "1.0.0",
             "error",
         ),
         "unsupported_claim": (
@@ -76,12 +76,21 @@ _BUILTIN_RULE_METADATA: Mapping[
     }
 )
 
-# frozen benchmark implementations keep the rule version their semantics shipped with
-_SUPERSEDED_RULE_VERSIONS: Mapping[tuple[str, str], str] = MappingProxyType(
+# Retired rule IDs stay reserved and are never reused. They remain correct for the frozen v0.1
+# checkers below, which still evaluate the exact-match meaning these IDs were published with.
+RETIRED_RULE_IDS: Mapping[str, str] = MappingProxyType(
     {
-        ("privacy_scope_violation", "1.0"): "1.0.0",
-        ("redundancy_bloat", "1.0"): "1.0.0",
-        ("stale_active", "1.0"): "1.0.0",
+        "memory.duplication.exact": "memory.duplication.equivalent-content",
+        "memory.scope.prohibited-exact-replica": "memory.scope.prohibited-replica",
+    }
+)
+
+# frozen benchmark implementations keep the rule identity their semantics shipped with
+_SUPERSEDED_RULES: Mapping[tuple[str, str], tuple[str, str]] = MappingProxyType(
+    {
+        ("privacy_scope_violation", "1.0"): ("memory.scope.prohibited-exact-replica", "1.0.0"),
+        ("redundancy_bloat", "1.0"): ("memory.duplication.exact", "1.0.0"),
+        ("stale_active", "1.0"): ("memory.state.explicit-stale", "1.0.0"),
     }
 )
 
@@ -89,14 +98,16 @@ _SUPERSEDED_RULE_VERSIONS: Mapping[tuple[str, str], str] = MappingProxyType(
 def _rule_metadata(
     checker_id: str, checker_version: object
 ) -> tuple[DefectClass, str, str, Severity] | None:
-    """Return canonical rule metadata, honouring superseded frozen rule versions."""
+    """Return canonical rule metadata, honouring superseded frozen rule identities."""
 
     metadata = _BUILTIN_RULE_METADATA.get(checker_id)
     if metadata is None:
         return None
     defect_class, rule_id, rule_version, severity = metadata
     if isinstance(checker_version, str):
-        rule_version = _SUPERSEDED_RULE_VERSIONS.get((checker_id, checker_version), rule_version)
+        rule_id, rule_version = _SUPERSEDED_RULES.get(
+            (checker_id, checker_version), (rule_id, rule_version)
+        )
     return (defect_class, rule_id, rule_version, severity)
 
 
