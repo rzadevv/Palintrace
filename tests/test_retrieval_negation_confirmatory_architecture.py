@@ -63,7 +63,9 @@ def test_frozen_retrieval_and_part_6h_predecessors_are_byte_exact() -> None:
     } == expected
 
 
-def test_frozen_identity_semantic_benchmark_and_cli_files_are_byte_exact() -> None:
+def test_frozen_identity_semantic_and_benchmark_files_are_byte_exact() -> None:
+    # cli.py is product surface, not a frozen research module; its contract is asserted
+    # in tests/test_cli_contract.py
     expected = {
         Path("src/palintrace/checkers/unsupported_claim.py"): (
             "604d08b766cf901475be78258c31162d76d748759db2f205049bbac285fa6cdc"
@@ -85,9 +87,6 @@ def test_frozen_identity_semantic_benchmark_and_cli_files_are_byte_exact() -> No
         ),
         Path("tests/fixtures/benchmark_v0.1.sha256.json"): (
             "028fe4e096adc556b4d23bd89c6f5c79f635cbcfe327ad94a2a5a2e7794a659d"
-        ),
-        Path("src/palintrace/cli.py"): (
-            "620aba148c80f6b6468156876eb3c9a4e6cc6d4b12b4d5325f8615823a2c9c57"
         ),
     }
     assert {

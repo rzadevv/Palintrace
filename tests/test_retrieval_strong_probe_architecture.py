@@ -20,6 +20,8 @@ def _imports(path: Path) -> tuple[str, ...]:
 
 
 def test_frozen_retrieval_implementation_and_part_five_contracts_are_byte_exact() -> None:
+    # cli.py is product surface, not a frozen research module; its contract is asserted
+    # in tests/test_cli_contract.py
     expected = {
         Path("src/palintrace/retrieval/__init__.py"): (
             "d322710fade529108a8b9dc58b7fa9945a821a74d0df27548663f9574a681ff1"
@@ -47,9 +49,6 @@ def test_frozen_retrieval_implementation_and_part_five_contracts_are_byte_exact(
         ),
         Path("src/palintrace/mutations/shadowing.py"): (
             "2350c9bf934124b9409e4b392363e41f52b972b0d620561fa9870928ba1cedce"
-        ),
-        Path("src/palintrace/cli.py"): (
-            "620aba148c80f6b6468156876eb3c9a4e6cc6d4b12b4d5325f8615823a2c9c57"
         ),
     }
     assert {
