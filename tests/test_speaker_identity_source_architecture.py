@@ -54,11 +54,10 @@ def test_identity_source_contract_is_available_without_exporting_candidate() -> 
     assert not hasattr(checkers, "IdentityGroundedUnsupportedClaimChecker")
 
 
-def test_cli_public_checker_and_transcript_contracts_remain_byte_frozen() -> None:
+def test_public_checker_and_transcript_contracts_remain_byte_frozen() -> None:
+    # cli.py is product surface, not a frozen research module; its contract is asserted
+    # in tests/test_cli_contract.py
     expected = {
-        Path("src/palintrace/cli.py"): (
-            "620aba148c80f6b6468156876eb3c9a4e6cc6d4b12b4d5325f8615823a2c9c57"
-        ),
         Path("src/palintrace/checkers/__init__.py"): (
             "c2ff4192aef0d5830e323f476e3b22db66e1cf6283e35ec0ee88c7c80602379a"
         ),
