@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Iterable, Mapping
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import ValidationError
 
@@ -15,12 +15,15 @@ from palintrace.adapters.base import (
     AdapterError,
     MemoryAdapter,
     deterministic_memory_id,
+    merge_scope,
     normalize_records,
     record_mapping,
     transport_error,
 )
 from palintrace.models import MemoryScope, NormalizedMemory, ProvenanceStatus, SourceRef
 from palintrace.models.store import NormalizedStore
+
+GroupScopeDimension = Literal["user_id", "agent_id", "session_id"]
 
 
 class GraphitiAdapter(MemoryAdapter):
@@ -38,6 +41,7 @@ class GraphitiAdapter(MemoryAdapter):
         password: str | None = None,
         group_ids: Iterable[str] | None = None,
         scope: MemoryScope | None = None,
+        group_scope: GroupScopeDimension | None = None,
         episode_transcript_map: Mapping[str, SourceRef | Mapping[str, Any] | str] | None = None,
         include_embeddings: bool = False,
         page_size: int = 500,
@@ -49,6 +53,7 @@ class GraphitiAdapter(MemoryAdapter):
         self._password = password
         self._group_ids = tuple(group_ids or ())
         self._scope = scope
+        self._group_scope = group_scope
         self._episode_transcript_map = dict(episode_transcript_map or {})
         self._include_embeddings = include_embeddings
         self._page_size = page_size
@@ -75,6 +80,7 @@ class GraphitiAdapter(MemoryAdapter):
             lambda record: normalize_graphiti_record(
                 record,
                 scope=self._scope,
+                group_scope=self._group_scope,
                 episode_transcript_map=self._episode_transcript_map,
             ),
         )
@@ -141,6 +147,7 @@ def normalize_graphiti_record(
     record: Any,
     *,
     scope: MemoryScope | None = None,
+    group_scope: GroupScopeDimension | None = None,
     episode_transcript_map: Mapping[str, SourceRef | Mapping[str, Any] | str] | None = None,
 ) -> NormalizedMemory:
     """Normalize one Graphiti ``EntityEdge`` fact."""
@@ -149,7 +156,10 @@ def normalize_graphiti_record(
     content = source.get("fact")
     if not isinstance(content, str):
         raise AdapterDataError("Graphiti EntityEdge requires string field 'fact'")
-    normalized_scope = scope or MemoryScope()
+    if group_scope is None:
+        normalized_scope = scope or MemoryScope()
+    else:
+        normalized_scope = _group_id_scope(source.get("group_id"), group_scope, scope)
 
     episodes = source.get("episodes", [])
     if not isinstance(episodes, list):
@@ -188,6 +198,32 @@ def normalize_graphiti_record(
         )
     except ValidationError as error:
         raise AdapterDataError(f"invalid Graphiti record: {error}") from error
+
+
+def _group_id_scope(
+    group_id: Any,
+    dimension: GroupScopeDimension,
+    caller_scope: MemoryScope | None,
+) -> MemoryScope:
+    """Place group_id in the caller-chosen dimension; never infer one from its value."""
+
+    if dimension not in ("user_id", "agent_id", "session_id"):
+        raise AdapterDataError(f"unsupported Graphiti group scope dimension: {dimension!r}")
+    if not isinstance(group_id, str) or not group_id.strip():
+        raise AdapterDataError(
+            f"Graphiti group scope {dimension} requires a non-blank string field 'group_id'"
+        )
+    existing = None if caller_scope is None else getattr(caller_scope, dimension)
+    if existing is not None and existing != group_id:
+        raise AdapterDataError(
+            f"Graphiti group_id conflicts with the supplied scope {dimension}"
+        )
+    mapped = MemoryScope(
+        user_id=group_id if dimension == "user_id" else None,
+        agent_id=group_id if dimension == "agent_id" else None,
+        session_id=group_id if dimension == "session_id" else None,
+    )
+    return merge_scope(mapped, caller_scope)
 
 
 def _mapped_episode_refs(
