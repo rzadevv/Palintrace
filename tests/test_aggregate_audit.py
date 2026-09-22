@@ -242,6 +242,33 @@ def test_completed_result_content_is_not_rewritten() -> None:
     assert actual.to_json() == expected.to_json()
 
 
+def test_list_valued_stats_details_survive_aggregate_serialization() -> None:
+    store = NormalizedStore(
+        adapter="test",
+        memories=(
+            NormalizedMemory(id="a", content="Claim A.", active=True, supersedes=("b",)),
+            NormalizedMemory(id="b", content="Claim B.", active=True, supersedes=("a",)),
+            NormalizedMemory(id="c", content="Claim C.", supersedes=("gone-2", "gone-1")),
+        ),
+    )
+
+    report = run_aggregate_audit(store)
+    text = report.to_json()
+    reloaded = AuditReport.model_validate_json(text)
+    stale = next(result for result in reloaded.results if result.checker_id == "stale_active")
+    dangling = stale.stats.details["dangling_supersession_targets"]
+
+    assert isinstance(dangling, tuple)
+    assert tuple(dict(record) for record in dangling) == (
+        {"superseder_id": "c", "missing_target_id": "gone-1"},
+        {"superseder_id": "c", "missing_target_id": "gone-2"},
+    )
+    assert stale.stats.details["missing_targets_skipped"] == 2
+    assert stale.stats.details["supersession_cycles"] == 1
+    assert reloaded.to_json() == text
+    assert "gone-1" in text
+
+
 def test_aggregate_module_does_not_cross_architecture_boundaries() -> None:
     source = (Path(__file__).parents[1] / "src/palintrace/audit.py").read_text(encoding="utf-8")
 
