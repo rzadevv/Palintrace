@@ -139,6 +139,28 @@ SARIF rule IDs come from `rule_id`. Severity maps as follows:
 SARIF carries the existing finding ID as its fingerprint. Rendering does not change finding identity
 or `--fail-on` behavior.
 
+## Frozen modules and the CLI contract
+
+Byte-level freezing is reserved for frozen research modules: the semantic, identity, retrieval and
+benchmark implementations whose exact source produced a published result in [Evaluation
+results](results.md), together with their probe fixtures. Those files stay pinned by SHA-256.
+
+`src/palintrace/cli.py` is ordinary product surface and is not pinned by hash. No published result
+artifact is produced through the CLI; each one comes from its own runner under `tools/`, and the
+CLI imports no evaluation module. The CLI is instead held to a behavioural contract:
+
+- the public commands are `audit`, `capabilities`, `dump`, `mutate`, `preflight`, and
+  `retrieval-audit`;
+- `audit --checker` accepts exactly the five public checker IDs plus `all`;
+- `unsupported_claim` requires an explicit `--semantic-model-id` and `--semantic-model-revision`,
+  with no default model, no default revision, and no implicitly constructed judge;
+- `retrieval-audit` requires a recorded observation and an explicit sufficiency policy;
+- `--fail-on` keeps the `info`, `warning`, `error` choices and remains absent by default; and
+- canonical and SARIF outputs are written before any gating exit status is returned.
+
+Adding a command or flag is a compatible change. Removing or renaming one, or altering any
+behaviour above, is an incompatible change under this policy.
+
 ## Deprecation
 
 Published rule IDs are deprecated in place rather than silently renamed or assigned a different
