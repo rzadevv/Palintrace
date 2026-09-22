@@ -70,6 +70,11 @@ def build_parser() -> argparse.ArgumentParser:
     dump.add_argument("--neo4j-user", default=os.getenv("NEO4J_USER"))
     dump.add_argument("--neo4j-password", default=os.getenv("NEO4J_PASSWORD"))
     dump.add_argument("--group-id", action="append", dest="group_ids")
+    dump.add_argument(
+        "--graphiti-group-scope",
+        choices=("user_id", "agent_id", "session_id"),
+        help="map each Graphiti group_id into this normalized scope dimension",
+    )
     dump.add_argument("--include-embeddings", action="store_true")
 
     dump.add_argument("--letta-base-url", default=os.getenv("LETTA_BASE_URL"))
@@ -261,6 +266,8 @@ def _run_mutation(args: argparse.Namespace) -> None:
 
 
 def _build_store(args: argparse.Namespace) -> NormalizedStore:
+    if args.graphiti_group_scope is not None and args.adapter != "graphiti":
+        raise AdapterDataError("--graphiti-group-scope is only valid for the graphiti adapter")
     if args.adapter == "file":
         if args.source is None:
             raise AdapterDataError("--source is required for the file adapter")
@@ -292,6 +299,7 @@ def _build_store(args: argparse.Namespace) -> NormalizedStore:
             password=args.neo4j_password,
             group_ids=args.group_ids,
             scope=scope,
+            group_scope=args.graphiti_group_scope,
             include_embeddings=args.include_embeddings,
             page_size=args.page_size,
         ).dump()
