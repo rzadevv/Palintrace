@@ -41,28 +41,43 @@ The canonical rule mapping for the five supported public static checkers is:
 | Current `checker_id` | Canonical `rule_id` |
 |---|---|
 | `orphaned_provenance` | `memory.provenance.orphaned` |
-| `redundancy_bloat` | `memory.duplication.exact` |
+| `redundancy_bloat` | `memory.duplication.equivalent-content` |
 | `stale_active` | `memory.state.explicit-stale` |
-| `privacy_scope_violation` | `memory.scope.prohibited-exact-replica` |
+| `privacy_scope_violation` | `memory.scope.prohibited-replica` |
 | `unsupported_claim` | `memory.claim.unsupported` |
 
 Recorded retrieval results use `retrieval_shadowing` with `memory.retrieval.shadowing`. This is a
 projection of a recorded observation, not a sixth static production checker.
 
-`memory.duplication.exact` and `memory.scope.prohibited-exact-replica` are at rule version `2.0.0`.
-Both now match on normalized content—NFKC, case folding, collapsed whitespace, and no trailing
-punctuation—rather than on byte-identical values, so each widened its public meaning. Their rule IDs
-are not renamed; the `exact` segment records the original release, not the current matching rule.
-All other public rules remain at `1.0.0`.
+### Retired rule identifiers
 
-`memory.state.explicit-stale` is also at rule version `2.0.0`. It now reports supersession cycles as
-one relational finding covering every member, so a cycle no longer appears as several independent
-stale memories.
+Two rule IDs were retired when the production checkers moved from byte-identical matching to
+normalized content—NFKC, case folding, collapsed whitespace, and no trailing punctuation:
 
-Rule version follows the semantics an implementation actually evaluates, so the frozen benchmark
-v0.1 checkers continue to report `1.0.0` while the current implementations report `2.0.0` under the
-same rule ID. A `CheckerResult` resolves its rule version from the `checker_id` and `checker_version`
-pair.
+| Retired `rule_id` | Replacement `rule_id` |
+|---|---|
+| `memory.duplication.exact` | `memory.duplication.equivalent-content` |
+| `memory.scope.prohibited-exact-replica` | `memory.scope.prohibited-replica` |
+
+The retired IDs named exact matching, so keeping them for a checker that no longer matches that way
+would have reassigned their published meaning. They are reserved permanently and are never applied
+to a different rule. `RETIRED_RULE_IDS` in `palintrace.checkers.models` records the mapping, and a
+test asserts no current rule reuses a retired ID.
+
+A retired ID is not withdrawn from output. The frozen benchmark v0.1 checkers still evaluate exact
+matching, so `memory.duplication.exact` and `memory.scope.prohibited-exact-replica` remain the
+accurate description of what they report, at rule version `1.0.0`. The replacement IDs start at
+`1.0.0` as new public rules; the never-released `2.0.0` revisions of the retired IDs are withdrawn
+with them.
+
+`memory.state.explicit-stale` keeps its ID and moves to rule version `2.0.0`. It now reports
+supersession cycles as one relational finding covering every member, so a cycle no longer appears as
+several independent stale memories. The ID still describes that defect, so the meaning widened
+rather than changed, and a version bump is the right signal.
+
+Rule identity follows the semantics an implementation actually evaluates. A `CheckerResult` resolves
+both its `rule_id` and its `rule_version` from the `checker_id` and `checker_version` pair, which is
+how one checker ID serves the current rule and its frozen predecessor at once.
 
 The experimental `unsupported_claim_identity_grounded` checker also uses
 `memory.claim.unsupported`. It is an alternate implementation of the same semantic rule and remains
