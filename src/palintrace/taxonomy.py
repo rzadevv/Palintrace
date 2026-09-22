@@ -2,11 +2,11 @@
 
 from enum import StrEnum
 
-TAXONOMY_VERSION = "1.0"
+TAXONOMY_VERSION = "1.1"
 
 
 class DefectClass(StrEnum):
-    """The eight defect classes frozen for taxonomy version 1.0."""
+    """The eight defect classes frozen for taxonomy version 1.1."""
 
     UNSUPPORTED_CLAIM = "unsupported_claim"
     INTERNAL_CONTRADICTION = "internal_contradiction"

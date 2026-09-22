@@ -1,10 +1,12 @@
 # Defect taxonomy
 
-Taxonomy version: `1.0`
+Taxonomy version: `1.1`
 
-Version 1.0 defines the following eight research labels. Package
-versions and detector thresholds do not change this taxonomy version. A later taxonomy revision must
-be explicit rather than renaming a class in response to detector behavior.
+Version 1.1 defines the following eight research labels. The eight classes are unchanged from 1.0;
+`stale_active` and `redundancy_bloat` gained wording for cases their definitions already covered in
+principle but described too narrowly. Package versions and detector thresholds do not change this
+taxonomy version. A later taxonomy revision must be explicit rather than renaming a class in
+response to detector behavior.
 
 ## `unsupported_claim`
 
@@ -68,25 +70,37 @@ leave both records active and create no supersession relationship.
 
 ## `stale_active`
 
-**Definition.** An older memory has been explicitly or clearly superseded by a newer memory, but the
-obsolete memory remains active/current/retrievable.
+**Definition.** A memory that an explicit replacement relation marks as obsolete remains
+active/current/retrievable. This covers two shapes. In the ordinary case a newer memory supersedes
+an older one and the older record stays active. In the cyclic case two or more memories supersede
+one another, directly or through a chain, so each is marked obsolete by another member and no member
+is a valid replacement; the defect is that active records remain in a supersession relation that
+resolves to nothing.
 
-**Inclusion criteria.** A replacement relation or unambiguous temporal update identifies the old
-record as obsolete, while that old record remains active.
+**Inclusion criteria.** A replacement relation or unambiguous temporal update identifies a record as
+obsolete, while that record remains active. For the cyclic case, the supersession relations form a
+closed loop and at least one member of that loop is active.
 
 **Exclusion criteria.** Two unresolved conflicting current records without a supersession relation
-belong to `internal_contradiction`. An obsolete record that is already inactive is not stale-active.
+belong to `internal_contradiction`. A cycle is not that class: its members are linked by explicit
+supersession relations, and the defect is the unresolvable replacement, not the conflict between the
+claims. A cycle whose members are all inactive is not stale-active, and neither is an obsolete
+record that is already inactive.
 
 **Example.** An active "User works at A" record remains active after a "User works at B" record is
-added with `supersedes: [old-id]`.
+added with `supersedes: [old-id]`. In the cyclic case, an active "User works at A" record declares
+`supersedes: [b]` while an active "User works at B" record declares `supersedes: [a]`.
 
 **Non-example.** The same replacement is present, but the old employment record has `active: false`.
 
 **Required evidence.** The old record, the superseding record or clear update evidence, the
-supersession/temporal relationship, and the old record's active state are required.
+supersession/temporal relationship, and the old record's active state are required. A cyclic case
+additionally requires every supersession relation in the loop and the active state of each member.
 
-**Gold label target.** The obsolete old memory is the primary gold target; the replacement is
-recorded as context and does not itself receive the label.
+**Gold label target.** In the ordinary case the obsolete old memory is the primary gold target; the
+replacement is recorded as context and does not itself receive the label. In the cyclic case no
+member is a replacement, so the cycle receives a relational gold label over every member and the
+manifest records all of their IDs.
 
 **Establishment.** Explicit supersession and active flags establish the controlled case statically.
 Runtime evidence would be needed only when retrievability is not represented in the store.
@@ -214,13 +228,17 @@ copies the portable memory fields, and changes exactly the requested principal d
 **Definition.** Two or more memories in the same relevant scope store the same substantive claim
 unnecessarily.
 
-**Inclusion criteria.** The core case is an exact-content duplicate with a distinct memory ID in the
-same scope. A controlled paraphrase is included only when its equivalence is fixed by the fixture.
+**Inclusion criteria.** The core case is a duplicate with a distinct memory ID in the same scope
+whose content is equivalent under normalization: NFKC, case folding, collapsed whitespace, and no
+trailing punctuation. Byte-identical content and content differing only in case, spacing, or a
+trailing period are both core cases. A paraphrase that survives none of those folds is included only
+when its equivalence is fixed by the fixture.
 
 **Exclusion criteria.** Similar vocabulary, complementary facts, or repetition across intentionally
 isolated scopes does not establish redundancy. Arbitrary lexical similarity is insufficient.
 
-**Example.** Two same-user, same-agent memories with different IDs both contain "User prefers Python."
+**Example.** Two same-user, same-agent memories with different IDs both contain "User prefers
+Python." A third holding "user prefers python" belongs to the same group.
 
 **Non-example.** One memory says "User prefers Python" and another says "User uses Python 3.13";
 these store different claims.
@@ -231,8 +249,9 @@ duplicate storage is unnecessary are required.
 **Gold label target.** The duplicate pair receives the relational gold label; the manifest records
 both IDs.
 
-**Establishment.** Exact duplicates are statically established. Uncontrolled paraphrase equivalence
-would require semantic evidence and is not produced by the mutation harness.
+**Establishment.** Duplicates that are equivalent under normalization are statically established;
+the fold is deterministic and needs no model. Equivalence beyond it—synonyms, reordering, or
+rephrasing—would require semantic evidence and is not produced by the mutation harness.
 
 **Mutation strategy.** `exact_duplicate` copies a record into the same scope with a new deterministic
 ID and preserves the original record.

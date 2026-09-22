@@ -15,7 +15,7 @@ EXPECTED_LABELS = (
 
 
 def test_taxonomy_version_and_labels_are_frozen() -> None:
-    assert TAXONOMY_VERSION == "1.0"
+    assert TAXONOMY_VERSION == "1.1"
     assert len(DefectClass) == 8
     assert tuple(defect.value for defect in DefectClass) == EXPECTED_LABELS
 
