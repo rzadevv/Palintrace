@@ -51,10 +51,9 @@ See [checker behavior](docs/checkers.md) for the checker-specific requirements.
 - A backend-independent normalized memory schema with deterministic JSON serialization.
 - File, Mem0, Graphiti, and Letta adapters.
 - Five public audit checkers for provenance, duplication, supersession, scope, and support.
-- Controlled mutation manifests kept separate from detector input.
+- Controlled mutation manifests kept separate from checker input.
 - Retrieval sufficiency and paired shadowing assessment for recorded observations.
 - An optional local CPU MiniLM semantic judge.
-- Reproducible synthetic evaluation fixtures and runners.
 
 ## Installation
 
@@ -154,14 +153,14 @@ palintrace retrieval-audit \
 | Checker | Detects | Extra input |
 |---|---|---|
 | `orphaned_provenance` | Declared transcript references that cannot be resolved | `TranscriptSet` |
-| `redundancy_bloat` | Exact duplicate memories in the same scope | None |
+| `redundancy_bloat` | Memories with equivalent normalized content in the same scope | None |
 | `stale_active` | Explicitly superseded memories that remain active | None |
-| `privacy_scope_violation` | Policy-prohibited exact replicas across user or agent boundaries | Scope policy |
+| `privacy_scope_violation` | Policy-prohibited replicas across user or agent boundaries | Scope policy |
 | `unsupported_claim` | Claims not entailed by their declared transcript evidence | `TranscriptSet` and semantic judge |
 
 `unsupported_claim` requires transcript evidence. The CLI implementation also requires the optional
 local semantic dependency plus an explicit model ID and revision when using the bundled MiniLM
-judge. The identity-grounded semantic candidate is experimental and is not a public/default checker.
+judge.
 
 See [checker behavior](docs/checkers.md), [semantic evidence](docs/semantics.md), and the
 [defect taxonomy](docs/taxonomy.md) for the detailed contracts.
@@ -202,56 +201,18 @@ Inspect the machine-readable contract without contacting a backend:
 palintrace capabilities --adapter graphiti
 ```
 
-## Evaluation
-
-Palintrace includes gold-safe controlled-mutation accounting and reproducible synthetic probes. The
-results are controlled evidence, not estimates of production accuracy or defect prevalence. They
-include supported, negative, and inconclusive findings.
-
-| Area | Current evidence |
-|---|---|
-| Structural checkers | Supported on the controlled synthetic benchmark |
-| Unsupported claim | Detects controlled substitutions; the plain representation has identity-sensitive clean failures |
-| Identity grounding | Supported as an optional experimental candidate |
-| Broad retrieval shadowing | Tested hypothesis not supported |
-| Negation-specific retrieval | Tested hypothesis not supported |
-| Confidence abstention | Inconclusive under the current synthetic probe |
-| Internal contradiction | Deferred |
-| Injected instruction | Deferred |
-
-See [evaluation results](docs/results.md) for the full experiments, counts, and limitations.
-
-The controlled static evaluation keeps mutation labels separate from checker input:
-
-```mermaid
-flowchart LR
-    Base[Base store] --> Harness[Mutation harness]
-    Harness --> Mutated[Mutated store]
-    Harness --> Manifest["Separate MutationManifest / gold labels"]
-    Mutated --> Checker[Checker]
-    Checker --> Result[CheckerResult]
-    Result --> Evaluator[Evaluator]
-    Manifest -->|joined only after checking| Evaluator
-    Evaluator --> Metrics[Evaluation metrics and results]
-```
-
-The checker never receives the gold manifest. Retrieval-shadowing challenges instead require paired
-recorded retrieval observations; see [retrieval auditing](docs/retrieval.md).
-
 ## Limitations
 
 - Palintrace does not ship a production/live backend retriever.
 - Retrieval shadowing can be projected from recorded observations but is not automatically scanned.
-- `internal_contradiction` and `injected_instruction` detectors remain deferred.
+- No checker reports `internal_contradiction` or `injected_instruction`; `palintrace mutate` can
+  inject both.
 - Semantic conclusions depend on the evidence and context supplied to the audit.
 - Palintrace does not perform automatic repair or generate embeddings.
 
 ## Documentation
 
-- [Compatibility policy](docs/compatibility.md)
 - [Checker behavior](docs/checkers.md)
-- [Evaluation methodology](docs/evaluation.md)
-- [Evaluation results](docs/results.md)
 - [Retrieval auditing](docs/retrieval.md)
 - [Semantic evidence](docs/semantics.md)
 - [Mutation harness](docs/mutations.md)

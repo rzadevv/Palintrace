@@ -11,9 +11,27 @@ are supported by the public API and CLI.
 | `privacy_scope_violation` | `privacy_scope_violation` | scope policy | structural |
 | `unsupported_claim` | `unsupported_claim` | transcripts and semantic model | semantic |
 
-The remaining taxonomy classes—`internal_contradiction`, `retrieval_shadowing`, and
-`injected_instruction`—do not have supported static production checkers. Retrieval shadowing is
-assessed through paired retrieval experiments rather than store inspection.
+`retrieval_shadowing` is reported by `palintrace retrieval-audit` from a recorded retrieval
+observation rather than by store inspection; see [Retrieval auditing](retrieval.md).
+`internal_contradiction` and `injected_instruction` have no checker.
+
+## Rule identifiers
+
+Each result carries a stable `rule_id` of the form `memory.<area>.<defect>`, a numeric `rule_version`,
+and a default severity:
+
+| `checker_id` | `rule_id` | `rule_version` | Severity |
+|---|---|---|---|
+| `orphaned_provenance` | `memory.provenance.orphaned` | `1.0.0` | `error` |
+| `redundancy_bloat` | `memory.duplication.equivalent-content` | `1.0.0` | `warning` |
+| `stale_active` | `memory.state.explicit-stale` | `2.0.0` | `error` |
+| `privacy_scope_violation` | `memory.scope.prohibited-replica` | `1.0.0` | `error` |
+| `unsupported_claim` | `memory.claim.unsupported` | `1.0.0` | `error` |
+| `retrieval_shadowing` | `memory.retrieval.shadowing` | `1.0.0` | `error` |
+
+`checker_id` names the implementation, `rule_id` names the defect it reports, and `rule_version`
+versions the rule's meaning. A custom checker outside this table must supply all three rule fields
+explicitly.
 
 ## Common result model
 
@@ -38,7 +56,7 @@ severity and finding presence, so confidence does not affect the exit status.
 remain logical memory identifiers rather than fabricated source-code locations.
 
 Findings avoid serializing memory content and transcript text. Semantic findings contain hashes and
-source coordinates instead. Mutation manifests and benchmark gold labels are never checker inputs.
+source coordinates instead. Mutation manifests and gold labels are never checker inputs.
 
 ## Orphaned provenance
 
@@ -163,26 +181,6 @@ palintrace audit \
 The semantic judge is loaded only when this checker is selected. See [Semantic
 checks](semantics.md) for the evidence and model contract.
 
-## Optional identity-grounded candidate
-
-The repository includes an evaluation candidate that prepends an explicitly trusted human-readable
-speaker label to evidence from exactly attributed transcript turns. It accepts only explicit
-turn-level bindings, abstains on unavailable or conflicting identity, and never infers identity from
-roles, scope IDs, provider metadata, transcript prose, or the memory claim.
-
-Current adapters do not automatically provide both exact turn attribution and a trustworthy semantic
-speaker label. Callers can construct an explicit source-admission envelope, where:
-
-- `TRUSTED_EXPLICIT` requires a turn, stable principal ID, and speaker label;
-- `TRUSTED_CONFIGURED` requires a turn and operator-configured speaker label;
-- `UNAVAILABLE` and `AMBIGUOUS` do not compile into bindings; and
-- conflicting labels or principal IDs fail closed.
-
-The candidate remains separate from `UnsupportedClaimChecker`, absent from public checker exports,
-not selectable through the CLI, and not enabled by default. Its current readiness is
-`OPTIONAL_EXPLICIT_API_READY`, not default readiness. See [Semantic checks](semantics.md) and
-[Evaluation results](results.md) for the exact evidence and limits.
-
 ## Running checks
 
 Select one checker explicitly:
@@ -197,3 +195,35 @@ palintrace audit \
 
 Input requirements are checker-specific. Palintrace rejects missing required inputs rather than
 silently omitting a selected check.
+
+Run every checker in one pass with `--checker all`. Checkers whose required inputs are missing are
+reported as skipped rather than failing the run. `palintrace preflight` reports which checkers a
+store can support before running them.
+
+## Adapter capabilities
+
+`palintrace capabilities --adapter <name>` prints which normalized fields an adapter can populate.
+Each field has one status:
+
+- `supported`: the adapter has a direct normalized mapping;
+- `conditional`: an optional source field or caller configuration is required; and
+- `unsupported`: the adapter has no normalized mapping.
+
+Status describes what the adapter can map, not whether every record carries a value.
+
+## Exit status and SARIF
+
+`audit` and `retrieval-audit` accept `--fail-on info|warning|error`. Severity is ordered
+`info < warning < error`.
+
+| Status | Meaning |
+|---|---|
+| `0` | The command succeeded and no configured gate failed |
+| `1` | The audit succeeded, but findings met the `--fail-on` threshold |
+| `2` | An argument, input, or configuration error occurred |
+
+Without `--fail-on`, findings do not change the exit status. Outputs are written before the exit
+status is decided.
+
+`--sarif-output` writes a SARIF `2.1.0` rendering alongside the JSON result. Severity maps `info` to
+`note`, `warning` to `warning`, and `error` to `error`.
