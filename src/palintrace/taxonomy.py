@@ -1,4 +1,4 @@
-"""Frozen research labels for memory-store defects."""
+"""Defect class labels for memory-store findings and mutations."""
 
 from enum import StrEnum
 
@@ -6,7 +6,7 @@ TAXONOMY_VERSION = "1.1"
 
 
 class DefectClass(StrEnum):
-    """The eight defect classes frozen for taxonomy version 1.1."""
+    """Defect classes that checkers report and mutations inject."""
 
     UNSUPPORTED_CLAIM = "unsupported_claim"
     INTERNAL_CONTRADICTION = "internal_contradiction"
