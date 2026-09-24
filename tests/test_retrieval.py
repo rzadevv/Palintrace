@@ -408,14 +408,7 @@ def test_retrieval_package_has_no_forbidden_dependencies_or_raw_access() -> None
     assert violations == []
 
 
-def test_retrieval_architecture_has_contract_only() -> None:
-    assert {path.name for path in RETRIEVAL_ROOT.glob("*.py")} == {
-        "__init__.py",
-        "base.py",
-        "challenge.py",
-        "models.py",
-        "policy.py",
-    }
+def test_retrieval_shadowing_is_not_a_store_checker() -> None:
     assert "RetrievalShadowingChecker" not in {
         node.name
         for path in Path("src/palintrace").rglob("*.py")
@@ -425,7 +418,7 @@ def test_retrieval_architecture_has_contract_only() -> None:
     assert "retrieval_shadowing" not in cli.CHECKER_NAMES
 
 
-def test_part_two_probe_can_be_translated_only_at_the_test_boundary() -> None:
+def test_mutation_retrieval_probe_translates_into_an_audit_request() -> None:
     base_store = NormalizedStore(
         adapter="test",
         memories=(

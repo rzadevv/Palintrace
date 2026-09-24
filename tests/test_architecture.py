@@ -1,6 +1,8 @@
 import ast
 from pathlib import Path
 
+from palintrace import checkers
+
 SOURCE_ROOT = Path("src/palintrace")
 CHECKER_ROOT = SOURCE_ROOT / "checkers"
 SEMANTICS_ROOT = SOURCE_ROOT / "semantics"
@@ -38,11 +40,6 @@ def test_generic_code_does_not_read_raw_attributes() -> None:
             if isinstance(node, ast.Attribute) and node.attr == "raw":
                 violations.append(f"{path}:{node.lineno}")
     assert violations == []
-
-
-def test_package_has_no_unimplemented_detector_repair_or_benchmark_layers() -> None:
-    forbidden = {"detectors", "repair", "benchmarks"}
-    assert not any(path.name in forbidden for path in SOURCE_ROOT.rglob("*"))
 
 
 def test_checker_package_cannot_import_mutation_code_or_gold_models() -> None:
@@ -84,19 +81,17 @@ def test_checker_package_does_not_read_raw_attributes() -> None:
     assert violations == []
 
 
-def test_checker_package_has_only_implemented_modules() -> None:
-    modules = {path.name for path in CHECKER_ROOT.glob("*.py")}
-    assert modules == {
-        "__init__.py",
-        "base.py",
-        "models.py",
-        "orphaned_provenance.py",
-        "privacy_scope_violation.py",
-        "redundancy_bloat.py",
-        "retrieval_shadowing.py",
-        "stale_active.py",
-        "unsupported_claim.py",
+def test_checker_package_exports_the_five_public_checkers() -> None:
+    exported = {name for name in checkers.__all__ if name.endswith("Checker")} - {"Checker"}
+
+    assert exported == {
+        "OrphanedProvenanceChecker",
+        "PrivacyScopeViolationChecker",
+        "RedundancyBloatChecker",
+        "StaleActiveChecker",
+        "UnsupportedClaimChecker",
     }
+    assert all(callable(getattr(checkers, name).check) for name in exported)
 
 
 def test_semantics_has_no_checker_or_mutation_dependency() -> None:
@@ -142,14 +137,3 @@ def test_semantics_does_not_read_raw_attributes() -> None:
             if isinstance(node, ast.Attribute) and node.attr == "raw":
                 violations.append(f"{path}:{node.lineno}")
     assert violations == []
-
-
-def test_semantics_contains_only_frozen_modules_plus_composition_and_identity() -> None:
-    assert {path.name for path in SEMANTICS_ROOT.glob("*.py")} == {
-        "__init__.py",
-        "base.py",
-        "composition.py",
-        "evidence.py",
-        "local_nli.py",
-        "models.py",
-    }

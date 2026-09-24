@@ -1,4 +1,4 @@
-"""Behavioural CLI contract that replaces the former byte freeze on cli.py."""
+"""Behavioural contract for the public CLI."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ def _action(parser: argparse.ArgumentParser, dest: str) -> argparse.Action:
     return next(action for action in parser._actions if action.dest == dest)
 
 
-def test_public_commands_are_exactly_the_documented_set() -> None:
+def test_public_commands_are_exactly_the_six_commands() -> None:
     commands = _subparsers(command.build_parser())
 
     assert tuple(sorted(commands.choices)) == PUBLIC_COMMANDS
@@ -116,7 +116,7 @@ def test_gating_options_keep_their_choices_and_absent_default(name: str) -> None
     assert fail_on.required is False
 
 
-def test_dump_keeps_the_adapter_and_scope_flags_probe_inputs_were_built_with() -> None:
+def test_dump_keeps_its_adapter_and_scope_flags() -> None:
     commands = _subparsers(command.build_parser())
     dump = commands.choices["dump"]
 
