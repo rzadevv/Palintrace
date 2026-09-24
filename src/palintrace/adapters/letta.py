@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Iterable
-from typing import Any, Literal
+from typing import Any
 
 from pydantic import ValidationError
 
@@ -21,8 +21,6 @@ from palintrace.adapters.base import (
 )
 from palintrace.models import MemoryScope, NormalizedMemory, ProvenanceStatus, SourceRef
 from palintrace.models.store import NormalizedStore
-
-LettaMemoryType = Literal["core", "archival"]
 
 
 class LettaAdapter(MemoryAdapter):
