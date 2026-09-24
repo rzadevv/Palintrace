@@ -73,20 +73,6 @@ mutation manifest or expected answer text. It also accepts the optional `--fail-
 by static audits, for example `--fail-on error`. Use `--sarif-output PATH` to write a SARIF projection
 alongside the canonical retrieval result.
 
-## Paired challenges
-
-`assess_paired_retrieval_challenge` compares baseline and mutated observations for the same request.
-Both observations must agree on query hash, expected targets, `top_k`, and retriever identity.
-
-| Outcome | Baseline | Mutated |
-|---|---|---|
-| `induced_shadowing` | sufficient | insufficient |
-| `resilient` | sufficient | sufficient |
-| `baseline_insufficient` | insufficient | either state |
-
-Only baseline-eligible challenges can show induced shadowing. Adding distractors to a store is a
-challenge construction step, not proof that shadowing occurred.
-
 ## Limitations
 
 - Palintrace does not ship a live production retriever.
