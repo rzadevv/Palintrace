@@ -87,13 +87,6 @@ Both observations must agree on query hash, expected targets, `top_k`, and retri
 Only baseline-eligible challenges can show induced shadowing. Adding distractors to a store is a
 challenge construction step, not proof that shadowing occurred.
 
-## Evaluation retriever
-
-The repository includes a deterministic lexical BM25-style retriever under `palintrace.evaluation` for
-reproducing controlled experiments. It tokenizes ASCII-alphanumeric terms, uses fixed scoring and
-tie ordering, and reads only memory content. It is intentionally absent from `palintrace.retrieval` and
-the public CLI.
-
 ## Limitations
 
 - Palintrace does not ship a live production retriever.
@@ -101,6 +94,3 @@ the public CLI.
 - Relevance targets must come from the audit scenario or caller.
 - Observations bind retriever identity and query hash but not a cryptographic digest of every store
   record.
-- Synthetic retrieval results are not production prevalence estimates.
-
-See [Evaluation results](results.md) for the strong and matched retrieval experiments.

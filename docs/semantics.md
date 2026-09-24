@@ -65,7 +65,7 @@ python -m pip install -e '.[semantic-local]'
 ```
 
 Construction requires an explicit Hugging Face model ID and revision. The implementation loads
-safetensors with `trust_remote_code=False`, moves the classifier to CPU, and uses evaluation mode.
+safetensors with `trust_remote_code=False`, moves the classifier to CPU, and runs it in inference mode.
 Torch and Transformers imports are lazy, so core installs and ordinary structural audits do not load
 the model.
 
@@ -90,63 +90,3 @@ evidence. Its pipeline is:
 The result includes source coordinates, relation, score, judge identity, composition style, and
 segment counts, but not transcript or memory text. Checker statistics expose skipped and assessed
 records so that zero findings cannot be mistaken for complete coverage.
-
-## Speaker identity
-
-First-person transcript evidence can be ambiguous when a memory names the speaker. Palintrace does not
-infer identity from transcript text, memory claims, roles, metadata, scope IDs, raw backend fields,
-NER, embeddings, or another model.
-
-`SpeakerIdentityBindings` accepts explicit turn-level mappings:
-
-```text
-(transcript_id, turn_idx) -> speaker_label
-```
-
-Resolution returns:
-
-- `RESOLVED` when every referenced turn has the same explicit speaker label;
-- `UNAVAILABLE` when a turn coordinate or binding is missing; or
-- `CONFLICT` when referenced turns have different labels.
-
-Only `RESOLVED` input can produce the grounded premise:
-
-```text
-The speaker is {speaker_label}.
-{plain_evidence}
-```
-
-There is no fallback to ungrounded evidence for unavailable or conflicting identity.
-
-## Trusted binding sources
-
-`SpeakerIdentitySourceAssertion` records caller-supplied source provenance separately from the
-semantic binding. Its trust classes are:
-
-- `TRUSTED_EXPLICIT`: exact turn, speaker label, and stable principal ID are required;
-- `TRUSTED_CONFIGURED`: exact turn and operator-configured speaker label are required;
-- `UNAVAILABLE`: the integration cannot supply a usable assertion; and
-- `AMBIGUOUS`: the integration supplies conflicting or incomplete identity information.
-
-Unavailable or ambiguous assertions cannot carry a speaker label and cannot compile. Conflicting
-labels or principal IDs fail closed. Principal IDs remain distinct from human-readable semantic
-labels.
-
-The current File, Mem0, Graphiti, Letta, and transcript input paths do not automatically provide
-both trustworthy exact-turn attribution and a human-readable label. File-based callers can provide
-explicit configuration. Other integrations need a surrounding ingestion layer that preserves
-turn-level assertions; provider IDs, episode prose, groups, roles, and arbitrary metadata are not
-enough.
-
-## Identity-grounded candidate
-
-`IdentityGroundedUnsupportedClaimChecker` uses the explicit identity contract and abstains on
-`UNAVAILABLE` or `CONFLICT`. It remains separate from `UnsupportedClaimChecker`, is not exported by
-the checker package, and is not available through the CLI or default checker list. Controlled
-synthetic evidence supports the tested representation, but production identity-binding prevalence
-is unknown. See [Evaluation results](results.md).
-
-## Deferred methods
-
-The repository retains fixtures documenting negative development results for internal contradiction
-and injected-instruction detection, but no production checker is implemented for either class.
