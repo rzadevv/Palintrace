@@ -96,7 +96,6 @@ def test_checker_package_has_only_implemented_modules() -> None:
         "retrieval_shadowing.py",
         "stale_active.py",
         "unsupported_claim.py",
-        "unsupported_claim_identity_grounded.py",
     }
 
 
@@ -151,8 +150,6 @@ def test_semantics_contains_only_frozen_modules_plus_composition_and_identity() 
         "base.py",
         "composition.py",
         "evidence.py",
-        "identity.py",
-        "identity_source.py",
         "local_nli.py",
         "models.py",
     }

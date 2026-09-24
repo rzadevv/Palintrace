@@ -184,14 +184,6 @@ def test_checker_result_rejects_wrong_schema_and_blank_identity() -> None:
             "error",
         ),
         (
-            "unsupported_claim_identity_grounded",
-            "0.1",
-            DefectClass.UNSUPPORTED_CLAIM,
-            "memory.claim.unsupported",
-            "1.0.0",
-            "error",
-        ),
-        (
             "retrieval_shadowing",
             "1.0",
             DefectClass.RETRIEVAL_SHADOWING,
@@ -232,25 +224,6 @@ def test_retired_rule_ids_are_reserved_and_never_reused_by_a_current_rule() -> N
     }
     assert current_rule_ids.isdisjoint(RETIRED_RULE_IDS)
     assert set(RETIRED_RULE_IDS.values()) <= current_rule_ids
-
-
-def test_alternate_checker_implementations_can_share_a_rule() -> None:
-    stats = CheckerStats(memories_scanned=0, findings_emitted=0)
-    supported = CheckerResult(
-        checker_id="unsupported_claim",
-        checker_version="1.0",
-        defect_class=DefectClass.UNSUPPORTED_CLAIM,
-        stats=stats,
-    )
-    identity_grounded = CheckerResult(
-        checker_id="unsupported_claim_identity_grounded",
-        checker_version="0.1",
-        defect_class=DefectClass.UNSUPPORTED_CLAIM,
-        stats=stats,
-    )
-
-    assert supported.checker_id != identity_grounded.checker_id
-    assert supported.rule_id == identity_grounded.rule_id == "memory.claim.unsupported"
 
 
 @pytest.mark.parametrize(

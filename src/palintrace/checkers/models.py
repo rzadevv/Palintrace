@@ -61,12 +61,6 @@ _BUILTIN_RULE_METADATA: Mapping[
             "1.0.0",
             "error",
         ),
-        "unsupported_claim_identity_grounded": (
-            DefectClass.UNSUPPORTED_CLAIM,
-            "memory.claim.unsupported",
-            "1.0.0",
-            "error",
-        ),
         "retrieval_shadowing": (
             DefectClass.RETRIEVAL_SHADOWING,
             "memory.retrieval.shadowing",

@@ -242,8 +242,6 @@ recorded retrieval observations; see [retrieval auditing](docs/retrieval.md).
 
 - Palintrace does not ship a production/live backend retriever.
 - Retrieval shadowing can be projected from recorded observations but is not automatically scanned.
-- The identity-grounded unsupported-claim candidate is optional and nondefault; current adapters do
-  not automatically supply trusted human-readable speaker bindings.
 - `internal_contradiction` and `injected_instruction` detectors remain deferred.
 - Semantic conclusions depend on the evidence and context supplied to the audit.
 - Palintrace does not perform automatic repair or generate embeddings.
@@ -258,7 +256,6 @@ recorded retrieval observations; see [retrieval auditing](docs/retrieval.md).
 - [Semantic evidence](docs/semantics.md)
 - [Mutation harness](docs/mutations.md)
 - [Defect taxonomy](docs/taxonomy.md)
-- [Speaker identity integration](docs/speaker_identity_integrations.md)
 
 ## Development
 

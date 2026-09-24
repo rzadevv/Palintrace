@@ -9,21 +9,6 @@ from palintrace.semantics.composition import (
     compose_evidence,
 )
 from palintrace.semantics.evidence import resolve_declared_evidence
-from palintrace.semantics.identity import (
-    SpeakerIdentityBinding,
-    SpeakerIdentityBindings,
-    SpeakerIdentityError,
-    SpeakerIdentityResolution,
-    SpeakerIdentityResolutionStatus,
-    build_speaker_grounded_premise,
-    resolve_speaker_identity,
-)
-from palintrace.semantics.identity_source import (
-    SpeakerIdentityAdmissionError,
-    SpeakerIdentitySourceAssertion,
-    SpeakerIdentitySourceAssertions,
-    SpeakerIdentityTrust,
-)
 from palintrace.semantics.local_nli import (
     LocalNLISemanticJudge,
     SemanticDependencyError,
@@ -61,18 +46,7 @@ __all__ = [
     "SemanticModelConfigError",
     "SemanticRelation",
     "SemanticUsage",
-    "SpeakerIdentityBinding",
-    "SpeakerIdentityBindings",
-    "SpeakerIdentityAdmissionError",
-    "SpeakerIdentityError",
-    "SpeakerIdentityResolution",
-    "SpeakerIdentityResolutionStatus",
-    "SpeakerIdentitySourceAssertion",
-    "SpeakerIdentitySourceAssertions",
-    "SpeakerIdentityTrust",
-    "build_speaker_grounded_premise",
     "compose_evidence",
     "resolve_declared_evidence",
-    "resolve_speaker_identity",
     "semantic_judge_identity",
 ]
