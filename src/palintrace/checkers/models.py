@@ -27,6 +27,7 @@ CHECKER_RESULT_SCHEMA_VERSION = "0.3"
 
 Severity = Literal["info", "warning", "error"]
 
+# checker_id -> (defect_class, rule_id, rule_version, severity)
 _BUILTIN_RULE_METADATA: Mapping[
     str, tuple[DefectClass, str, str, Severity]
 ] = MappingProxyType(
@@ -69,41 +70,6 @@ _BUILTIN_RULE_METADATA: Mapping[
         ),
     }
 )
-
-# Retired rule IDs stay reserved and are never reused. They remain correct for the frozen v0.1
-# checkers below, which still evaluate the exact-match meaning these IDs were published with.
-RETIRED_RULE_IDS: Mapping[str, str] = MappingProxyType(
-    {
-        "memory.duplication.exact": "memory.duplication.equivalent-content",
-        "memory.scope.prohibited-exact-replica": "memory.scope.prohibited-replica",
-    }
-)
-
-# frozen benchmark implementations keep the rule identity their semantics shipped with
-_SUPERSEDED_RULES: Mapping[tuple[str, str], tuple[str, str]] = MappingProxyType(
-    {
-        ("privacy_scope_violation", "1.0"): ("memory.scope.prohibited-exact-replica", "1.0.0"),
-        ("redundancy_bloat", "1.0"): ("memory.duplication.exact", "1.0.0"),
-        ("stale_active", "1.0"): ("memory.state.explicit-stale", "1.0.0"),
-    }
-)
-
-
-def _rule_metadata(
-    checker_id: str, checker_version: object
-) -> tuple[DefectClass, str, str, Severity] | None:
-    """Return canonical rule metadata, honouring superseded frozen rule identities."""
-
-    metadata = _BUILTIN_RULE_METADATA.get(checker_id)
-    if metadata is None:
-        return None
-    defect_class, rule_id, rule_version, severity = metadata
-    if isinstance(checker_version, str):
-        rule_id, rule_version = _SUPERSEDED_RULES.get(
-            (checker_id, checker_version), (rule_id, rule_version)
-        )
-    return (defect_class, rule_id, rule_version, severity)
-
 
 _RULE_ID_PATTERN = re.compile(
     r"memory\.[a-z0-9]+(?:-[a-z0-9]+)*\.[a-z0-9]+(?:-[a-z0-9]+)*"
@@ -305,7 +271,7 @@ class CheckerResult(BaseModel):
         checker_id = data.get("checker_id")
         if not isinstance(checker_id, str):
             return data
-        metadata = _rule_metadata(checker_id, data.get("checker_version"))
+        metadata = _BUILTIN_RULE_METADATA.get(checker_id)
         if metadata is None:
             if any(field not in data for field in ("rule_id", "rule_version", "severity")):
                 raise ValueError("custom checkers must supply explicit rule metadata")
@@ -352,7 +318,7 @@ class CheckerResult(BaseModel):
 
     @model_validator(mode="after")
     def findings_match_result(self) -> CheckerResult:
-        metadata = _rule_metadata(self.checker_id, self.checker_version)
+        metadata = _BUILTIN_RULE_METADATA.get(self.checker_id)
         if metadata is not None:
             expected_defect, rule_id, rule_version, severity = metadata
             if self.defect_class is not expected_defect:
