@@ -7,7 +7,6 @@ from pathlib import Path
 import pytest
 
 import palintrace.cli as cli
-import palintrace.retrieval as retrieval
 from palintrace.checkers import CheckerResult
 from palintrace.retrieval import (
     RetrievalHit,
@@ -339,23 +338,6 @@ def test_cli_calls_projection_once_with_validated_observation_and_enum(
 
     assert cli.main(_arguments(observation_path, policy="any_expected")) == 0
     assert calls == [(observation, RetrievalSufficiencyPolicy.ANY_EXPECTED)]
-
-
-def test_cli_never_executes_runtime_retrieval(
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    observation_path = tmp_path / "observation.json"
-    _write_observation(observation_path, _observation())
-
-    def unexpected_execution(**kwargs: object) -> None:
-        pytest.fail(f"recorded retrieval CLI must not execute retrieval: {kwargs}")
-
-    monkeypatch.setattr(retrieval, "run_retrieval_audit", unexpected_execution)
-
-    assert cli.main(_arguments(observation_path)) == 0
-    CheckerResult.model_validate_json(capsys.readouterr().out)
 
 
 def test_retrieval_cli_handler_delegates_without_projection_logic() -> None:

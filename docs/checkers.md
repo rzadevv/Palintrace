@@ -157,7 +157,7 @@ The checker processes each declared memory as follows:
 
 1. resolve all declared source references;
 2. abstain if resolution fails or yields no evidence;
-3. compose evidence using the configured fixed composition style;
+3. join the evidence texts into one premise;
 4. obtain one directional judgment with evidence as premise and memory content as hypothesis;
 5. accept `entailment`; and
 6. report `neutral` or `contradiction` as unsupported.

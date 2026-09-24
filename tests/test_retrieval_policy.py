@@ -10,20 +10,14 @@ from pydantic import ValidationError
 import palintrace.retrieval as retrieval_api
 from palintrace import cli
 from palintrace.checkers import CheckerCost, Finding
-from palintrace.models import NormalizedMemory, NormalizedStore
-from palintrace.mutations import DistractorFamily, MutationRequest, mutate
 from palintrace.retrieval import (
-    RetrievalAuditRequest,
     RetrievalHit,
     RetrievalObservation,
-    RetrievalResponse,
     RetrievalSufficiencyAssessment,
     RetrievalSufficiencyPolicy,
     RetrievalUsage,
     assess_retrieval_sufficiency,
-    run_retrieval_audit,
 )
-from palintrace.taxonomy import DefectClass
 
 POLICY_PATH = Path("src/palintrace/retrieval/policy.py")
 QUERY_TEXT = "Which stored memory answers this exact audit query?"
@@ -385,7 +379,6 @@ def test_policy_module_has_no_execution_or_forbidden_dependencies() -> None:
     forbidden_names = {
         "Finding",
         "NormalizedStore",
-        "Retriever",
         "RetrievalProbe",
     }
     violations: list[str] = []
@@ -427,69 +420,13 @@ def test_finding_and_checker_cost_schemas_are_unchanged_and_no_checker_exists() 
     assert "retrieval_shadowing" not in cli.CHECKER_NAMES
 
 
-class FakeRetriever:
-    retriever_id = "policy-fake"
-    retriever_version = "1"
-
-    def __init__(self, response: RetrievalResponse) -> None:
-        self.response = response
-        self.calls: list[dict[str, object]] = []
-
-    def retrieve(self, *, query: str, top_k: int) -> RetrievalResponse:
-        self.calls.append({"query": query, "top_k": top_k})
-        return self.response
-
-
 def test_single_target_policies_agree_for_present_and_absent_results() -> None:
-    base_store = NormalizedStore(
-        adapter="test",
-        memories=(
-            NormalizedMemory(
-                id="editor-neovim",
-                content="User's favorite editor is Neovim.",
-            ),
-        ),
-    )
-    mutation = mutate(
-        base_store,
-        MutationRequest(
-            defect_class=DefectClass.RETRIEVAL_SHADOWING,
-            target_memory_id="editor-neovim",
-            query="Which editor does the user prefer?",
-            distractor_family=DistractorFamily.EDITOR,
-        ),
-    )
-    probe = mutation.manifest.retrieval_probe
-    assert probe is not None
-    assert len(probe.expected_memory_ids) == 1
-    request = RetrievalAuditRequest(
-        request_id="policy-cross-check",
-        query=probe.query,
-        expected_memory_ids=probe.expected_memory_ids,
+    target_returned = _observation(
+        expected_memory_ids=("m1",),
+        hits=(RetrievalHit(memory_id="m1", rank=1),),
         top_k=2,
     )
-    target_returned_retriever = FakeRetriever(
-        RetrievalResponse(
-            hits=(RetrievalHit(memory_id=probe.expected_memory_ids[0], rank=1),),
-            usage=RetrievalUsage(retrieval_calls=1, candidate_count=1),
-        )
-    )
-    target_absent_retriever = FakeRetriever(
-        RetrievalResponse(
-            hits=(),
-            usage=RetrievalUsage(retrieval_calls=1, candidate_count=0),
-        )
-    )
-    target_returned = run_retrieval_audit(
-        store=mutation.mutated_store,
-        request=request,
-        retriever=target_returned_retriever,
-    )
-    target_absent = run_retrieval_audit(
-        store=mutation.mutated_store,
-        request=request,
-        retriever=target_absent_retriever,
-    )
+    target_absent = _observation(expected_memory_ids=("m1",), top_k=2)
 
     returned_all, returned_any = _assess_both(target_returned)
     absent_all, absent_any = _assess_both(target_absent)
@@ -497,5 +434,3 @@ def test_single_target_policies_agree_for_present_and_absent_results() -> None:
     assert returned_any.sufficient is True
     assert absent_all.sufficient is False
     assert absent_any.sufficient is False
-    assert target_returned_retriever.calls == [{"query": probe.query, "top_k": 2}]
-    assert target_absent_retriever.calls == [{"query": probe.query, "top_k": 2}]

@@ -16,8 +16,6 @@ from palintrace.checkers.models import (
 )
 from palintrace.models import NormalizedStore, ProvenanceStatus, TranscriptSet
 from palintrace.semantics import (
-    PRIMARY_EVIDENCE_COMPOSITION_STYLE,
-    EvidenceCompositionStyle,
     SemanticInputTooLongError,
     SemanticJudge,
     SemanticJudgment,
@@ -55,16 +53,9 @@ class UnsupportedClaimChecker:
     checker_version = "1.0"
     defect_class = DefectClass.UNSUPPORTED_CLAIM
 
-    def __init__(
-        self,
-        judge: SemanticJudge,
-        composition_style: EvidenceCompositionStyle = PRIMARY_EVIDENCE_COMPOSITION_STYLE,
-    ) -> None:
-        if not isinstance(composition_style, EvidenceCompositionStyle):
-            raise ValueError("unsupported evidence composition style")
+    def __init__(self, judge: SemanticJudge) -> None:
         self._judge = judge
         self._judge_id, self._judge_version = semantic_judge_identity(judge)
-        self.composition_style = composition_style
 
     def check(
         self,
@@ -107,10 +98,7 @@ class UnsupportedClaimChecker:
                 details["skipped_no_evidence"] += 1
                 continue
 
-            composed = compose_evidence(
-                resolution.segments,
-                style=self.composition_style,
-            )
+            composed = compose_evidence(resolution.segments)
             if not composed.text.strip():
                 details["skipped_no_evidence"] += 1
                 continue
@@ -154,7 +142,7 @@ class UnsupportedClaimChecker:
                         "semantic_relation": judgment.relation.value,
                         "judge_id": self._judge_id,
                         "judge_version": self._judge_version,
-                        "composition_style": self.composition_style.value,
+                        "composition_style": "plain",
                         "unique_segment_count": composed.unique_segment_count,
                         "premise_sha256": _text_sha256(composed.text),
                         "hypothesis_sha256": _text_sha256(memory.content),

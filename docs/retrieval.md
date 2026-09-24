@@ -1,38 +1,27 @@
 # Retrieval auditing
 
-Palintrace represents and audits retrieval behavior without choosing a production retrieval backend.
-The caller supplies the target request and either runs a `Retriever` or provides an already-recorded
-observation.
-
-## Audit request
-
-`RetrievalAuditRequest` declares:
-
-- a nonblank request ID;
-- the query text;
-- one or more expected memory IDs; and
-- a positive `top_k`.
-
-Expected targets are explicit audit inputs. They are never passed to the retriever and are not
-inferred from returned memories.
-
-## Retriever protocol
-
-A `Retriever` exposes a stable `retriever_id`, `retriever_version`, and:
-
-```python
-response = retriever.retrieve(query=request.query, top_k=request.top_k)
-```
-
-`run_retrieval_audit` checks the request against a normalized store, calls the retriever without
-expected IDs, and then reconciles returned IDs with the audited snapshot. Duplicate, missing,
-out-of-store, or inconsistent hits are rejected rather than silently repaired.
+Palintrace audits retrieval behavior from recorded observations. It does not run a retriever: the
+caller runs their own retrieval, records the result as a `RetrievalObservation` JSON file, and passes
+it to `palintrace retrieval-audit`.
 
 ## Recorded observations
 
-`RetrievalObservation` stores the request identity, SHA-256 of the query, expected targets,
-retriever identity, `top_k`, ranked hits, and usage. It does not store the query text, memory text,
-gold mutation metadata, or distractor IDs.
+`RetrievalObservation` stores a nonblank request ID, the lowercase hex SHA-256 of the query, the
+expected target memory IDs, the retriever identity, `top_k`, ranked hits, and usage. It does not
+store the query text or memory text.
+
+```json
+{
+  "request_id": "editor-preference",
+  "query_sha256": "<sha256 of the query text>",
+  "expected_memory_ids": ["editor-neovim"],
+  "top_k": 3,
+  "retriever_id": "my-retriever",
+  "retriever_version": "1",
+  "hits": [{"memory_id": "editor-vscode", "rank": 1, "score": 0.82}],
+  "usage": {"retrieval_calls": 1, "candidate_count": 1}
+}
+```
 
 Hits have unique one-based ranks and memory IDs. Their optional scores are finite numbers and are
 not interpreted across different retrievers.

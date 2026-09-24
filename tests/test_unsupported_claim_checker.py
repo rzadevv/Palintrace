@@ -22,7 +22,6 @@ from palintrace.models import (
     TranscriptTurn,
 )
 from palintrace.semantics import (
-    EvidenceCompositionStyle,
     LocalNLISemanticJudge,
     SemanticInputTooLongError,
     SemanticJudgeError,
@@ -120,14 +119,9 @@ def _single_memory_result(
     hypothesis: str,
     relation: SemanticRelation,
     score: float = 0.8,
-    composition_style: EvidenceCompositionStyle | None = None,
 ) -> tuple[_FakeJudge, CheckerResult]:
     judge = _FakeJudge(default=_judgment(relation, score=score))
-    checker = (
-        UnsupportedClaimChecker(judge)
-        if composition_style is None
-        else UnsupportedClaimChecker(judge, composition_style=composition_style)
-    )
+    checker = UnsupportedClaimChecker(judge)
     result = checker.check(
         _store(
             _memory(
@@ -509,22 +503,6 @@ def test_duplicate_source_ref_does_not_change_semantic_finding_identity() -> Non
     assert "segment_count" not in duplicate_evidence
     assert single_evidence == duplicate_evidence
     assert single_finding.finding_id == duplicate_finding.finding_id
-
-
-def test_role_labeled_composition_override_changes_only_premise_and_evidence() -> None:
-    judge, result = _single_memory_result(
-        premise="Declared fact.",
-        hypothesis="Stored claim.",
-        relation=SemanticRelation.NEUTRAL,
-        composition_style=EvidenceCompositionStyle.ROLE_LABELED,
-    )
-
-    assert judge.calls == [("user: Declared fact.", "Stored claim.")]
-    evidence = result.findings[0].evidence[0]
-    assert evidence.data["composition_style"] == "role_labeled"
-    assert evidence.data["premise_sha256"] == hashlib.sha256(
-        b"user: Declared fact."
-    ).hexdigest()
 
 
 def test_cost_aggregates_successful_usage_and_skips_contribute_zero() -> None:

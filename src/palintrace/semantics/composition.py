@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from enum import StrEnum
 from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -12,22 +11,11 @@ from palintrace.semantics.models import EvidenceSegment
 _StrictPositiveInt = Annotated[int, Field(strict=True, ge=1)]
 
 
-class EvidenceCompositionStyle(StrEnum):
-    """The two frozen representations evaluated for multi-segment evidence."""
-
-    PLAIN = "plain"
-    ROLE_LABELED = "role_labeled"
-
-
-PRIMARY_EVIDENCE_COMPOSITION_STYLE = EvidenceCompositionStyle.PLAIN
-
-
 class ComposedEvidence(BaseModel):
     """One deterministic premise plus transparent segment counts."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    style: EvidenceCompositionStyle
     text: str
     segment_count: _StrictPositiveInt
     unique_segment_count: _StrictPositiveInt
@@ -89,26 +77,12 @@ def canonical_unique_evidence_segments(
 
 def compose_evidence(
     segments: tuple[EvidenceSegment, ...],
-    *,
-    style: EvidenceCompositionStyle = PRIMARY_EVIDENCE_COMPOSITION_STYLE,
 ) -> ComposedEvidence:
-    """Canonicalize, exactly deduplicate, and render resolved evidence segments."""
-
-    if not segments:
-        raise SemanticCompositionError("at least one resolved evidence segment is required")
-    if not isinstance(style, EvidenceCompositionStyle):
-        raise SemanticCompositionError("unsupported evidence composition style")
+    """Canonicalize, exactly deduplicate, and join resolved evidence texts by newline."""
 
     unique_segments = canonical_unique_evidence_segments(segments)
-
-    if style is EvidenceCompositionStyle.PLAIN:
-        text = "\n".join(segment.text for segment in unique_segments)
-    else:
-        text = "\n".join(f"{segment.role}: {segment.text}" for segment in unique_segments)
-
     return ComposedEvidence(
-        style=style,
-        text=text,
+        text="\n".join(segment.text for segment in unique_segments),
         segment_count=len(segments),
         unique_segment_count=len(unique_segments),
     )

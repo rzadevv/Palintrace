@@ -44,17 +44,11 @@ to provenance checking.
 ## Evidence composition
 
 `compose_evidence()` accepts a nonempty tuple of resolved segments. It sorts them by source
-coordinates and content, removes exact duplicate declarations, and reports both original and unique
-segment counts.
+coordinates and content, removes exact duplicate declarations, joins the exact segment texts with
+newlines, and reports both original and unique segment counts.
 
-Two rendering styles exist:
-
-- `plain`: exact segment texts joined by newlines; and
-- `role_labeled`: each segment rendered as `<role>: <text>`.
-
-The public unsupported-claim checker uses `plain`. Composition does not filter roles, normalize
-case, rewrite pronouns, summarize, truncate, or add instructions. Empty evidence raises
-`SemanticCompositionError`.
+Composition does not filter roles, normalize case, rewrite pronouns, summarize, truncate, or add
+instructions. Empty evidence raises `SemanticCompositionError`.
 
 ## Bundled local NLI judge
 
@@ -82,7 +76,7 @@ evidence. Its pipeline is:
 
 1. resolve declared source coordinates;
 2. reject structurally broken or empty evidence;
-3. compose the evidence using `plain`;
+3. compose the evidence;
 4. call the configured semantic judge with evidence as premise and memory content as hypothesis;
 5. emit no finding for entailment; and
 6. emit an `unsupported_claim` finding for neutral or contradiction.

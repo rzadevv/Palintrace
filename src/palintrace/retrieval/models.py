@@ -1,4 +1,4 @@
-"""Provider-independent retrieval audit and runtime observation models."""
+"""Recorded retrieval observation models."""
 
 from __future__ import annotations
 
@@ -38,33 +38,6 @@ def _canonical_hits(value: tuple[RetrievalHit, ...]) -> tuple[RetrievalHit, ...]
     return tuple(sorted(value, key=lambda hit: hit.rank))
 
 
-class RetrievalAuditRequest(BaseModel):
-    """A caller-declared query and visible relevance targets for one retrieval audit."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    request_id: str
-    query: str
-    expected_memory_ids: tuple[str, ...]
-    top_k: StrictPositiveInt
-
-    @field_validator("request_id", "query")
-    @classmethod
-    def required_strings_must_not_be_blank(cls, value: str) -> str:
-        if not value.strip():
-            raise ValueError("request_id and query must not be blank")
-        return value
-
-    @field_validator("expected_memory_ids")
-    @classmethod
-    def expected_ids_are_canonical(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        return _canonical_memory_ids(
-            value,
-            field_name="expected_memory_ids",
-            require_nonempty=True,
-        )
-
-
 class RetrievalHit(BaseModel):
     """One minimal retrieval result, ordered authoritatively by one-based rank."""
 
@@ -100,22 +73,8 @@ class RetrievalUsage(BaseModel):
     candidate_count: StrictNonNegativeInt
 
 
-class RetrievalResponse(BaseModel):
-    """A retriever's minimal runtime result without audit targets or defect semantics."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    hits: tuple[RetrievalHit, ...]
-    usage: RetrievalUsage
-
-    @field_validator("hits")
-    @classmethod
-    def hits_are_canonical(cls, value: tuple[RetrievalHit, ...]) -> tuple[RetrievalHit, ...]:
-        return _canonical_hits(value)
-
-
 class RetrievalObservation(BaseModel):
-    """Deterministic joined audit specification and target-blind runtime evidence."""
+    """One recorded retrieval run joined to the targets it was expected to return."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 

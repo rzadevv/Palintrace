@@ -15,16 +15,11 @@ from palintrace.checkers import (
     Finding,
     project_retrieval_shadowing_result,
 )
-from palintrace.models import NormalizedMemory, NormalizedStore
-from palintrace.mutations import DistractorFamily, GoldLabelUnit, MutationRequest, mutate
 from palintrace.retrieval import (
-    RetrievalAuditRequest,
     RetrievalHit,
     RetrievalObservation,
-    RetrievalResponse,
     RetrievalSufficiencyPolicy,
     RetrievalUsage,
-    run_retrieval_audit,
 )
 from palintrace.taxonomy import DefectClass
 
@@ -402,7 +397,6 @@ def test_projection_module_has_no_store_retriever_mutation_or_raw_dependency() -
         "MutationManifest",
         "MutationRequest",
         "NormalizedStore",
-        "Retriever",
         "RetrievalProbe",
     }
     violations: list[str] = []
@@ -434,70 +428,9 @@ def test_no_checker_class_or_cli_choice_was_added() -> None:
     assert "retrieval_shadowing" not in cli.CHECKER_NAMES
 
 
-class FakeRetriever:
-    retriever_id = "projection-fake"
-    retriever_version = "1"
-
-    def __init__(self, response: RetrievalResponse) -> None:
-        self.response = response
-        self.calls: list[dict[str, object]] = []
-
-    def retrieve(self, *, query: str, top_k: int) -> RetrievalResponse:
-        self.calls.append({"query": query, "top_k": top_k})
-        return self.response
-
-
 def test_single_target_projects_to_zero_or_one_case_finding() -> None:
-    base_store = NormalizedStore(
-        adapter="test",
-        memories=(
-            NormalizedMemory(
-                id="editor-neovim",
-                content="User's favorite editor is Neovim.",
-            ),
-        ),
-    )
-    mutation = mutate(
-        base_store,
-        MutationRequest(
-            defect_class=DefectClass.RETRIEVAL_SHADOWING,
-            target_memory_id="editor-neovim",
-            query="Which editor does the user prefer?",
-            distractor_family=DistractorFamily.EDITOR,
-        ),
-    )
-    probe = mutation.manifest.retrieval_probe
-    assert probe is not None
-    assert len(probe.expected_memory_ids) == 1
-    assert mutation.manifest.gold_label.unit is GoldLabelUnit.RETRIEVAL_CASE
-    request = RetrievalAuditRequest(
-        request_id="projection-cross-check",
-        query=probe.query,
-        expected_memory_ids=probe.expected_memory_ids,
-        top_k=2,
-    )
-    target_returned_retriever = FakeRetriever(
-        RetrievalResponse(
-            hits=(RetrievalHit(memory_id=probe.expected_memory_ids[0], rank=1),),
-            usage=RetrievalUsage(retrieval_calls=1, candidate_count=1),
-        )
-    )
-    target_absent_retriever = FakeRetriever(
-        RetrievalResponse(
-            hits=(),
-            usage=RetrievalUsage(retrieval_calls=1, candidate_count=0),
-        )
-    )
-    target_returned = run_retrieval_audit(
-        store=mutation.mutated_store,
-        request=request,
-        retriever=target_returned_retriever,
-    )
-    target_absent = run_retrieval_audit(
-        store=mutation.mutated_store,
-        request=request,
-        retriever=target_absent_retriever,
-    )
+    target_returned = _observation(hits=(RetrievalHit(memory_id="m1", rank=1),), top_k=2)
+    target_absent = _observation(top_k=2)
 
     for policy in RetrievalSufficiencyPolicy:
         assert project_retrieval_shadowing_result(
@@ -509,7 +442,4 @@ def test_single_target_projects_to_zero_or_one_case_finding() -> None:
             policy=policy,
         )
         assert len(absent_result.findings) == 1
-        assert absent_result.findings[0].memory_ids == mutation.manifest.gold_label.memory_ids
-
-    assert target_returned_retriever.calls == [{"query": probe.query, "top_k": 2}]
-    assert target_absent_retriever.calls == [{"query": probe.query, "top_k": 2}]
+        assert absent_result.findings[0].memory_ids == ("m1",)

@@ -2,9 +2,7 @@
 
 from palintrace.semantics.base import SemanticJudge, semantic_judge_identity
 from palintrace.semantics.composition import (
-    PRIMARY_EVIDENCE_COMPOSITION_STYLE,
     ComposedEvidence,
-    EvidenceCompositionStyle,
     SemanticCompositionError,
     compose_evidence,
 )
@@ -29,13 +27,11 @@ from palintrace.semantics.models import (
 
 __all__ = [
     "ComposedEvidence",
-    "EvidenceCompositionStyle",
     "EvidenceIssueKind",
     "EvidenceResolution",
     "EvidenceResolutionIssue",
     "EvidenceSegment",
     "LocalNLISemanticJudge",
-    "PRIMARY_EVIDENCE_COMPOSITION_STYLE",
     "SemanticCompositionError",
     "SemanticDependencyError",
     "SemanticInputError",
