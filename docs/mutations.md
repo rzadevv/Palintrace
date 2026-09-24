@@ -1,16 +1,15 @@
 # Mutation harness
 
-Palintrace mutations create controlled defects; they do not detect them. The public entry point is:
+Palintrace mutations inject controlled defects into a normalized store; they do not detect them. The public entry point is:
 
 ```python
 result = mutate(store, request, transcripts=None)
 ```
 
-Mutation manifest schema 1.1 adds explicit gold-label units and structural invariants. It remains
-separate from taxonomy version 1.0.
+`palintrace mutate` runs the same operation from the command line (see [CLI](#cli)).
 
-`result.mutated_store` is the detector-visible normalized store. `result.manifest` is separate gold
-data for later evaluation and must never be passed to a detector. Mutation labels, mutation IDs, and
+`result.mutated_store` is the checker-visible normalized store. `result.manifest` is separate gold
+data (manifest schema `1.1`) and must never be passed to a checker. Mutation labels, mutation IDs, and
 manifest data are never inserted into normalized memories, `raw`, transcript metadata, or store
 fields.
 
@@ -63,7 +62,7 @@ behavioral defect. All other controlled mutations represent an injected positive
 
 Retrieval challenge manifests contain a `RetrievalProbe` with a query, expected target IDs, and
 distractor IDs. They deliberately contain no retrieved IDs, rank, pass/fail result, or claim that
-shadowing occurred. A later configured retrieval experiment must supply that observation. The caller
+shadowing occurred. A recorded retrieval run must supply that observation. The caller
 must select the fixed `editor` distractor family explicitly; the harness does not infer a target's
 topic or present these templates as generic distractors.
 
@@ -78,17 +77,15 @@ Palintrace does not claim that arbitrary substitutions conflict. "User knows Pyt
 Rust" may both be true, so a programming-language substitution without an exclusive-value contract
 is rejected.
 
-## Mutation artifact control
+## Mutation artifacts
 
-Synthetic benchmarks must not reward detectors for recognizing the harness instead of the defect:
+Mutated stores carry no trace of the harness that a checker could key on:
 
 - generated memory and broken-reference IDs are opaque and contain no mutation role or class names;
-- content-changing substitutions require targets without stored embeddings, because the harness does not
-  regenerate embeddings; derived changed-content records also carry no copied embedding;
-- mutation metadata and gold semantics never enter detector-visible records or `raw`;
-- relational gold is scored as one memory-pair relation, not two independent memory labels;
-- fixed templates define controlled challenges and must not be treated as evidence that a method
-  generalizes beyond those templates.
+- content-changing substitutions require targets without stored embeddings, because the harness does
+  not regenerate embeddings; derived changed-content records also carry no copied embedding;
+- mutation metadata and gold semantics never enter checker-visible records or `raw`; and
+- relational gold is one memory-pair relation, not two independent memory labels.
 
 ## CLI
 
