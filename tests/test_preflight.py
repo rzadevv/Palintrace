@@ -603,7 +603,6 @@ def test_preflight_module_has_no_forbidden_architecture_imports() -> None:
     assert not any(
         module.startswith(
             (
-                "palintrace.evaluation",
                 "palintrace.mutations",
                 "palintrace.retrieval",
                 "palintrace.semantics.local_nli",

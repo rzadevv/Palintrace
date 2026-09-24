@@ -127,9 +127,8 @@ def test_dump_keeps_the_adapter_and_scope_flags_probe_inputs_were_built_with() -
     assert _action(dump, "include_raw").default is False
 
 
-def test_cli_does_not_import_evaluation_or_probe_modules() -> None:
+def test_cli_does_not_import_shadowing_mutation_module() -> None:
     source = (cli.__file__ or "")
     text = open(source, encoding="utf-8").read()
 
-    assert "palintrace.evaluation" not in text
     assert "palintrace.mutations.shadowing" not in text

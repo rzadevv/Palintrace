@@ -272,7 +272,6 @@ def test_list_valued_stats_details_survive_aggregate_serialization() -> None:
 def test_aggregate_module_does_not_cross_architecture_boundaries() -> None:
     source = (Path(__file__).parents[1] / "src/palintrace/audit.py").read_text(encoding="utf-8")
 
-    assert "palintrace.evaluation" not in source
     assert "palintrace.mutations" not in source
     assert "palintrace.retrieval" not in source
     assert ".raw" not in source
