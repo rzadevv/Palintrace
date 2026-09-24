@@ -43,7 +43,7 @@ class DistractorFamily(StrEnum):
 
 
 class GoldLabelUnit(StrEnum):
-    """The evaluation object that receives one gold label."""
+    """The object that receives one gold label."""
 
     MEMORY = "memory"
     MEMORY_PAIR = "memory_pair"
@@ -89,7 +89,7 @@ class MutationTarget(BaseModel):
 
 
 class GoldLabel(BaseModel):
-    """One evaluation unit, including relational IDs kept together."""
+    """One gold-labelled unit, including relational IDs kept together."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
